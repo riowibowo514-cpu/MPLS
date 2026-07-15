@@ -8,6 +8,7 @@ export default function FormPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
 
   // Form State
@@ -57,6 +58,11 @@ export default function FormPage() {
     const el = document.getElementById(id);
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const input = el.querySelector('input, select, textarea') as HTMLElement;
+      if (input) {
+        // focus with small delay to allow scroll first
+        setTimeout(() => input.focus(), 300);
+      }
     }
   };
 
@@ -142,8 +148,8 @@ export default function FormPage() {
         throw new Error(errorData.error || 'Terjadi kesalahan saat menyimpan data');
       }
 
-      router.push('/');
-      router.refresh();
+      setIsSuccess(true);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     } catch (err: any) {
       setError(err.message || 'Gagal menyimpan data');
       setIsSubmitting(false);
@@ -502,6 +508,33 @@ export default function FormPage() {
       </div>
     </div>
   );
+
+  if (isSuccess) {
+    return (
+      <main className="container animate-fade-in" style={{ marginTop: '4rem', textAlign: 'center' }}>
+        <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '3rem 2rem' }}>
+          <div style={{ width: '80px', height: '80px', background: '#dcfce7', color: '#22c55e', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', margin: '0 auto 1.5rem' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>
+          </div>
+          <h2 style={{ fontSize: '1.75rem', marginBottom: '1rem' }}>Instrumen Selesai Diisi!</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', lineHeight: 1.6 }}>
+            Terima kasih telah mengisi instrumen Monitoring dan Evaluasi MPLS Ramah 2026. Data untuk sekolah <strong>{identitas.namaSekolah}</strong> telah berhasil disimpan secara permanen.
+          </p>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2.5rem', lineHeight: 1.6 }}>
+            Untuk mengunduh laporan pengisian ini (format PDF), Anda dapat menuju ke halaman <strong>Cari Hasil</strong>.
+          </p>
+          <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+            <button className="btn btn-outline" onClick={() => window.location.reload()}>
+              Isi Sekolah Lain
+            </button>
+            <button className="btn btn-primary" onClick={() => router.push('/cari')}>
+              Ke Halaman Cari Hasil
+            </button>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   return (
     <main className="container">

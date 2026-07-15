@@ -13,7 +13,7 @@ export async function GET(request: Request) {
     const { data, error } = await supabase
       .from('monev_entry')
       .select('*')
-      .ilike('namaSekolah', `%${q}%`)
+      .or(`namaSekolah.ilike.%${q}%,npsn.ilike.%${q}%`)
       .order('createdAt', { ascending: false })
       .limit(20);
 

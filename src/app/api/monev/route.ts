@@ -21,7 +21,7 @@ export async function POST(request: Request) {
           npsn: body.npsn,
           jenjang: body.jenjang,
           kabKota: body.kabKota,
-          alamat: body.alamat,
+          alamat: body.alamat || "-",
           namaPetugas: body.namaPetugas,
           tanggal: body.tanggal,
           namaKepsek: body.namaKepsek,

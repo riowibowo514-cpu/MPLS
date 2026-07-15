@@ -53,7 +53,7 @@ export default function SearchPage() {
       <div className="card">
         <h2>Cari Hasil Monev</h2>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem' }}>
-          Masukkan nama sekolah Anda untuk mencari dan mengunduh laporan hasil Monitoring dan Evaluasi (PDF).
+          Masukkan <strong>Nama Sekolah</strong> atau <strong>NPSN</strong> untuk mencari dan mengunduh laporan hasil Monitoring dan Evaluasi (PDF).
         </p>
 
         <form onSubmit={handleSearch} style={{ display: 'flex', gap: '0.5rem', marginBottom: '2rem' }}>
@@ -61,7 +61,7 @@ export default function SearchPage() {
             type="text" 
             value={query}
             onChange={e => setQuery(e.target.value)}
-            placeholder="Contoh: SD Negeri 1 Padang"
+            placeholder="Contoh: SD Negeri 1 Padang atau 12345678"
             style={{ flex: 1 }}
           />
           <button type="submit" className="btn btn-primary" disabled={loading}>
@@ -79,7 +79,7 @@ export default function SearchPage() {
           <div style={{ textAlign: 'center', padding: '2rem', backgroundColor: 'var(--bg-color)', borderRadius: 'var(--radius-md)' }}>
             <p style={{ fontWeight: 600 }}>Sekolah tidak ditemukan.</p>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
-              Pastikan nama sekolah diketik dengan benar atau pastikan petugas sudah mensubmit data monev sekolah Anda.
+              Pastikan Nama Sekolah / NPSN diketik dengan benar, atau pastikan petugas sudah mensubmit data monev sekolah Anda.
             </p>
           </div>
         )}
