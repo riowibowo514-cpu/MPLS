@@ -13,11 +13,24 @@ export default function FormPage() {
   // Form State
   const [identitas, setIdentitas] = useState({
     namaSekolah: '',
+    npsn: '',
     jenjang: 'TK',
+    kabKota: '',
     alamat: '',
     namaPetugas: '',
     tanggal: new Date().toISOString().split('T')[0],
     namaKepsek: ''
+  });
+
+  const [materiTes, setMateriTes] = useState({
+    materiUtama: { rincian: '', waktu: '' },
+    materiPilihan: { rincian: '', waktu: '' },
+    rangkianTes: { rincian: '', waktu: '' }
+  });
+
+  const [permasalahanSolusi, setPermasalahanSolusi] = useState({
+    perencanaan: { rincian: '', solusi: '' },
+    pelaksanaan: { rincian: '', solusi: '' }
   });
 
   const [jawabanUmum, setJawabanUmum] = useState<Record<string, { jawaban?: boolean, catatan?: string }>>({});
@@ -34,7 +47,7 @@ export default function FormPage() {
     if (step >= 2) {
       const result = calculateStatus(jawabanUmum, identitas.jenjang as any);
       setStatusOtomatis(result);
-      if (!kesimpulan.statusFinal || step === 4) {
+      if (!kesimpulan.statusFinal || step === 5) {
         setKesimpulan(prev => ({ ...prev, statusFinal: result.status }));
       }
     }
@@ -43,7 +56,7 @@ export default function FormPage() {
   // removed inline import
   const handleNext = () => {
     if (step === 1) {
-      if (!identitas.namaSekolah || !identitas.alamat || !identitas.namaPetugas || !identitas.namaKepsek) {
+      if (!identitas.namaSekolah || !identitas.npsn || !identitas.kabKota || !identitas.alamat || !identitas.namaPetugas || !identitas.namaKepsek) {
         setError('Harap lengkapi semua field identitas.');
         return;
       }
@@ -99,7 +112,9 @@ export default function FormPage() {
         jawabanUmum,
         jawabanKhusus: {},
         ...kesimpulan,
-        statusOtomatis: statusOtomatis?.status
+        statusOtomatis: statusOtomatis?.status,
+        materiTes,
+        permasalahanSolusi
       };
 
       const response = await fetch('/api/monev', {
@@ -182,6 +197,10 @@ export default function FormPage() {
         <input type="text" value={identitas.namaSekolah} onChange={e => setIdentitas({ ...identitas, namaSekolah: e.target.value })} placeholder="Contoh: SD Negeri 1 Padang" />
       </div>
       <div className="form-group">
+        <label>NPSN</label>
+        <input type="text" value={identitas.npsn} onChange={e => setIdentitas({ ...identitas, npsn: e.target.value })} placeholder="Contoh: 12345678" />
+      </div>
+      <div className="form-group">
         <label>Jenjang Pendidikan</label>
         <select value={identitas.jenjang} onChange={e => setIdentitas({ ...identitas, jenjang: e.target.value })}>
           <option value="TK">TK / PAUD</option>
@@ -189,6 +208,10 @@ export default function FormPage() {
           <option value="SMP">SMP</option>
           <option value="SMA/K">SMA / SMK</option>
         </select>
+      </div>
+      <div className="form-group">
+        <label>Kabupaten / Kota</label>
+        <input type="text" value={identitas.kabKota} onChange={e => setIdentitas({ ...identitas, kabKota: e.target.value })} placeholder="Contoh: Kota Padang" />
       </div>
       <div className="form-group">
         <label>Alamat Sekolah</label>
@@ -227,6 +250,164 @@ export default function FormPage() {
   );
 
   const renderStep4 = () => (
+    <div className="animate-fade-in">
+      <div className="card">
+        <h2>Materi & Rangkaian Tes MPLS</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
+          Tuliskan rincian materi/kegiatan serta waktu pelaksanaan yang dilakukan sekolah.
+        </p>
+        
+        <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+          <h3>1. Materi Utama</h3>
+          <div className="form-group">
+            <label>Rincian Kegiatan</label>
+            <textarea 
+              value={materiTes.materiUtama.rincian} 
+              onChange={e => setMateriTes({
+                ...materiTes,
+                materiUtama: { ...materiTes.materiUtama, rincian: e.target.value }
+              })} 
+              placeholder="Contoh: Pengenalan warga sekolah, visi misi, tata tertib, budaya 5S..."
+              rows={3}
+            />
+          </div>
+          <div className="form-group">
+            <label>Waktu Pelaksanaan</label>
+            <input 
+              type="text" 
+              value={materiTes.materiUtama.waktu} 
+              onChange={e => setMateriTes({
+                ...materiTes,
+                materiUtama: { ...materiTes.materiUtama, waktu: e.target.value }
+              })} 
+              placeholder="Contoh: Hari ke-1 & ke-2, Pukul 07.30 - 10.00 WIB"
+            />
+          </div>
+        </div>
+
+        <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+          <h3>2. Materi Pilihan</h3>
+          <div className="form-group">
+            <label>Rincian Kegiatan</label>
+            <textarea 
+              value={materiTes.materiPilihan.rincian} 
+              onChange={e => setMateriTes({
+                ...materiTes,
+                materiPilihan: { ...materiTes.materiPilihan, rincian: e.target.value }
+              })} 
+              placeholder="Contoh: Penanggulangan kekerasan, simulasi mitigasi bencana, pola hidup bersih..."
+              rows={3}
+            />
+          </div>
+          <div className="form-group">
+            <label>Waktu Pelaksanaan</label>
+            <input 
+              type="text" 
+              value={materiTes.materiPilihan.waktu} 
+              onChange={e => setMateriTes({
+                ...materiTes,
+                materiPilihan: { ...materiTes.materiPilihan, waktu: e.target.value }
+              })} 
+              placeholder="Contoh: Hari ke-2, Pukul 10.30 - 12.00 WIB"
+            />
+          </div>
+        </div>
+
+        <div>
+          <h3>3. Rangkaian Tes (Asesmen Profil/Awal)</h3>
+          <div className="form-group">
+            <label>Rincian Kegiatan</label>
+            <textarea 
+              value={materiTes.rangkianTes.rincian} 
+              onChange={e => setMateriTes({
+                ...materiTes,
+                rangkianTes: { ...materiTes.rangkianTes, rincian: e.target.value }
+              })} 
+              placeholder="Contoh: Pengamatan perilaku, wawancara sederhana, tes literasi & numerasi awal..."
+              rows={3}
+            />
+          </div>
+          <div className="form-group">
+            <label>Waktu Pelaksanaan</label>
+            <input 
+              type="text" 
+              value={materiTes.rangkianTes.waktu} 
+              onChange={e => setMateriTes({
+                ...materiTes,
+                rangkianTes: { ...materiTes.rangkianTes, waktu: e.target.value }
+              })} 
+              placeholder="Contoh: Hari ke-3, Pukul 08.00 - 11.00 WIB"
+            />
+          </div>
+        </div>
+      </div>
+
+      <div className="card">
+        <h2>Permasalahan & Solusi</h2>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1.5rem', fontSize: '0.875rem' }}>
+          Tuliskan kendala/permasalahan yang dihadapi serta solusi penyelesaiannya di masing-masing tahap.
+        </p>
+
+        <div style={{ borderBottom: '1px solid var(--border-color)', paddingBottom: '1.5rem', marginBottom: '1.5rem' }}>
+          <h3>1. Tahap Perencanaan</h3>
+          <div className="form-group">
+            <label>Permasalahan / Kendala</label>
+            <textarea 
+              value={permasalahanSolusi.perencanaan.rincian} 
+              onChange={e => setPermasalahanSolusi({
+                ...permasalahanSolusi,
+                perencanaan: { ...permasalahanSolusi.perencanaan, rincian: e.target.value }
+              })} 
+              placeholder="Contoh: Beberapa narasumber eksternal berhalangan hadir di hari yang ditentukan..."
+              rows={3}
+            />
+          </div>
+          <div className="form-group">
+            <label>Solusi Penyelesaian</label>
+            <textarea 
+              value={permasalahanSolusi.perencanaan.solusi} 
+              onChange={e => setPermasalahanSolusi({
+                ...permasalahanSolusi,
+                perencanaan: { ...permasalahanSolusi.perencanaan, solusi: e.target.value }
+              })} 
+              placeholder="Contoh: Menjadwalkan ulang ke hari berikutnya atau mengganti dengan narasumber internal..."
+              rows={3}
+            />
+          </div>
+        </div>
+
+        <div>
+          <h3>2. Tahap Pelaksanaan</h3>
+          <div className="form-group">
+            <label>Permasalahan / Kendala</label>
+            <textarea 
+              value={permasalahanSolusi.pelaksanaan.rincian} 
+              onChange={e => setPermasalahanSolusi({
+                ...permasalahanSolusi,
+                pelaksanaan: { ...permasalahanSolusi.pelaksanaan, rincian: e.target.value }
+              })} 
+              placeholder="Contoh: Cuaca hujan lebat mengganggu kegiatan pengenalan lingkungan luar ruangan..."
+              rows={3}
+            />
+          </div>
+          <div className="form-group">
+            <label>Solusi Penyelesaian</label>
+            <textarea 
+              value={permasalahanSolusi.pelaksanaan.solusi} 
+              onChange={e => setPermasalahanSolusi({
+                ...permasalahanSolusi,
+                pelaksanaan: { ...permasalahanSolusi.pelaksanaan, solusi: e.target.value }
+              })} 
+              placeholder="Contoh: Pengenalan lingkungan diganti menggunakan media video/presentasi di dalam aula..."
+              rows={3}
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderStep5 = () => (
     <div className="animate-fade-in">
       <div className="card">
         <h2>Kesimpulan Status Monev</h2>
@@ -294,7 +475,7 @@ export default function FormPage() {
   return (
     <main className="container">
       <div className="steps-container">
-        {[1, 2, 3, 4].map(s => (
+        {[1, 2, 3, 4, 5].map(s => (
           <div key={s} className={`step ${step === s ? 'active' : ''} ${step > s ? 'completed' : ''}`}>
             {s}
           </div>
@@ -311,6 +492,7 @@ export default function FormPage() {
       {step === 2 && renderStep2()}
       {step === 3 && renderStep3()}
       {step === 4 && renderStep4()}
+      {step === 5 && renderStep5()}
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
         {step > 1 ? (
@@ -319,7 +501,7 @@ export default function FormPage() {
           </button>
         ) : <div />}
 
-        {step < 4 ? (
+        {step < 5 ? (
           <button className="btn btn-primary" onClick={handleNext}>
             Selanjutnya
           </button>

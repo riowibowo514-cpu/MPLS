@@ -15,12 +15,14 @@ export function generatePDF(data: MonevEntryData) {
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
   doc.text('Identitas Sekolah', 20, 38);
-  doc.text(`Nama Sekolah : ${data.namaSekolah}`, 20, 45);
-  doc.text(`Jenjang      : ${data.jenjang}`, 20, 52);
-  doc.text(`Tanggal      : ${data.tanggal}`, 20, 59);
-  doc.text(`Petugas Monev: ${data.namaPetugas}`, 20, 66);
+  doc.text(`Nama Sekolah : ${data.namaSekolah}`, 20, 44);
+  doc.text(`NPSN         : ${data.npsn || '-'}`, 20, 50);
+  doc.text(`Kabupaten/Kota: ${data.kabKota || '-'}`, 20, 56);
+  doc.text(`Jenjang      : ${data.jenjang}`, 20, 62);
+  doc.text(`Tanggal      : ${data.tanggal}`, 20, 68);
+  doc.text(`Petugas Monev: ${data.namaPetugas}`, 20, 74);
 
-  let currentY = 75;
+  let currentY = 82;
 
   // Render semua kategori instrumen
   INSTRUMEN_BARU.forEach((kategori) => {
@@ -66,6 +68,75 @@ export function generatePDF(data: MonevEntryData) {
 
     currentY = (doc as any).lastAutoTable.finalY + 10;
   });
+
+  // Materi & Rangkaian Tes MPLS Table
+  if (data.materiTes) {
+    if (currentY > 230) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(59, 130, 246);
+    doc.text('MATERI & RANGKAIAN TES MPLS', 20, currentY);
+    
+    const materiRows = [
+      ['1. Materi Utama', data.materiTes.materiUtama?.rincian || '-', data.materiTes.materiUtama?.waktu || '-'],
+      ['2. Materi Pilihan', data.materiTes.materiPilihan?.rincian || '-', data.materiTes.materiPilihan?.waktu || '-'],
+      ['3. Rangkaian Tes', data.materiTes.rangkianTes?.rincian || '-', data.materiTes.rangkianTes?.waktu || '-']
+    ];
+    
+    autoTable(doc, {
+      startY: currentY + 3,
+      head: [['Kategori', 'Rincian Kegiatan', 'Waktu Pelaksanaan']],
+      body: materiRows,
+      theme: 'grid',
+      headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0] },
+      columnStyles: { 
+        0: { cellWidth: 40, fontStyle: 'bold' }, 
+        1: { cellWidth: 85 }, 
+        2: { cellWidth: 45 }
+      },
+      margin: { left: 20, right: 20 },
+      styles: { fontSize: 9, cellPadding: 2.5 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 10;
+  }
+
+  // Permasalahan & Solusi Table
+  if (data.permasalahanSolusi) {
+    if (currentY > 230) {
+      doc.addPage();
+      currentY = 20;
+    }
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(59, 130, 246);
+    doc.text('PERMASALAHAN & SOLUSI', 20, currentY);
+    
+    const masalahRows = [
+      ['Tahap Perencanaan', data.permasalahanSolusi.perencanaan?.rincian || '-', data.permasalahanSolusi.perencanaan?.solusi || '-'],
+      ['Tahap Pelaksanaan', data.permasalahanSolusi.pelaksanaan?.rincian || '-', data.permasalahanSolusi.pelaksanaan?.solusi || '-']
+    ];
+    
+    autoTable(doc, {
+      startY: currentY + 3,
+      head: [['Tahap', 'Permasalahan / Kendala', 'Solusi Penyelesaian']],
+      body: masalahRows,
+      theme: 'grid',
+      headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0] },
+      columnStyles: { 
+        0: { cellWidth: 40, fontStyle: 'bold' }, 
+        1: { cellWidth: 65 }, 
+        2: { cellWidth: 65 }
+      },
+      margin: { left: 20, right: 20 },
+      styles: { fontSize: 9, cellPadding: 2.5 }
+    });
+    
+    currentY = (doc as any).lastAutoTable.finalY + 10;
+  }
 
   // Cek ruang untuk kesimpulan
   if (currentY > 200) {

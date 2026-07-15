@@ -12,17 +12,28 @@ export const supabase = (supabaseUrl && supabaseAnonKey)
 export type MonevEntryData = {
   id?: string;
   namaSekolah: string;
+  npsn: string;
   jenjang: string;
+  kabKota: string;
   alamat: string;
   namaPetugas: string;
-  tanggal: string;
+  tanggal: string; // Hari & tanggal Monev
   namaKepsek: string;
-  jawabanUmum: Record<string, { jawaban?: boolean, catatan?: string }>;
+  jawabanUmum: Record<string, { jawaban?: boolean | string, catatan?: string }>;
   jawabanKhusus: Record<string, any>;
   catatanKritis: string;
   rekomendasi: string;
   statusOtomatis: string;
   statusFinal: string;
   alasanOverride: string;
+  materiTes: {
+    materiUtama: { rincian: string; waktu: string };
+    materiPilihan: { rincian: string; waktu: string };
+    rangkianTes: { rincian: string; waktu: string };
+  };
+  permasalahanSolusi: {
+    perencanaan: { rincian: string; solusi: string };
+    pelaksanaan: { rincian: string; solusi: string };
+  };
   createdAt?: string;
 };

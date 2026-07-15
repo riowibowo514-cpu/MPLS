@@ -18,7 +18,9 @@ export async function POST(request: Request) {
       .insert([
         {
           namaSekolah: body.namaSekolah,
+          npsn: body.npsn,
           jenjang: body.jenjang,
+          kabKota: body.kabKota,
           alamat: body.alamat,
           namaPetugas: body.namaPetugas,
           tanggal: body.tanggal,
@@ -29,7 +31,9 @@ export async function POST(request: Request) {
           rekomendasi: body.rekomendasi,
           statusOtomatis: body.statusOtomatis,
           statusFinal: body.statusFinal,
-          alasanOverride: body.alasanOverride
+          alasanOverride: body.alasanOverride,
+          materiTes: body.materiTes,
+          permasalahanSolusi: body.permasalahanSolusi
         }
       ])
       .select();

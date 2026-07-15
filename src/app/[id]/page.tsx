@@ -82,6 +82,10 @@ export default function DetailPage() {
       <div className="card">
         <h2>Identitas</h2>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: '1rem', marginBottom: '1rem' }}>
+          <div style={{ color: 'var(--text-secondary)' }}>NPSN</div>
+          <div style={{ fontWeight: 500 }}>{data.npsn || '-'}</div>
+          <div style={{ color: 'var(--text-secondary)' }}>Kabupaten / Kota</div>
+          <div style={{ fontWeight: 500 }}>{data.kabKota || '-'}</div>
           <div style={{ color: 'var(--text-secondary)' }}>Alamat</div>
           <div style={{ fontWeight: 500 }}>{data.alamat}</div>
           <div style={{ color: 'var(--text-secondary)' }}>Kepala Sekolah</div>
@@ -125,6 +129,68 @@ export default function DetailPage() {
           </div>
         )}
       </div>
+
+      {/* Materi & Rangkaian Tes MPLS */}
+      {data.materiTes && (
+        <div className="card">
+          <h2>Materi & Rangkaian Tes MPLS</h2>
+          <div style={{ display: 'grid', gap: '1.5rem' }}>
+            {data.materiTes.materiUtama && (data.materiTes.materiUtama.rincian || data.materiTes.materiUtama.waktu) && (
+              <div>
+                <strong style={{ color: 'var(--primary)' }}>1. Materi Utama</strong>
+                <p style={{ margin: '0.25rem 0', fontSize: '0.95rem' }}>{data.materiTes.materiUtama.rincian || '-'}</p>
+                <small style={{ color: 'var(--text-secondary)' }}>Waktu: {data.materiTes.materiUtama.waktu || '-'}</small>
+              </div>
+            )}
+            {data.materiTes.materiPilihan && (data.materiTes.materiPilihan.rincian || data.materiTes.materiPilihan.waktu) && (
+              <div>
+                <strong style={{ color: 'var(--primary)' }}>2. Materi Pilihan</strong>
+                <p style={{ margin: '0.25rem 0', fontSize: '0.95rem' }}>{data.materiTes.materiPilihan.rincian || '-'}</p>
+                <small style={{ color: 'var(--text-secondary)' }}>Waktu: {data.materiTes.materiPilihan.waktu || '-'}</small>
+              </div>
+            )}
+            {data.materiTes.rangkianTes && (data.materiTes.rangkianTes.rincian || data.materiTes.rangkianTes.waktu) && (
+              <div>
+                <strong style={{ color: 'var(--primary)' }}>3. Rangkaian Tes (Asesmen Profil/Awal)</strong>
+                <p style={{ margin: '0.25rem 0', fontSize: '0.95rem' }}>{data.materiTes.rangkianTes.rincian || '-'}</p>
+                <small style={{ color: 'var(--text-secondary)' }}>Waktu: {data.materiTes.rangkianTes.waktu || '-'}</small>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Permasalahan & Solusi */}
+      {data.permasalahanSolusi && (
+        <div className="card">
+          <h2>Permasalahan & Solusi</h2>
+          <table style={{ width: '100%', borderCollapse: 'collapse', marginTop: '0.5rem' }}>
+            <thead>
+              <tr style={{ borderBottom: '2px solid var(--border-color)', textAlign: 'left' }}>
+                <th style={{ padding: '0.75rem 0.5rem', width: '150px' }}>Tahap</th>
+                <th style={{ padding: '0.75rem 0.5rem' }}>Permasalahan / Kendala</th>
+                <th style={{ padding: '0.75rem 0.5rem' }}>Solusi Penyelesaian</th>
+              </tr>
+            </thead>
+            <tbody>
+              {data.permasalahanSolusi.perencanaan && (data.permasalahanSolusi.perencanaan.rincian || data.permasalahanSolusi.perencanaan.solusi) && (
+                <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
+                  <td style={{ padding: '1rem 0.5rem', fontWeight: 600, verticalAlign: 'top' }}>Perencanaan</td>
+                  <td style={{ padding: '1rem 0.5rem', verticalAlign: 'top', whiteSpace: 'pre-wrap' }}>{data.permasalahanSolusi.perencanaan.rincian || '-'}</td>
+                  <td style={{ padding: '1rem 0.5rem', verticalAlign: 'top', whiteSpace: 'pre-wrap' }}>{data.permasalahanSolusi.perencanaan.solusi || '-'}</td>
+                </tr>
+              )}
+              {data.permasalahanSolusi.pelaksanaan && (data.permasalahanSolusi.pelaksanaan.rincian || data.permasalahanSolusi.pelaksanaan.solusi) && (
+                <tr style={{ borderBottom: '1px solid var(--border-color)' }}>
+                  <td style={{ padding: '1rem 0.5rem', fontWeight: 600, verticalAlign: 'top' }}>Pelaksanaan</td>
+                  <td style={{ padding: '1rem 0.5rem', verticalAlign: 'top', whiteSpace: 'pre-wrap' }}>{data.permasalahanSolusi.pelaksanaan.rincian || '-'}</td>
+                  <td style={{ padding: '1rem 0.5rem', verticalAlign: 'top', whiteSpace: 'pre-wrap' }}>{data.permasalahanSolusi.pelaksanaan.solusi || '-'}</td>
+                </tr>
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {INSTRUMEN_BARU.map((kategori) => {
         const validItems = getItemsForJenjang(kategori, data.jenjang as any);
