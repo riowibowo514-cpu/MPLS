@@ -11,6 +11,7 @@ export function generateExcelSummary(dataList: MonevEntryData[]) {
     kategori.items.forEach((item, idx) => {
       const qCode = `${kategori.id === 'perencanaan' ? 'A' : 'B'}${idx + 1}`;
       questionMap[item.id] = `${qCode}. ${item.pertanyaan}`;
+      // Simpan qCode ke properti item khusus buat excel (karena ts tidak bisa, kita pakai trik di bawah)
     });
   });
 
@@ -31,19 +32,37 @@ export function generateExcelSummary(dataList: MonevEntryData[]) {
     };
 
     INSTRUMEN_BARU.forEach(kategori => {
-      kategori.items.forEach(item => {
+      kategori.items.forEach((item, idx) => {
         const qTitle = questionMap[item.id];
+        const qCode = `${kategori.id === 'perencanaan' ? 'A' : 'B'}${idx + 1}`;
+        const cTitle = `Catatan ${qCode}`;
         const ansObj = data.jawabanUmum?.[item.id];
         let val = '-';
+        let cat = '-';
         if (ansObj) {
           if (ansObj.jawaban === true) val = 'Ya';
           else if (ansObj.jawaban === false) val = 'Tidak';
           else if (typeof ansObj.jawaban === 'string') val = ansObj.jawaban;
-          if (ansObj.catatan) val += ` (Catatan: ${ansObj.catatan})`;
+          
+          if (ansObj.catatan) cat = ansObj.catatan;
         }
         row[qTitle] = val;
+        row[cTitle] = cat;
       });
     });
+
+    // Menambahkan data Bagian 4 (Materi Tes & Permasalahan Solusi)
+    row['Materi Utama (Rincian)'] = data.materiTes?.materiUtama?.rincian || '-';
+    row['Materi Utama (Waktu)'] = data.materiTes?.materiUtama?.waktu || '-';
+    row['Materi Pilihan (Rincian)'] = data.materiTes?.materiPilihan?.rincian || '-';
+    row['Materi Pilihan (Waktu)'] = data.materiTes?.materiPilihan?.waktu || '-';
+    row['Rangkaian Tes (Rincian)'] = data.materiTes?.rangkianTes?.rincian || '-';
+    row['Rangkaian Tes (Waktu)'] = data.materiTes?.rangkianTes?.waktu || '-';
+    
+    row['Masalah Perencanaan'] = data.permasalahanSolusi?.perencanaan?.rincian || '-';
+    row['Solusi Perencanaan'] = data.permasalahanSolusi?.perencanaan?.solusi || '-';
+    row['Masalah Pelaksanaan'] = data.permasalahanSolusi?.pelaksanaan?.rincian || '-';
+    row['Solusi Pelaksanaan'] = data.permasalahanSolusi?.pelaksanaan?.solusi || '-';
 
     return row;
   });
