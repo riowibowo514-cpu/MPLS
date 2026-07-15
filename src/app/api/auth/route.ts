@@ -4,7 +4,7 @@ export async function POST(request: Request) {
   try {
     const { password } = await request.json();
 
-    if (password === 'D4t4BgtkSumbar.') {
+    if (password === 'D4t4BgtkSumbar') {
       const response = NextResponse.json({ success: true });
       response.cookies.set('admin_token', 'true', {
         httpOnly: true,
