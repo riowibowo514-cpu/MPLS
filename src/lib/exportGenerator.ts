@@ -21,7 +21,6 @@ export function generateExcelSummary(dataList: MonevEntryData[]) {
       'NPSN': data.npsn || '-',
       'Jenjang': data.jenjang,
       'Kabupaten/Kota': data.kabKota || '-',
-      'Alamat': data.alamat,
       'Kepala Sekolah': data.namaKepsek,
       'Petugas Monev': data.namaPetugas,
       'Tanggal Monev': data.tanggal,
