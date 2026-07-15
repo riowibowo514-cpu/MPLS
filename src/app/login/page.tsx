@@ -22,8 +22,9 @@ export default function LoginPage() {
       });
 
       if (res.ok) {
-        router.push('/admin');
-        router.refresh();
+        // Menggunakan window.location.href untuk memastikan full page reload 
+        // sehingga cookie yang baru diset terbaca dengan sempurna oleh middleware
+        window.location.href = '/admin';
       } else {
         const data = await res.json();
         setError(data.error || 'Terjadi kesalahan saat login.');
@@ -82,6 +83,15 @@ export default function LoginPage() {
             {isLoading ? 'Memproses...' : 'Masuk'}
           </button>
         </form>
+      </div>
+      <div style={{ marginTop: '2rem', textAlign: 'center' }}>
+        <button 
+          onClick={() => router.push('/')} 
+          className="btn btn-outline" 
+          style={{ border: 'none' }}
+        >
+          &larr; Kembali ke Beranda
+        </button>
       </div>
     </main>
   );
