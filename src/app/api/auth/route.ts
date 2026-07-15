@@ -20,3 +20,9 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: 'Invalid request' }, { status: 400 });
   }
 }
+
+export async function DELETE() {
+  const response = NextResponse.json({ success: true });
+  response.cookies.delete('admin_token');
+  return response;
+}
