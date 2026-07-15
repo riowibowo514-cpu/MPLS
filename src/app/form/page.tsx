@@ -33,7 +33,7 @@ export default function FormPage() {
     pelaksanaan: { rincian: '', solusi: '' }
   });
 
-  const [jawabanUmum, setJawabanUmum] = useState<Record<string, { jawaban?: boolean, catatan?: string }>>({});
+  const [jawabanUmum, setJawabanUmum] = useState<Record<string, { jawaban?: boolean | string, catatan?: string }>>({});
   const [kesimpulan, setKesimpulan] = useState({
     statusFinal: '',
     alasanOverride: '',
@@ -62,25 +62,18 @@ export default function FormPage() {
       }
     } else if (step === 2) {
       const perencanaan = INSTRUMEN_BARU.find(k => k.id === 'perencanaan');
-      const pelaksanaan = INSTRUMEN_BARU.find(k => k.id === 'pelaksanaan');
       const itemsPerencanaan = perencanaan ? getItemsForJenjang(perencanaan, identitas.jenjang as any) : [];
-      const itemsPelaksanaan = pelaksanaan ? getItemsForJenjang(pelaksanaan, identitas.jenjang as any) : [];
-      const isComplete = [...itemsPerencanaan, ...itemsPelaksanaan].every(item => jawabanUmum[item.id]?.jawaban !== undefined);
+      const isComplete = itemsPerencanaan.every(item => jawabanUmum[item.id]?.jawaban !== undefined);
       
       if (!isComplete) {
         setError('Harap jawab semua pertanyaan di tahap ini.');
         return;
       }
     } else if (step === 3) {
-      const asesmen = INSTRUMEN_BARU.find(k => k.id === 'asesmen');
-      const kepatuhan = INSTRUMEN_BARU.find(k => k.id === 'kepatuhan');
-      const outcome = INSTRUMEN_BARU.find(k => k.id === 'outcome');
+      const pelaksanaan = INSTRUMEN_BARU.find(k => k.id === 'pelaksanaan');
+      const itemsPelaksanaan = pelaksanaan ? getItemsForJenjang(pelaksanaan, identitas.jenjang as any) : [];
       
-      const itemsAsesmen = asesmen ? getItemsForJenjang(asesmen, identitas.jenjang as any) : [];
-      const itemsKepatuhan = kepatuhan ? getItemsForJenjang(kepatuhan, identitas.jenjang as any) : [];
-      const itemsOutcome = outcome ? getItemsForJenjang(outcome, identitas.jenjang as any) : [];
-      
-      const isComplete = [...itemsAsesmen, ...itemsKepatuhan, ...itemsOutcome].every(item => jawabanUmum[item.id]?.jawaban !== undefined);
+      const isComplete = itemsPelaksanaan.every(item => jawabanUmum[item.id]?.jawaban !== undefined);
       if (!isComplete) {
         setError('Harap jawab semua pertanyaan di tahap ini.');
         return;
@@ -153,31 +146,50 @@ export default function FormPage() {
             <p style={{ fontWeight: 600, color: 'var(--text-primary)', marginBottom: '0.5rem' }}>
               {index + 1}. {item.pertanyaan}
             </p>
-            <div className="radio-group" style={{ marginBottom: '1rem' }}>
-              <label className="radio-card">
-                <input 
-                  type="radio" 
-                  name={item.id} 
-                  checked={jawabanUmum[item.id]?.jawaban === true}
-                  onChange={() => setJawabanUmum({ ...jawabanUmum, [item.id]: { ...jawabanUmum[item.id], jawaban: true } })}
-                />
-                <div className="radio-card-content ya">Ya</div>
-              </label>
-              <label className="radio-card">
-                <input 
-                  type="radio" 
-                  name={item.id} 
-                  checked={jawabanUmum[item.id]?.jawaban === false}
-                  onChange={() => setJawabanUmum({ ...jawabanUmum, [item.id]: { ...jawabanUmum[item.id], jawaban: false } })}
-                />
-                <div className="radio-card-content tidak">Tidak</div>
-              </label>
-            </div>
+            {kategori.tipeJawaban === 'ya-tidak' ? (
+              <div className="radio-group" style={{ marginBottom: '1rem' }}>
+                <label className="radio-card">
+                  <input 
+                    type="radio" 
+                    name={item.id} 
+                    checked={jawabanUmum[item.id]?.jawaban === true}
+                    onChange={() => setJawabanUmum({ ...jawabanUmum, [item.id]: { ...jawabanUmum[item.id], jawaban: true } })}
+                  />
+                  <div className="radio-card-content ya">Ya</div>
+                </label>
+                <label className="radio-card">
+                  <input 
+                    type="radio" 
+                    name={item.id} 
+                    checked={jawabanUmum[item.id]?.jawaban === false}
+                    onChange={() => setJawabanUmum({ ...jawabanUmum, [item.id]: { ...jawabanUmum[item.id], jawaban: false } })}
+                  />
+                  <div className="radio-card-content tidak">Tidak</div>
+                </label>
+              </div>
+            ) : (
+              <div className="radio-group-likert" style={{ marginBottom: '1rem', display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
+                {['SS', 'S', 'TS', 'STS'].map(val => (
+                  <label key={val} className="radio-card" style={{ flex: '1 1 auto', minWidth: '80px' }}>
+                    <input 
+                      type="radio" 
+                      name={item.id} 
+                      checked={jawabanUmum[item.id]?.jawaban === val}
+                      onChange={() => setJawabanUmum({ ...jawabanUmum, [item.id]: { ...jawabanUmum[item.id], jawaban: val } })}
+                    />
+                    <div className="radio-card-content default">{val}</div>
+                  </label>
+                ))}
+                <div style={{ width: '100%', fontSize: '0.75rem', color: 'var(--text-secondary)', marginTop: '0.25rem' }}>
+                  *SS = Sangat Sesuai, S = Sesuai, TS = Tidak Sesuai, STS = Sangat Tidak Sesuai
+                </div>
+              </div>
+            )}
             <div>
-              <label style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Catatan / Bukti Fisik (Opsional)</label>
+              <label style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Catatan / Keterangan</label>
               <input
                 type="text"
-                placeholder="Tuliskan catatan..."
+                placeholder="Tuliskan catatan/keterangan..."
                 value={jawabanUmum[item.id]?.catatan || ''}
                 onChange={e => setJawabanUmum({ ...jawabanUmum, [item.id]: { ...jawabanUmum[item.id], catatan: e.target.value } })}
                 style={{ padding: '0.5rem', fontSize: '0.875rem', marginTop: '0.25rem' }}
@@ -234,18 +246,15 @@ export default function FormPage() {
 
   const renderStep2 = () => (
     <div className="card animate-fade-in">
-      <h2>Instrumen (Bagian 1)</h2>
+      <h2>Instrumen (Bagian A)</h2>
       {renderRadioKategori('perencanaan')}
-      {renderRadioKategori('pelaksanaan')}
     </div>
   );
 
   const renderStep3 = () => (
     <div className="card animate-fade-in">
-      <h2>Instrumen (Bagian 2)</h2>
-      {renderRadioKategori('asesmen')}
-      {renderRadioKategori('kepatuhan')}
-      {renderRadioKategori('outcome')}
+      <h2>Instrumen (Bagian B)</h2>
+      {renderRadioKategori('pelaksanaan')}
     </div>
   );
 

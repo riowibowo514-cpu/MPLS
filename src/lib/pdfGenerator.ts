@@ -39,31 +39,61 @@ export function generatePDF(data: MonevEntryData) {
     doc.setTextColor(59, 130, 246); // Warna biru ala header lama (sesuaikan jika perlu, misal hitam)
     doc.text(kategori.judul, 20, currentY);
     
-    const rows = validItems.map((item, index) => {
-      const ans = data.jawabanUmum[item.id] || {};
-      return [
-        index + 1,
-        item.pertanyaan,
-        ans.jawaban === true ? 'Ya' : '',
-        ans.jawaban === false ? 'Tidak' : '',
-        ans.catatan || ''
-      ];
-    });
+    let head: string[][] = [];
+    let rows: any[][] = [];
+    let colStyles: any = {};
 
-    autoTable(doc, {
-      startY: currentY + 3,
-      head: [['No', 'Indikator', 'Ya', 'Tidak', 'Catatan/Bukti Fisik']],
-      body: rows,
-      theme: 'grid',
-      headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0] },
-      columnStyles: { 
+    if (kategori.tipeJawaban === 'ya-tidak') {
+      head = [['No', 'Pernyataan', 'Ya', 'Tidak', 'Catatan/Keterangan']];
+      colStyles = { 
         0: { cellWidth: 10 }, 
         2: { cellWidth: 15, halign: 'center' }, 
         3: { cellWidth: 15, halign: 'center' },
         4: { cellWidth: 40 }
-      },
+      };
+      rows = validItems.map((item, index) => {
+        const ans = data.jawabanUmum[item.id] || {};
+        return [
+          index + 1,
+          item.pertanyaan,
+          ans.jawaban === true ? 'V' : '',
+          ans.jawaban === false ? 'V' : '',
+          ans.catatan || ''
+        ];
+      });
+    } else {
+      head = [['No', 'Pernyataan', 'SS', 'S', 'TS', 'STS', 'Catatan/Keterangan']];
+      colStyles = { 
+        0: { cellWidth: 10 }, 
+        2: { cellWidth: 10, halign: 'center' }, 
+        3: { cellWidth: 10, halign: 'center' },
+        4: { cellWidth: 10, halign: 'center' },
+        5: { cellWidth: 10, halign: 'center' },
+        6: { cellWidth: 35 }
+      };
+      rows = validItems.map((item, index) => {
+        const ans = data.jawabanUmum[item.id] || {};
+        return [
+          index + 1,
+          item.pertanyaan,
+          ans.jawaban === 'SS' ? 'V' : '',
+          ans.jawaban === 'S' ? 'V' : '',
+          ans.jawaban === 'TS' ? 'V' : '',
+          ans.jawaban === 'STS' ? 'V' : '',
+          ans.catatan || ''
+        ];
+      });
+    }
+
+    autoTable(doc, {
+      startY: currentY + 3,
+      head: head,
+      body: rows,
+      theme: 'grid',
+      headStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], halign: 'center' },
+      columnStyles: colStyles,
       margin: { left: 20, right: 20 },
-      styles: { fontSize: 10, cellPadding: 2 }
+      styles: { fontSize: 9, cellPadding: 2 }
     });
 
     currentY = (doc as any).lastAutoTable.finalY + 10;

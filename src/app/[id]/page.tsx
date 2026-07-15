@@ -215,7 +215,7 @@ export default function DetailPage() {
                         )}
                       </td>
                       <td style={{ padding: '1rem 0', verticalAlign: 'top', textAlign: 'right', fontWeight: 600 }}>
-                        {ans.jawaban === true ? <span style={{ color: 'var(--success)' }}>Ya</span> : ans.jawaban === false ? <span style={{ color: 'var(--danger)' }}>Tidak</span> : '-'}
+                        {ans.jawaban === true ? <span style={{ color: 'var(--success)' }}>Ya</span> : ans.jawaban === false ? <span style={{ color: 'var(--danger)' }}>Tidak</span> : typeof ans.jawaban === 'string' ? <span style={{ color: 'var(--primary)' }}>{ans.jawaban}</span> : '-'}
                       </td>
                     </tr>
                   );
