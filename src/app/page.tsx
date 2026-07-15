@@ -311,13 +311,12 @@ export default function FormPage() {
           <div className="form-group">
             <label>Waktu Pelaksanaan</label>
             <input 
-              type="text" 
+              type="date" 
               value={materiTes.materiUtama.waktu} 
               onChange={e => setMateriTes({
                 ...materiTes,
                 materiUtama: { ...materiTes.materiUtama, waktu: e.target.value }
               })} 
-              placeholder="Contoh: Hari ke-1 & ke-2, Pukul 07.30 - 10.00 WIB"
             />
           </div>
         </div>
@@ -339,13 +338,12 @@ export default function FormPage() {
           <div className="form-group">
             <label>Waktu Pelaksanaan</label>
             <input 
-              type="text" 
+              type="date" 
               value={materiTes.materiPilihan.waktu} 
               onChange={e => setMateriTes({
                 ...materiTes,
                 materiPilihan: { ...materiTes.materiPilihan, waktu: e.target.value }
               })} 
-              placeholder="Contoh: Hari ke-2, Pukul 10.30 - 12.00 WIB"
             />
           </div>
         </div>
@@ -367,13 +365,12 @@ export default function FormPage() {
           <div className="form-group">
             <label>Waktu Pelaksanaan</label>
             <input 
-              type="text" 
+              type="date" 
               value={materiTes.rangkianTes.waktu} 
               onChange={e => setMateriTes({
                 ...materiTes,
                 rangkianTes: { ...materiTes.rangkianTes, waktu: e.target.value }
               })} 
-              placeholder="Contoh: Hari ke-3, Pukul 08.00 - 11.00 WIB"
             />
           </div>
         </div>
