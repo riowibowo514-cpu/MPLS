@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import { MonevEntryData } from '@/lib/supabase';
+import { generateExcelSummary, generatePDFSummary } from '@/lib/exportGenerator';
 
 export default function Home() {
   const [entries, setEntries] = useState<MonevEntryData[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
     fetch('/api/monev')
@@ -32,12 +34,55 @@ export default function Home() {
     return 'badge-default';
   };
 
+  const handleExport = async (type: 'excel' | 'pdf') => {
+    setExporting(true);
+    try {
+      const res = await fetch('/api/monev?all=true');
+      const data = await res.json();
+      if (data.error) throw new Error(data.error);
+      
+      const allEntries = data.data || [];
+      if (allEntries.length === 0) {
+        alert('Tidak ada data untuk diekspor');
+        return;
+      }
+
+      if (type === 'excel') {
+        generateExcelSummary(allEntries);
+      } else {
+        generatePDFSummary(allEntries);
+      }
+    } catch (err) {
+      console.error(err);
+      alert('Gagal mengunduh rekap data');
+    } finally {
+      setExporting(false);
+    }
+  };
+
   return (
     <main className="container animate-fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1>Riwayat Monev</h1>
           <p>Daftar seluruh hasil pemantauan MPLS Ramah 2026</p>
+        </div>
+        <div style={{ display: 'flex', gap: '0.5rem' }}>
+          <button 
+            className="btn btn-outline" 
+            onClick={() => handleExport('excel')}
+            disabled={exporting || loading || entries.length === 0}
+            style={{ backgroundColor: '#fff' }}
+          >
+            {exporting ? 'Memproses...' : 'Unduh Rekap Excel'}
+          </button>
+          <button 
+            className="btn btn-primary" 
+            onClick={() => handleExport('pdf')}
+            disabled={exporting || loading || entries.length === 0}
+          >
+            {exporting ? 'Memproses...' : 'Unduh Rekap PDF'}
+          </button>
         </div>
       </div>
 

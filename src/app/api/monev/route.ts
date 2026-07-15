@@ -50,14 +50,21 @@ export async function POST(request: Request) {
   }
 }
 
-export async function GET() {
+export async function GET(request: Request) {
   try {
-    // Ambil data terbaru, batasi 100
-    const { data, error } = await supabase
+    const { searchParams } = new URL(request.url);
+    const fetchAll = searchParams.get('all') === 'true';
+
+    let query = supabase
       .from('monev_entry')
       .select('*')
-      .order('createdAt', { ascending: false })
-      .limit(100);
+      .order('createdAt', { ascending: false });
+
+    if (!fetchAll) {
+      query = query.limit(100);
+    }
+
+    const { data, error } = await query;
 
     if (error) {
       return NextResponse.json({ error: error.message }, { status: 500 });
