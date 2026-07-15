@@ -60,25 +60,12 @@ export default function Home() {
     }
   };
 
-  const handleLogout = async () => {
-    try {
-      await fetch('/api/auth', { method: 'DELETE' });
-      window.location.href = '/';
-    } catch (err) {
-      console.error(err);
-      window.location.href = '/';
-    }
-  };
-
   return (
     <main className="container animate-fade-in">
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
             Riwayat Monev
-            <button className="btn btn-outline" onClick={handleLogout} style={{ fontSize: '0.875rem', padding: '0.25rem 0.75rem', color: 'var(--danger)', borderColor: 'var(--danger)' }}>
-              Logout Admin
-            </button>
           </h1>
           <p>Daftar seluruh hasil pemantauan MPLS Ramah 2026</p>
         </div>
