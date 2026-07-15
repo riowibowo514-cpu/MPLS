@@ -219,6 +219,12 @@ textarea:focus {
   color: var(--danger);
 }
 
+.radio-card input:checked + .radio-card-content.default {
+  border-color: var(--primary);
+  background-color: var(--primary-light);
+  color: var(--primary);
+}
+
 .radio-card:hover .radio-card-content {
   border-color: var(--primary-light);
   transform: translateY(-2px);
