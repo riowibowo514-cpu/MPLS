@@ -89,7 +89,7 @@ export default function DashboardPage() {
 
           {activeCard !== null && (
             <div className="animate-fade-in" style={{ marginBottom: '2rem' }}>
-              <DashboardSchoolList data={data.sekolahPerKabKota} />
+              <DashboardSchoolList data={data.sekolahPerKabKota} mode={activeCard} />
             </div>
           )}
 
