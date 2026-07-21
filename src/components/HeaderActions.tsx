@@ -19,6 +19,9 @@ export default function HeaderActions() {
 
   return (
     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+      <Link href="/" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
+        Beranda
+      </Link>
       <Link href="/isi-form" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem', borderColor: 'var(--primary)', color: 'var(--primary)' }}>
         Isi Instrumen
       </Link>
