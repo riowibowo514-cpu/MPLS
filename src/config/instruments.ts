@@ -57,65 +57,71 @@ export function getItemsForJenjang(kategori: KategoriInstrumen, jenjang: Jenjang
   return kategori.items.filter(item => !item.jenjangTarget || item.jenjangTarget.includes(jenjang));
 }
 
+export interface StatusResult {
+  status: 'SANGAT RAMAH' | 'CUKUP RAMAH' | 'KURANG';
+  percentage: number;
+  label: string;
+}
+
+function getStatusFromPercentage(percentage: number, totalSkor: number, maksimalSkor: number): StatusResult {
+  if (percentage >= 90) {
+    return { status: 'SANGAT RAMAH', percentage, label: `Skor ${totalSkor}/${maksimalSkor} (${percentage}%)` };
+  } else if (percentage >= 70) {
+    return { status: 'CUKUP RAMAH', percentage, label: `Skor ${totalSkor}/${maksimalSkor} (${percentage}%)` };
+  } else {
+    return { status: 'KURANG', percentage, label: `Skor ${totalSkor}/${maksimalSkor} (${percentage}%)` };
+  }
+}
+
 // Menghitung status berdasarkan skor
 // Ya = 4, Tidak = 0
 // SS = 4, S = 3, TS = 2, STS = 1
 export function calculateStatus(
   jawabanUmum: Record<string, { jawaban?: boolean | string, catatan?: string }>,
   jenjang: Jenjang
-): { status: 'SANGAT RAMAH' | 'CUKUP RAMAH' | 'KURANG', percentageUmum: number, label: string } {
-  let totalSkor = 0;
-  let maksimalSkor = 0;
-  let terjawab = 0;
-  let totalSoal = 0;
+): { perencanaan: StatusResult, pelaksanaan: StatusResult, rekapitulasi: StatusResult } {
+  let skorPerencanaan = 0, maxPerencanaan = 0;
+  let skorPelaksanaan = 0, maxPelaksanaan = 0;
 
   INSTRUMEN_BARU.forEach(kategori => {
     const validItems = getItemsForJenjang(kategori, jenjang);
     validItems.forEach(item => {
-      totalSoal++;
       const ans = jawabanUmum[item.id]?.jawaban;
       
-      if (ans !== undefined) {
-        terjawab++;
-      }
-      
+      let itemSkor = 0;
+      let itemMax = 0;
+
       if (kategori.tipeJawaban === 'ya-tidak') {
-        maksimalSkor += 4;
-        if (ans === true) totalSkor += 4;
+        itemMax = 4;
+        if (ans === true) itemSkor = 4;
       } else if (kategori.tipeJawaban === 'skala-4') {
-        maksimalSkor += 4;
-        if (ans === 'SS') totalSkor += 4;
-        else if (ans === 'S') totalSkor += 3;
-        else if (ans === 'TS') totalSkor += 2;
-        else if (ans === 'STS') totalSkor += 1;
+        itemMax = 4;
+        if (ans === 'SS') itemSkor = 4;
+        else if (ans === 'S') itemSkor = 3;
+        else if (ans === 'TS') itemSkor = 2;
+        else if (ans === 'STS') itemSkor = 1;
+      }
+
+      if (kategori.id === 'perencanaan') {
+        skorPerencanaan += itemSkor;
+        maxPerencanaan += itemMax;
+      } else if (kategori.id === 'pelaksanaan') {
+        skorPelaksanaan += itemSkor;
+        maxPelaksanaan += itemMax;
       }
     });
   });
   
-  const percentageUmum = maksimalSkor === 0 ? 0 : Math.round((totalSkor / maksimalSkor) * 100);
-
-  // Kriteria Penilaian Berdasarkan Persentase:
-  // >= 90% = SANGAT RAMAH
-  // 70% - 89% = CUKUP RAMAH
-  // < 70% = KURANG
+  const pctPerencanaan = maxPerencanaan === 0 ? 0 : Math.round((skorPerencanaan / maxPerencanaan) * 100);
+  const pctPelaksanaan = maxPelaksanaan === 0 ? 0 : Math.round((skorPelaksanaan / maxPelaksanaan) * 100);
   
-  if (percentageUmum >= 90) {
-    return {
-      status: 'SANGAT RAMAH',
-      percentageUmum,
-      label: `Skor ${totalSkor}/${maksimalSkor} (${percentageUmum}%)`
-    };
-  } else if (percentageUmum >= 70) {
-    return {
-      status: 'CUKUP RAMAH',
-      percentageUmum,
-      label: `Skor ${totalSkor}/${maksimalSkor} (${percentageUmum}%)`
-    };
-  } else {
-    return {
-      status: 'KURANG',
-      percentageUmum,
-      label: `Skor ${totalSkor}/${maksimalSkor} (${percentageUmum}%)`
-    };
-  }
+  const skorTotal = skorPerencanaan + skorPelaksanaan;
+  const maxTotal = maxPerencanaan + maxPelaksanaan;
+  const pctTotal = maxTotal === 0 ? 0 : Math.round((skorTotal / maxTotal) * 100);
+
+  return {
+    perencanaan: getStatusFromPercentage(pctPerencanaan, skorPerencanaan, maxPerencanaan),
+    pelaksanaan: getStatusFromPercentage(pctPelaksanaan, skorPelaksanaan, maxPelaksanaan),
+    rekapitulasi: getStatusFromPercentage(pctTotal, skorTotal, maxTotal)
+  };
 }

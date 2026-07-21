@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { INSTRUMEN_BARU, calculateStatus, getItemsForJenjang } from '@/config/instruments';
+import { INSTRUMEN_BARU, calculateStatus, getItemsForJenjang, StatusResult } from '@/config/instruments';
 
 export default function FormPage() {
   const router = useRouter();
@@ -41,14 +41,18 @@ export default function FormPage() {
     rekomendasi: ''
   });
 
-  const [statusOtomatis, setStatusOtomatis] = useState<{ status: string, label: string } | null>(null);
+  const [statusOtomatis, setStatusOtomatis] = useState<{
+    perencanaan: StatusResult;
+    pelaksanaan: StatusResult;
+    rekapitulasi: StatusResult;
+  } | null>(null);
 
   useEffect(() => {
     if (step >= 2) {
       const result = calculateStatus(jawabanUmum, identitas.jenjang as any);
       setStatusOtomatis(result);
       if (!kesimpulan.statusFinal || step === 5) {
-        setKesimpulan(prev => ({ ...prev, statusFinal: result.status }));
+        setKesimpulan(prev => ({ ...prev, statusFinal: result.rekapitulasi.status }));
       }
     }
   }, [jawabanUmum, identitas.jenjang, step]);
@@ -132,7 +136,7 @@ export default function FormPage() {
         jawabanUmum,
         jawabanKhusus: {},
         ...kesimpulan, // will default to the auto calculated status
-        statusOtomatis: statusOtomatis?.status,
+        statusOtomatis: statusOtomatis?.rekapitulasi.status,
         materiTes,
         permasalahanSolusi
       };
@@ -445,13 +449,45 @@ export default function FormPage() {
     <div className="animate-fade-in">
       <div className="card">
         <h2>Kesimpulan Status Monev</h2>
-        <div style={{ padding: '1.5rem', backgroundColor: 'var(--bg-color)', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem' }}>
-          <p style={{ margin: 0, fontSize: '0.875rem' }}>Status yang Dihasilkan Sistem:</p>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginTop: '0.5rem' }}>
-            <span style={{ fontSize: '1.5rem', fontWeight: 700, color: 'var(--primary)' }}>
-              {statusOtomatis?.status}
-            </span>
-            <span className="badge badge-default">{statusOtomatis?.label}</span>
+        
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '1rem', marginBottom: '1.5rem' }}>
+          {/* Perencanaan */}
+          <div style={{ padding: '1rem', backgroundColor: 'var(--bg-color)', borderRadius: 'var(--radius-md)', borderLeft: '4px solid #3b82f6' }}>
+            <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>Tahap Perencanaan</p>
+            <div style={{ marginTop: '0.5rem' }}>
+              <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)', display: 'block' }}>
+                {statusOtomatis?.perencanaan?.status}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                {statusOtomatis?.perencanaan?.label}
+              </span>
+            </div>
+          </div>
+
+          {/* Pelaksanaan */}
+          <div style={{ padding: '1rem', backgroundColor: 'var(--bg-color)', borderRadius: 'var(--radius-md)', borderLeft: '4px solid #8b5cf6' }}>
+            <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>Tahap Pelaksanaan</p>
+            <div style={{ marginTop: '0.5rem' }}>
+              <span style={{ fontSize: '1.25rem', fontWeight: 700, color: 'var(--primary)', display: 'block' }}>
+                {statusOtomatis?.pelaksanaan?.status}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                {statusOtomatis?.pelaksanaan?.label}
+              </span>
+            </div>
+          </div>
+
+          {/* Rekapitulasi */}
+          <div style={{ padding: '1rem', backgroundColor: '#eef2ff', borderRadius: 'var(--radius-md)', borderLeft: '4px solid #10b981' }}>
+            <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>Rekapitulasi Total</p>
+            <div style={{ marginTop: '0.5rem' }}>
+              <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#10b981', display: 'block' }}>
+                {statusOtomatis?.rekapitulasi?.status}
+              </span>
+              <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
+                {statusOtomatis?.rekapitulasi?.label}
+              </span>
+            </div>
           </div>
         </div>
 
@@ -468,14 +504,14 @@ export default function FormPage() {
           </select>
         </div>
 
-        {kesimpulan.statusFinal !== statusOtomatis?.status && (
+        {kesimpulan.statusFinal !== statusOtomatis?.rekapitulasi?.status && (
           <div className="form-group animate-fade-in">
             <label style={{ color: 'var(--warning)' }}>Alasan Mengubah Status (Wajib)</label>
             <textarea 
               value={kesimpulan.alasanOverride}
               onChange={e => setKesimpulan({ ...kesimpulan, alasanOverride: e.target.value })}
               rows={2}
-              placeholder="Berikan alasan mengapa status final berbeda dengan hitungan sistem..."
+              placeholder="Berikan alasan mengapa status final berbeda dengan hitungan rekapitulasi sistem..."
               style={{ borderColor: 'var(--warning)' }}
             />
           </div>
