@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { MonevEntryData } from '@/lib/supabase';
-import { INSTRUMEN_BARU, getItemsForJenjang } from '@/config/instruments';
+import { INSTRUMEN_BARU, getItemsForJenjang, calculateStatus } from '@/config/instruments';
 import { generatePDF } from '@/lib/pdfGenerator';
 
 export default function DetailPage() {
@@ -60,6 +60,8 @@ export default function DetailPage() {
     return 'badge-default';
   };
 
+  const statusDetail = data ? calculateStatus(data.jawabanUmum || {}, data.jenjang as any) : null;
+
   const handleDownloadPDF = () => {
     generatePDF(data);
   };
@@ -97,13 +99,27 @@ export default function DetailPage() {
 
       <div className="card">
         <h2>Kesimpulan</h2>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center', marginBottom: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(150px, 1fr))', gap: '1rem', marginBottom: '1.5rem', padding: '1.5rem', backgroundColor: 'var(--bg-color)', borderRadius: 'var(--radius-md)' }}>
+          {statusDetail && (
+            <>
+              <div>
+                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Tahap Perencanaan</div>
+                <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{statusDetail.perencanaan.status}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{statusDetail.perencanaan.label}</div>
+              </div>
+              <div>
+                <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Tahap Pelaksanaan</div>
+                <div style={{ fontWeight: 600, color: 'var(--primary)' }}>{statusDetail.pelaksanaan.status}</div>
+                <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>{statusDetail.pelaksanaan.label}</div>
+              </div>
+            </>
+          )}
           <div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Status Sistem</div>
+            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Rekapitulasi (Sistem)</div>
             <span className="badge badge-default">{data.statusOtomatis}</span>
           </div>
           <div>
-            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Status Final</div>
+            <div style={{ fontSize: '0.875rem', color: 'var(--text-secondary)', marginBottom: '0.25rem' }}>Status Final (Asesor)</div>
             <span className={`badge ${getBadgeClass(data.statusFinal)}`}>{data.statusFinal}</span>
           </div>
         </div>
