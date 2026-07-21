@@ -19,7 +19,7 @@ export default function RootLayout({
         <header className="app-header">
           <div className="container" style={{ paddingTop: '1rem', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <Link href="/" className="app-logo">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--primary)' }}><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+              <img src="/logo-bgtk.png" alt="Logo BGTK Sumbar" style={{ height: '32px', width: 'auto', objectFit: 'contain' }} />
               Monev MPLS 2026
             </Link>
             <HeaderActions />
