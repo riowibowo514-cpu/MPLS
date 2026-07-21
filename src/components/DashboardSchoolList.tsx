@@ -1,8 +1,10 @@
 "use client";
 
 import { useState } from 'react';
+import Link from 'next/link';
 
 type School = {
+  id: string;
   namaSekolah: string;
   jenjang: string;
   statusFinal: string;
@@ -93,7 +95,8 @@ export default function DashboardSchoolList({ data }: { data: Record<string, Sch
               <div style={{ padding: '0 1rem 1rem 1rem', backgroundColor: 'var(--bg-color)', borderTop: '1px solid var(--border-color)' }}>
                 <div style={{ display: 'grid', gap: '0.5rem', marginTop: '1rem' }}>
                   {data[kabKota].map((school, i) => (
-                    <div 
+                    <Link 
+                      href={`/${school.id}`}
                       key={i} 
                       style={{ 
                         display: 'flex', 
@@ -102,23 +105,34 @@ export default function DashboardSchoolList({ data }: { data: Record<string, Sch
                         padding: '0.75rem',
                         backgroundColor: '#fff',
                         borderRadius: 'var(--radius-sm)',
-                        border: '1px solid var(--border-color)'
+                        border: '1px solid var(--border-color)',
+                        textDecoration: 'none',
+                        transition: 'box-shadow 0.2s ease, transform 0.2s ease'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.transform = 'translateY(-2px)';
+                        e.currentTarget.style.boxShadow = '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.transform = 'translateY(0)';
+                        e.currentTarget.style.boxShadow = 'none';
                       }}
                     >
                       <div>
-                        <div style={{ fontWeight: 500, color: 'var(--text-primary)', marginBottom: '0.25rem' }}>
+                        <div style={{ fontWeight: 500, color: 'var(--primary)', marginBottom: '0.25rem', transition: 'color 0.2s ease' }}>
                           {school.namaSekolah}
                         </div>
                         <div style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>
                           Jenjang: {school.jenjang}
                         </div>
                       </div>
-                      <div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem' }}>
                         <span className={`badge ${getBadgeClass(school.statusFinal)}`}>
                           {school.statusFinal}
                         </span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--text-secondary)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"></path><path d="m12 5 7 7-7 7"></path></svg>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               </div>
