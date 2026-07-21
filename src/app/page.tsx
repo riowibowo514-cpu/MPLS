@@ -50,12 +50,22 @@ export default function DashboardPage() {
         <>
           {/* Highlight Cards */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-            <div className="card" style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div 
+              className="card" 
+              style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease', border: showSchoolList ? '2px solid var(--primary)' : '1px solid var(--border-color)' }}
+              onClick={() => setShowSchoolList(!showSchoolList)}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              title="Klik untuk melihat daftar sekolah"
+            >
               <h3 style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 600 }}>Total Sampel Sekolah</h3>
               <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--primary)', margin: '0.5rem 0' }}>
                 {data.totalSampel}
               </div>
-              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>sekolah telah dimonitor</p>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                sekolah telah dimonitor
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showSchoolList ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </p>
             </div>
             
             <div 
