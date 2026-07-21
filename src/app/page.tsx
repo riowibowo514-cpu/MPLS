@@ -9,6 +9,7 @@ export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [showSchoolList, setShowSchoolList] = useState(false);
 
   useEffect(() => {
     fetch('/api/statistik')
@@ -57,22 +58,36 @@ export default function DashboardPage() {
               <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>sekolah telah dimonitor</p>
             </div>
             
-            <div className="card" style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <div 
+              className="card" 
+              style={{ textAlign: 'center', padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'center', cursor: 'pointer', transition: 'all 0.2s ease', border: showSchoolList ? '2px solid var(--primary)' : '1px solid var(--border-color)' }}
+              onClick={() => setShowSchoolList(!showSchoolList)}
+              onMouseEnter={(e) => e.currentTarget.style.transform = 'translateY(-2px)'}
+              onMouseLeave={(e) => e.currentTarget.style.transform = 'translateY(0)'}
+              title="Klik untuk melihat detail daerah"
+            >
               <h3 style={{ margin: 0, color: 'var(--text-secondary)', fontSize: '1rem', fontWeight: 600 }}>Keterwakilan Daerah</h3>
               <div style={{ fontSize: '3rem', fontWeight: 800, color: 'var(--primary)', margin: '0.5rem 0' }}>
                 {data.totalKabKota}
               </div>
-              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Kabupaten / Kota</p>
+              <p style={{ margin: 0, fontSize: '0.875rem', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.25rem' }}>
+                Kabupaten / Kota 
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ transform: showSchoolList ? 'rotate(180deg)' : 'rotate(0deg)', transition: 'transform 0.3s ease' }}><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </p>
             </div>
           </div>
+
+          {showSchoolList && (
+            <div className="animate-fade-in" style={{ marginBottom: '2rem' }}>
+              <DashboardSchoolList data={data.sekolahPerKabKota} />
+            </div>
+          )}
 
           {/* Charts Component */}
           <DashboardCharts 
             statusData={data.statusChartData} 
             jenjangData={data.jenjangChartData} 
           />
-
-          <DashboardSchoolList data={data.sekolahPerKabKota} />
 
           <div style={{ textAlign: 'center', marginTop: '3rem' }}>
             <Link href="/isi-form" className="btn btn-primary" style={{ padding: '0.75rem 2rem', fontSize: '1.125rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>
