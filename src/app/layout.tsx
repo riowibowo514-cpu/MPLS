@@ -18,9 +18,11 @@ export default function RootLayout({
       <body>
         <header className="app-header">
           <div className="container" style={{ paddingTop: '1rem', paddingBottom: '1rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-            <Link href="/" className="app-logo">
-              <img src="/logo-bgtk.png" alt="Logo BGTK Sumbar" style={{ height: '40px', width: 'auto', objectFit: 'contain', transform: 'scale(2)', transformOrigin: 'left center', marginRight: '1rem' }} />
-              Monev MPLS 2026
+            <Link href="/" className="app-logo" style={{ gap: '1rem' }}>
+              <div style={{ width: '130px', height: '40px', overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', borderRadius: '4px' }}>
+                <img src="/logo-bgtk.png" alt="Logo BGTK Sumbar" style={{ height: '120px', width: 'auto', maxWidth: 'none', objectFit: 'contain' }} />
+              </div>
+              <span style={{ fontSize: '1.25rem' }}>Monev MPLS 2026</span>
             </Link>
             <HeaderActions />
           </div>
