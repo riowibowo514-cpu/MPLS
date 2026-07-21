@@ -126,7 +126,7 @@ export default function DetailPage() {
 
         {data.alasanOverride && (
           <div style={{ padding: '1rem', backgroundColor: 'var(--warning-bg)', borderRadius: 'var(--radius-md)', marginBottom: '1.5rem' }}>
-            <strong>Alasan Perubahan Status:</strong><br/>
+            <strong>Alasan Perubahan Status / Catatan Observer:</strong><br/>
             {data.alasanOverride}
           </div>
         )}

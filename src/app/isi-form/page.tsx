@@ -111,20 +111,33 @@ export default function FormPage() {
 
   const handleSubmit = async () => {
     // Validasi Step 4
-    if (!materiTes.materiUtama.rincian || !materiTes.materiUtama.waktu) {
-      setError('Materi Utama (Rincian & Waktu) wajib diisi.'); scrollToField('field-materiUtama'); return;
+    if (step === 4) {
+      if (!materiTes.materiUtama.rincian || !materiTes.materiUtama.waktu) {
+        setError('Materi Utama (Rincian & Waktu) wajib diisi.'); scrollToField('field-materiUtama'); return;
+      }
+      if (!materiTes.materiPilihan.rincian || !materiTes.materiPilihan.waktu) {
+        setError('Materi Pilihan (Rincian & Waktu) wajib diisi.'); scrollToField('field-materiPilihan'); return;
+      }
+      if (!materiTes.rangkianTes.rincian || !materiTes.rangkianTes.waktu) {
+        setError('Rangkaian Tes (Rincian & Waktu) wajib diisi.'); scrollToField('field-rangkianTes'); return;
+      }
+      if (!permasalahanSolusi.perencanaan.rincian || !permasalahanSolusi.perencanaan.solusi) {
+        setError('Permasalahan & Solusi Tahap Perencanaan wajib diisi.'); scrollToField('field-permasalahanPerencanaan'); return;
+      }
+      if (!permasalahanSolusi.pelaksanaan.rincian || !permasalahanSolusi.pelaksanaan.solusi) {
+        setError('Permasalahan & Solusi Tahap Pelaksanaan wajib diisi.'); scrollToField('field-permasalahanPelaksanaan'); return;
+      }
     }
-    if (!materiTes.materiPilihan.rincian || !materiTes.materiPilihan.waktu) {
-      setError('Materi Pilihan (Rincian & Waktu) wajib diisi.'); scrollToField('field-materiPilihan'); return;
-    }
-    if (!materiTes.rangkianTes.rincian || !materiTes.rangkianTes.waktu) {
-      setError('Rangkaian Tes (Rincian & Waktu) wajib diisi.'); scrollToField('field-rangkianTes'); return;
-    }
-    if (!permasalahanSolusi.perencanaan.rincian || !permasalahanSolusi.perencanaan.solusi) {
-      setError('Permasalahan & Solusi Tahap Perencanaan wajib diisi.'); scrollToField('field-permasalahanPerencanaan'); return;
-    }
-    if (!permasalahanSolusi.pelaksanaan.rincian || !permasalahanSolusi.pelaksanaan.solusi) {
-      setError('Permasalahan & Solusi Tahap Pelaksanaan wajib diisi.'); scrollToField('field-permasalahanPelaksanaan'); return;
+
+    if (step === 5) {
+      if (kesimpulan.statusFinal === 'KURANG' && !kesimpulan.alasanOverride) {
+        setError('Karena Status Final adalah KURANG, Anda wajib memberikan catatan/alasan pada kolom Alasan Mengubah Status.');
+        return;
+      }
+      if (kesimpulan.statusFinal !== statusOtomatis?.rekapitulasi?.status && !kesimpulan.alasanOverride) {
+        setError('Alasan Mengubah Status wajib diisi karena Anda mengubah status yang disarankan sistem.');
+        return;
+      }
     }
 
     setIsSubmitting(true);
@@ -504,14 +517,14 @@ export default function FormPage() {
           </select>
         </div>
 
-        {kesimpulan.statusFinal !== statusOtomatis?.rekapitulasi?.status && (
+        {(kesimpulan.statusFinal !== statusOtomatis?.rekapitulasi?.status || kesimpulan.statusFinal === 'KURANG') && (
           <div className="form-group animate-fade-in">
-            <label style={{ color: 'var(--warning)' }}>Alasan Mengubah Status (Wajib)</label>
+            <label style={{ color: 'var(--warning)' }}>Alasan / Catatan (Wajib)</label>
             <textarea 
               value={kesimpulan.alasanOverride}
               onChange={e => setKesimpulan({ ...kesimpulan, alasanOverride: e.target.value })}
               rows={2}
-              placeholder="Berikan alasan mengapa status final berbeda dengan hitungan rekapitulasi sistem..."
+              placeholder={kesimpulan.statusFinal === 'KURANG' ? "Berikan catatan mengapa status sekolah ini KURANG..." : "Berikan alasan mengapa status final berbeda dengan hitungan rekapitulasi sistem..."}
               style={{ borderColor: 'var(--warning)' }}
             />
           </div>
@@ -572,7 +585,7 @@ export default function FormPage() {
   return (
     <main className="container">
       <div className="steps-container">
-        {[1, 2, 3, 4].map(s => (
+        {[1, 2, 3, 4, 5].map(s => (
           <div key={s} className={`step ${step === s ? 'active' : ''} ${step > s ? 'completed' : ''}`}>
             {s}
           </div>
@@ -583,6 +596,7 @@ export default function FormPage() {
       {step === 2 && renderStep2()}
       {step === 3 && renderStep3()}
       {step === 4 && renderStep4()}
+      {step === 5 && renderStep5()}
 
       {error && (
         <div className="card" style={{ borderColor: 'var(--danger)', backgroundColor: 'var(--danger-bg)', padding: '1rem', marginTop: '1.5rem', marginBottom: '0' }}>
@@ -597,7 +611,7 @@ export default function FormPage() {
           </button>
         ) : <div />}
 
-        {step < 4 ? (
+        {step < 5 ? (
           <button className="btn btn-primary" onClick={handleNext}>
             Selanjutnya
           </button>
