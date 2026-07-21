@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import DashboardCharts from '@/components/DashboardCharts';
+import DashboardSchoolList from '@/components/DashboardSchoolList';
 
 export default function DashboardPage() {
   const [data, setData] = useState<any>(null);
@@ -70,6 +71,8 @@ export default function DashboardPage() {
             statusData={data.statusChartData} 
             jenjangData={data.jenjangChartData} 
           />
+
+          <DashboardSchoolList data={data.sekolahPerKabKota} />
 
           <div style={{ textAlign: 'center', marginTop: '3rem' }}>
             <Link href="/isi-form" className="btn btn-primary" style={{ padding: '0.75rem 2rem', fontSize: '1.125rem', display: 'inline-flex', alignItems: 'center', gap: '0.5rem' }}>

@@ -7,7 +7,7 @@ export async function GET() {
   try {
     const { data, error } = await supabase
       .from('monev_entry')
-      .select('jenjang, kabKota, statusFinal');
+      .select('jenjang, kabKota, statusFinal, namaSekolah');
 
     if (error) {
       console.error(error);
@@ -48,11 +48,26 @@ export async function GET() {
       { name: 'SMA/K', total: jenjangCounts['SMA/K'] }
     ];
 
+    // Group schools by kabKota
+    const sekolahPerKabKota: Record<string, { namaSekolah: string, jenjang: string, statusFinal: string }[]> = {};
+    entries.forEach(entry => {
+      if (!entry.kabKota) return;
+      if (!sekolahPerKabKota[entry.kabKota]) {
+        sekolahPerKabKota[entry.kabKota] = [];
+      }
+      sekolahPerKabKota[entry.kabKota].push({
+        namaSekolah: entry.namaSekolah,
+        jenjang: entry.jenjang,
+        statusFinal: entry.statusFinal
+      });
+    });
+
     return NextResponse.json({
       totalSampel,
       totalKabKota: kabKotaSet.size,
       statusChartData,
-      jenjangChartData
+      jenjangChartData,
+      sekolahPerKabKota
     });
 
   } catch (err: any) {
