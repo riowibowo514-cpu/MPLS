@@ -18,8 +18,11 @@ export default function HeaderActions() {
   };
 
   return (
-    <div style={{ display: 'flex', gap: '0.5rem' }}>
-      <Link href="/cari" className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
+    <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
+      <Link href="/isi-form" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem', borderColor: 'var(--primary)', color: 'var(--primary)' }}>
+        Isi Instrumen
+      </Link>
+      <Link href="/cari" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
         Cari Hasil
       </Link>
       {isAdmin ? (
