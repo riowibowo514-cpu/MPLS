@@ -284,7 +284,22 @@ export default function SearchPage() {
             </tbody>
           </table>
           
-          <p style={{ marginBottom: '4rem' }}>Demikian form instrumen ini diisi dengan sebenar-benarnya sesuai dengan kondisi di lapangan.</p>
+          <p style={{ marginBottom: '2rem' }}>Demikian form instrumen ini diisi dengan sebenar-benarnya sesuai dengan kondisi di lapangan.</p>
+          
+          {selectedPengisian.metadata_values['_statusOtomatis'] && (
+            <div style={{ marginTop: '2rem', marginBottom: '2rem' }}>
+              <h4 style={{ borderBottom: '1px solid black', paddingBottom: '0.5rem' }}>HASIL EVALUASI MONEV</h4>
+              <p><strong>Status Penilaian Sistem:</strong> {selectedPengisian.metadata_values['_statusOtomatis']} (Skor: {selectedPengisian.metadata_values['_skorTotal']}%)</p>
+              {selectedPengisian.metadata_values['_statusFinal'] && selectedPengisian.metadata_values['_statusFinal'] !== selectedPengisian.metadata_values['_statusOtomatis'] && (
+                <>
+                  <p><strong>Penilaian Subjektif Petugas:</strong> {selectedPengisian.metadata_values['_statusFinal']}</p>
+                  <p><strong>Alasan Perubahan:</strong> {selectedPengisian.metadata_values['_alasanOverride']}</p>
+                </>
+              )}
+              <p style={{marginTop: '1rem'}}><strong>Catatan Kritis:</strong><br/>{selectedPengisian.metadata_values['_catatanKritis'] || '-'}</p>
+              <p style={{marginTop: '1rem'}}><strong>Rekomendasi:</strong><br/>{selectedPengisian.metadata_values['_rekomendasi'] || '-'}</p>
+            </div>
+          )}
           
           <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', textAlign: 'center' }}>
             <div style={{ width: '40%' }}>
