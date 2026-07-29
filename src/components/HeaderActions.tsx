@@ -22,9 +22,6 @@ export default function HeaderActions() {
       <Link href="/" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
         Beranda
       </Link>
-      <Link href="/kegiatan" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem', borderColor: 'var(--primary)', color: 'var(--primary)' }}>
-        Isi Instrumen
-      </Link>
       <Link href="/cari" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
         Cari Hasil
       </Link>

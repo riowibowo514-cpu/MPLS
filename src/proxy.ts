@@ -9,13 +9,12 @@ const SECRET_KEY = new TextEncoder().encode(
 export async function proxy(request: NextRequest) {
   const path = request.nextUrl.pathname;
   
-  // Protect ONLY admin routes as per user request
   const isAdminPath = path.startsWith('/admin');
+  const isDashboardPath = path.startsWith('/dashboard');
 
-  if (isAdminPath) {
+  if (isAdminPath || isDashboardPath) {
     const token = request.cookies.get('session')?.value;
     
-    // Redirect to login if no token
     if (!token) {
       return NextResponse.redirect(new URL('/login', request.url));
     }
@@ -23,10 +22,23 @@ export async function proxy(request: NextRequest) {
     try {
       const { payload } = await jwtVerify(token, SECRET_KEY);
       const role = payload.role as string;
+      const mustChangePassword = payload.must_change_password as boolean;
       
-      // Strict admin check
-      if (role !== 'admin') {
+      // Admin protection
+      if (isAdminPath && role !== 'admin') {
         return NextResponse.redirect(new URL('/', request.url));
+      }
+
+      // Dashboard protection (Admin & Pimpinan allowed)
+      if (isDashboardPath) {
+        if (role !== 'admin' && role !== 'pimpinan') {
+          return NextResponse.redirect(new URL('/login', request.url));
+        }
+
+        // Forced password reset check for Pimpinan
+        if (role === 'pimpinan' && mustChangePassword) {
+          return NextResponse.redirect(new URL('/ubah-password', request.url));
+        }
       }
       
     } catch (error) {
@@ -38,5 +50,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/admin/:path*'],
+  matcher: ['/admin/:path*', '/dashboard/:path*'],
 };
