@@ -1,8 +1,9 @@
 "use client";
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { supabase } from '@/lib/supabase';
+import { supabase, MonevEntryData } from '@/lib/supabase';
 import { Kegiatan, InstrumenFull, Pengisian } from '@/lib/types';
+import { generatePDF } from '@/lib/pdfGenerator';
 
 export default function SearchPage() {
   const [kegiatans, setKegiatans] = useState<Kegiatan[]>([]);
@@ -10,6 +11,7 @@ export default function SearchPage() {
   
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<Pengisian[]>([]);
+  const [oldResults, setOldResults] = useState<MonevEntryData[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -30,13 +32,25 @@ export default function SearchPage() {
     }
     // Reset search when activity changes
     setResults([]);
+    setOldResults([]);
     setHasSearched(false);
     setQuery('');
   }, [selectedKegiatanId]);
 
   const fetchKegiatans = async () => {
     const { data } = await supabase.from('kegiatan').select('*').eq('status', 'aktif').order('created_at', { ascending: false });
-    if (data) setKegiatans(data);
+    const dynamicKegiatans = data || [];
+    
+    // Tambahkan MPLS lama secara manual (karena struktur data lama tidak ada di tabel kegiatan)
+    const mplsLama = {
+      id: 'mpls-lama',
+      nama_kegiatan: 'MPLS 2026 (Format Lama)',
+      status: 'aktif',
+      created_at: new Date().toISOString(),
+      tahun: '2026'
+    } as Kegiatan;
+    
+    setKegiatans([mplsLama, ...dynamicKegiatans]);
   };
 
   const fetchSchema = async (k_id: string) => {
@@ -52,7 +66,7 @@ export default function SearchPage() {
 
   const handleSearch = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!schema) {
+    if (!schema && selectedKegiatanId !== 'mpls-lama') {
       setError('Silakan pilih kegiatan terlebih dahulu.');
       return;
     }
@@ -66,25 +80,38 @@ export default function SearchPage() {
     setHasSearched(true);
     
     try {
-      // Ambil data pengisian untuk instrumen ini
-      const { data: allPengisian, error: fetchErr } = await supabase
-        .from('pengisian')
-        .select('*')
-        .eq('instrumen_id', schema.id);
+      if (selectedKegiatanId === 'mpls-lama') {
+        const res = await fetch(`/api/monev/search?q=${encodeURIComponent(query)}`);
+        const data = await res.json();
+        
+        if (res.ok) {
+          setOldResults(data.data || []);
+        } else {
+          setError(data.error || 'Terjadi kesalahan.');
+          setOldResults([]);
+        }
+      } else {
+        // Ambil data pengisian untuk instrumen ini
+        const { data: allPengisian, error: fetchErr } = await supabase
+          .from('pengisian')
+          .select('*')
+          .eq('instrumen_id', schema!.id);
 
-      if (fetchErr) throw fetchErr;
+        if (fetchErr) throw fetchErr;
 
-      // Filter di client untuk mencocokkan kata kunci ke dalam semua nilai metadata (JSON)
-      const q = query.toLowerCase();
-      const filtered = (allPengisian || []).filter(p => {
-        const metaValues = Object.values(p.metadata_values || {}) as string[];
-        return metaValues.some(val => String(val).toLowerCase().includes(q));
-      });
+        // Filter di client untuk mencocokkan kata kunci ke dalam semua nilai metadata (JSON)
+        const q = query.toLowerCase();
+        const filtered = (allPengisian || []).filter(p => {
+          const metaValues = Object.values(p.metadata_values || {}) as string[];
+          return metaValues.some(val => String(val).toLowerCase().includes(q));
+        });
 
-      setResults(filtered);
+        setResults(filtered);
+      }
     } catch (err) {
       setError('Koneksi bermasalah.');
       setResults([]);
+      setOldResults([]);
     } finally {
       setLoading(false);
     }
@@ -156,7 +183,7 @@ export default function SearchPage() {
           </div>
         )}
 
-        {hasSearched && !loading && !error && results.length === 0 && (
+        {hasSearched && !loading && !error && results.length === 0 && oldResults.length === 0 && (
           <div style={{ textAlign: 'center', padding: '2rem', backgroundColor: 'var(--bg-color)', borderRadius: 'var(--radius-md)' }}>
             <p style={{ fontWeight: 600 }}>Data tidak ditemukan.</p>
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem' }}>
@@ -165,9 +192,34 @@ export default function SearchPage() {
           </div>
         )}
 
-        {results.length > 0 && (
+        {(results.length > 0 || oldResults.length > 0) && (
           <div className="history-list">
             <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem' }}>Hasil Pencarian:</h3>
+            
+            {/* Render Hasil MPLS Lama */}
+            {oldResults.map((entry) => (
+              <div key={entry.id} className="history-item" style={{ cursor: 'default' }}>
+                <div className="history-item-content">
+                  <h3>{entry.namaSekolah}</h3>
+                  <p style={{ color: 'var(--text-secondary)' }}>
+                    Disubmit pada: {entry.tanggal} &bull; Oleh: {entry.namaPetugas}
+                  </p>
+                </div>
+                <div>
+                  <button className="btn btn-outline" onClick={() => {
+                    try {
+                      generatePDF(entry);
+                    } catch(err) {
+                      alert('Gagal mencetak PDF format lama');
+                    }
+                  }}>
+                    Unduh PDF
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {/* Render Hasil Dinamis */}
             {results.map((entry) => (
               <div key={entry.id} className="history-item" style={{ cursor: 'default' }}>
                 <div className="history-item-content">
