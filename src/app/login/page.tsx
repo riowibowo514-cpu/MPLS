@@ -3,6 +3,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
@@ -18,13 +19,13 @@ export default function LoginPage() {
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ password })
+        body: JSON.stringify({ username, password })
       });
 
       if (res.ok) {
-        // Menggunakan window.location.href untuk memastikan full page reload 
-        // sehingga cookie yang baru diset terbaca dengan sempurna oleh middleware
-        window.location.href = '/admin';
+        const data = await res.json();
+        // Gunakan window.location.href agar middleware dapat membaca cookie baru dengan sempurna
+        window.location.href = data.redirect || '/dashboard';
       } else {
         const data = await res.json();
         setError(data.error || 'Terjadi kesalahan saat login.');
@@ -39,19 +40,32 @@ export default function LoginPage() {
   return (
     <main className="container animate-fade-in" style={{ maxWidth: '400px', marginTop: '6rem' }}>
       <div className="card">
-        <h2 style={{ textAlign: 'center', marginBottom: '0.5rem' }}>Login Admin</h2>
+        <h2 style={{ textAlign: 'center', marginBottom: '0.5rem' }}>Login Portal Monev</h2>
         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-          Masukkan password untuk mengakses halaman rekapitulasi data.
+          Silakan masuk menggunakan kredensial Anda.
         </p>
         <form onSubmit={handleLogin}>
+          <div className="form-group">
+            <label>Username / NIP</label>
+            <input 
+              type="text" 
+              value={username} 
+              onChange={e => setUsername(e.target.value)} 
+              placeholder="Masukkan username..."
+              autoFocus
+              style={{ width: '100%' }}
+              required
+            />
+          </div>
           <div className="form-group" style={{ position: 'relative' }}>
+            <label>Password</label>
             <input 
               type={showPassword ? "text" : "password"} 
               value={password} 
               onChange={e => setPassword(e.target.value)} 
               placeholder="Masukkan password..."
-              autoFocus
               style={{ width: '100%', paddingRight: '2.5rem' }}
+              required
             />
             <button 
               type="button"
@@ -59,8 +73,7 @@ export default function LoginPage() {
               style={{ 
                 position: 'absolute', 
                 right: '0.75rem', 
-                top: '50%', 
-                transform: 'translateY(-50%)', 
+                bottom: '0.75rem', 
                 background: 'none', 
                 border: 'none', 
                 cursor: 'pointer',
@@ -78,7 +91,7 @@ export default function LoginPage() {
               )}
             </button>
           </div>
-          {error && <p style={{ color: 'var(--danger)', fontSize: '0.875rem', marginTop: '-1rem', marginBottom: '1rem' }}>{error}</p>}
+          {error && <p style={{ color: 'var(--danger)', fontSize: '0.875rem', marginTop: '-0.5rem', marginBottom: '1rem' }}>{error}</p>}
           <button type="submit" className="btn btn-primary" style={{ width: '100%' }} disabled={isLoading}>
             {isLoading ? 'Memproses...' : 'Masuk'}
           </button>
