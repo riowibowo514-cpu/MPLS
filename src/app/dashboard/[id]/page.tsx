@@ -6,6 +6,11 @@ import { InstrumenFull } from '@/lib/types';
 import Link from 'next/link';
 import * as XLSX from 'xlsx';
 
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement } from 'chart.js';
+import { Pie, Bar, Line } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement);
+
 export default function DetailDashboardKegiatan({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
   const kegiatan_id = unwrappedParams.id;
@@ -43,7 +48,8 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
       const { data: pData } = await supabase
         .from('pengisian')
         .select('*, jawaban(*)')
-        .eq('instrumen_id', inst.id);
+        .eq('instrumen_id', inst.id)
+        .order('tanggal_pengisian', { ascending: true }); // urutkan waktu
         
       setPengisians(pData || []);
     } catch (error) {
@@ -119,6 +125,47 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
   if (isLoading) return <div className="container" style={{ padding: '2rem' }}>Memuat analitik...</div>;
   if (!schema) return <div className="container" style={{ padding: '2rem' }}>Data tidak ditemukan.</div>;
 
+  // Chart Data Preparation
+  const dateCounts = pengisians.reduce((acc, p) => {
+    const date = new Date(p.tanggal_pengisian).toLocaleDateString('id-ID');
+    acc[date] = (acc[date] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const lineData = {
+    labels: Object.keys(dateCounts),
+    datasets: [{
+      label: 'Pertumbuhan Responden Masuk',
+      data: Object.values(dateCounts),
+      borderColor: '#3b82f6',
+      backgroundColor: 'rgba(59, 130, 246, 0.2)',
+      fill: true,
+      tension: 0.3
+    }]
+  };
+
+  let pieData = null;
+  let pieTitle = '';
+  // Coba ambil field metadata pertama (contoh: Jenjang, Kabupaten) untuk chart Pie
+  if (schema.metadata_fields.length > 0) {
+    const firstMeta = schema.metadata_fields[0];
+    pieTitle = `Distribusi by ${firstMeta.label_field}`;
+    const metaCounts = pengisians.reduce((acc, p) => {
+      const val = p.metadata_values[firstMeta.id] || 'Tidak Diisi';
+      acc[val] = (acc[val] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+
+    pieData = {
+      labels: Object.keys(metaCounts),
+      datasets: [{
+        data: Object.values(metaCounts),
+        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6'],
+        borderWidth: 0
+      }]
+    };
+  }
+
   return (
     <main className="container animate-fade-in" style={{ padding: '2rem 1rem', paddingBottom: '4rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
@@ -143,7 +190,25 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
           Belum ada data pengisian untuk instrumen ini.
         </div>
       ) : (
-        <div className="card">
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            {pieData && (
+              <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <h3 style={{ marginBottom: '1rem' }}>{pieTitle}</h3>
+                <div style={{ width: '100%', maxWidth: '250px' }}>
+                  <Pie data={pieData} />
+                </div>
+              </div>
+            )}
+            <div className="card">
+              <h3 style={{ marginBottom: '1rem' }}>Pertumbuhan Data Harian</h3>
+              <div style={{ width: '100%', height: '250px' }}>
+                <Line data={lineData} options={{ maintainAspectRatio: false }} />
+              </div>
+            </div>
+          </div>
+
+          <div className="card">
           <h3 style={{ marginBottom: '1rem' }}>Data Terbaru Masuk</h3>
           <div style={{ overflowX: 'auto' }}>
             <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
@@ -175,6 +240,7 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
             </p>
           )}
         </div>
+        </>
       )}
 
       <div style={{ textAlign: 'center', marginTop: '3rem' }}>

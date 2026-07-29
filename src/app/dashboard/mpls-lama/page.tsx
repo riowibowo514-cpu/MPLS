@@ -5,6 +5,11 @@ import Link from 'next/link';
 import { MonevEntryData } from '@/lib/supabase';
 import { generateExcelSummary, generatePDFSummary } from '@/lib/exportGenerator';
 
+import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement } from 'chart.js';
+import { Pie, Bar } from 'react-chartjs-2';
+
+ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement);
+
 export default function Home() {
   const [entries, setEntries] = useState<MonevEntryData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -12,7 +17,7 @@ export default function Home() {
   const [exporting, setExporting] = useState(false);
 
   useEffect(() => {
-    fetch('/api/monev')
+    fetch('/api/monev?all=true')
       .then(res => res.json())
       .then(data => {
         if (data.error) throw new Error(data.error);
@@ -37,20 +42,14 @@ export default function Home() {
   const handleExport = async (type: 'excel' | 'pdf') => {
     setExporting(true);
     try {
-      const res = await fetch('/api/monev?all=true');
-      const data = await res.json();
-      if (data.error) throw new Error(data.error);
-      
-      const allEntries = data.data || [];
-      if (allEntries.length === 0) {
+      if (entries.length === 0) {
         alert('Tidak ada data untuk diekspor');
         return;
       }
-
       if (type === 'excel') {
-        generateExcelSummary(allEntries);
+        generateExcelSummary(entries);
       } else {
-        generatePDFSummary(allEntries);
+        generatePDFSummary(entries);
       }
     } catch (err) {
       console.error(err);
@@ -60,14 +59,54 @@ export default function Home() {
     }
   };
 
+  // Kalkulasi Statistik
+  const statusCounts = entries.reduce((acc, entry) => {
+    acc[entry.statusFinal] = (acc[entry.statusFinal] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const jenjangCounts = entries.reduce((acc, entry) => {
+    acc[entry.jenjang] = (acc[entry.jenjang] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const pieData = {
+    labels: ['Sangat Ramah', 'Cukup Ramah', 'Kurang'],
+    datasets: [{
+      data: [
+        statusCounts['SANGAT RAMAH'] || 0, 
+        statusCounts['CUKUP RAMAH'] || 0, 
+        statusCounts['KURANG'] || 0
+      ],
+      backgroundColor: ['#10b981', '#f59e0b', '#ef4444'],
+      borderWidth: 0
+    }]
+  };
+
+  const barData = {
+    labels: ['TK', 'SD', 'SMP', 'SMA/K', 'SLB'],
+    datasets: [{
+      label: 'Jumlah Sekolah',
+      data: [
+        jenjangCounts['TK'] || 0,
+        jenjangCounts['SD'] || 0,
+        jenjangCounts['SMP'] || 0,
+        jenjangCounts['SMA/K'] || 0,
+        jenjangCounts['SLB'] || 0
+      ],
+      backgroundColor: '#3b82f6',
+      borderRadius: 4
+    }]
+  };
+
   return (
-    <main className="container animate-fade-in">
+    <main className="container animate-fade-in" style={{ paddingBottom: '4rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
           <h1 style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
-            Riwayat Monev
+            Riwayat Monev MPLS 2026
           </h1>
-          <p>Daftar seluruh hasil pemantauan MPLS Ramah 2026</p>
+          <p>Dashboard analitik dan daftar seluruh hasil pemantauan.</p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button 
@@ -76,14 +115,14 @@ export default function Home() {
             disabled={exporting || loading || entries.length === 0}
             style={{ backgroundColor: '#fff' }}
           >
-            {exporting ? 'Memproses...' : 'Unduh Rekap Excel'}
+            {exporting ? 'Memproses...' : 'Unduh Excel'}
           </button>
           <button 
             className="btn btn-primary" 
             onClick={() => handleExport('pdf')}
             disabled={exporting || loading || entries.length === 0}
           >
-            {exporting ? 'Memproses...' : 'Unduh Rekap PDF'}
+            {exporting ? 'Memproses...' : 'Unduh PDF'}
           </button>
         </div>
       </div>
@@ -102,17 +141,29 @@ export default function Home() {
 
       {!loading && !error && entries.length === 0 && (
         <div className="card" style={{ textAlign: 'center', padding: '4rem 2rem' }}>
-          <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1" strokeLinecap="round" strokeLinejoin="round" style={{ color: 'var(--text-secondary)', marginBottom: '1rem', display: 'inline-block' }}><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
           <h3>Belum ada data monev</h3>
-          <p>Jadilah yang pertama untuk mengisi instrumen monev MPLS ini.</p>
-          <Link href="/" className="btn btn-primary" style={{ marginTop: '1rem' }}>
-            Isi Monev Sekarang
-          </Link>
         </div>
       )}
 
       {!loading && entries.length > 0 && (
-        <div className="history-list">
+        <>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <h3 style={{ marginBottom: '1rem' }}>Persentase Status</h3>
+              <div style={{ width: '100%', maxWidth: '250px' }}>
+                <Pie data={pieData} />
+              </div>
+            </div>
+            <div className="card">
+              <h3 style={{ marginBottom: '1rem' }}>Sebaran Jenjang</h3>
+              <div style={{ width: '100%', height: '250px' }}>
+                <Bar data={barData} options={{ maintainAspectRatio: false }} />
+              </div>
+            </div>
+          </div>
+          
+          <h3 style={{ marginBottom: '1rem' }}>Data Terbaru</h3>
+          <div className="history-list">
           {entries.map((entry) => (
             <Link href={`/${entry.id}`} key={entry.id} className="history-item">
               <div className="history-item-content">
@@ -129,6 +180,7 @@ export default function Home() {
             </Link>
           ))}
         </div>
+        </>
       )}
     </main>
   );
