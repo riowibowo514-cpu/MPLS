@@ -7,7 +7,7 @@ export default function PortalMonevPage() {
     <main className="container animate-fade-in" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
         <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '1rem' }}>
-          Portal BGTK Provinsi Sumatera Barat
+          Portal Evaluasi BGTK Provinsi Sumatera Barat
         </h1>
         <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', maxWidth: '700px', margin: '0 auto' }}>
           Sistem Terpadu Monitoring dan Evaluasi (Monev) Kegiatan Guru dan Tenaga Kependidikan. Silakan pilih akses masuk Anda:
@@ -23,14 +23,11 @@ export default function PortalMonevPage() {
           </div>
           <h2 style={{ marginBottom: '1rem' }}>Saya Petugas Monev</h2>
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.875rem', flex: 1 }}>
-            Akses untuk mengisi instrumen monev (seperti MPLS, Matgem) dan mengunduh laporan PDF yang siap ditandatangani.
+            Akses untuk mengisi instrumen monev (seperti MPLS, Matgem) yang siap ditandatangani.
           </p>
           <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', width: '100%' }}>
             <Link href="/kegiatan" className="btn btn-primary" style={{ width: '100%' }}>
               Isi Instrumen Baru
-            </Link>
-            <Link href="/cari" className="btn btn-outline" style={{ width: '100%' }}>
-              Cari & Unduh Hasil (PDF)
             </Link>
           </div>
         </div>

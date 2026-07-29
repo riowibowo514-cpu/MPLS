@@ -22,13 +22,13 @@ export default function HeaderActions() {
       <Link href="/" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
         Beranda
       </Link>
-      <Link href="/isi-form" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem', borderColor: 'var(--primary)', color: 'var(--primary)' }}>
+      <Link href="/kegiatan" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem', borderColor: 'var(--primary)', color: 'var(--primary)' }}>
         Isi Instrumen
       </Link>
       <Link href="/cari" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
         Cari Hasil
       </Link>
-      {isAdmin ? (
+      {isAdmin && (
         <button 
           className="btn" 
           onClick={handleLogout} 
@@ -37,15 +37,12 @@ export default function HeaderActions() {
             fontSize: '0.875rem', 
             backgroundColor: 'var(--danger-bg)', 
             color: 'var(--danger)', 
-            border: '1px solid var(--danger)' 
+            border: '1px solid var(--danger)',
+            marginLeft: '0.5rem'
           }}
         >
           Logout Admin
         </button>
-      ) : (
-        <Link href="/admin" className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.875rem' }}>
-          Admin
-        </Link>
       )}
     </div>
   );
