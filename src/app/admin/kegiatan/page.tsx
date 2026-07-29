@@ -95,6 +95,13 @@ export default function KelolaKegiatan() {
                 >
                   Kelola Instrumen
                 </button>
+                <a 
+                  href={`/api/admin/export-excel?kegiatan_id=${k.id}`}
+                  className="btn btn-outline"
+                  style={{ flex: 1, textAlign: 'center', textDecoration: 'none', lineHeight: '2.5' }}
+                >
+                  Unduh Excel
+                </a>
               </div>
             </div>
           ))}
