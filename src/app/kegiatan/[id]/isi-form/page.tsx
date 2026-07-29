@@ -18,8 +18,8 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
   const [schema, setSchema] = useState<InstrumenFull | null>(null);
   
   // State untuk form
+  const [currentStep, setCurrentStep] = useState(0);
   const [metadataValues, setMetadataValues] = useState<Record<string, string>>({});
-  // Format jawaban: { [item_id]: { nilai_skor: number, nilai_teks: string, catatan_bukti: string } }
   const [jawabanValues, setJawabanValues] = useState<Record<string, any>>({});
 
   useEffect(() => {
@@ -99,6 +99,16 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!schema) return;
+
+    const hasMeta = schema.metadata_fields.length > 0;
+    const totalSteps = (hasMeta ? 1 : 0) + schema.sections.length;
+
+    if (currentStep < totalSteps - 1) {
+      setCurrentStep(prev => prev + 1);
+      window.scrollTo(0, 0);
+      return;
+    }
+
     setIsSubmitting(true);
     setError('');
 
@@ -171,9 +181,23 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
       </div>
 
       <form onSubmit={handleSubmit}>
+        <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.875rem' }}>
+          <span style={{ fontWeight: 600, color: 'var(--primary)' }}>
+            Langkah {currentStep + 1} dari {(schema.metadata_fields.length > 0 ? 1 : 0) + schema.sections.length}
+          </span>
+          <div style={{ background: '#e2e8f0', borderRadius: '99px', height: '8px', flex: 1, marginLeft: '1rem', overflow: 'hidden' }}>
+            <div style={{ 
+              background: 'var(--primary)', 
+              height: '100%', 
+              width: `${((currentStep + 1) / ((schema.metadata_fields.length > 0 ? 1 : 0) + schema.sections.length)) * 100}%`,
+              transition: 'width 0.3s ease'
+            }} />
+          </div>
+        </div>
+
         {/* Identitas / Metadata */}
-        {schema.metadata_fields.length > 0 && (
-          <div className="card" style={{ marginBottom: '2rem', borderTop: '4px solid #3b82f6' }}>
+        {schema.metadata_fields.length > 0 && currentStep === 0 && (
+          <div className="card animate-fade-in" style={{ marginBottom: '2rem', borderTop: '4px solid #3b82f6' }}>
             <h2 style={{ marginBottom: '1.5rem' }}>Informasi Umum</h2>
             <div style={{ display: 'grid', gap: '1rem' }}>
               {schema.metadata_fields.map(m => (
@@ -193,9 +217,13 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
         )}
 
         {/* Sections & Items */}
-        {schema.sections.map((section, sIdx) => (
-          <div key={section.id} className="card" style={{ marginBottom: '2rem', borderTop: '4px solid #8b5cf6' }}>
-            <h2 style={{ marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
+        {schema.sections.map((section, sIdx) => {
+          const sectionStepIndex = schema.metadata_fields.length > 0 ? sIdx + 1 : sIdx;
+          if (currentStep !== sectionStepIndex) return null;
+
+          return (
+            <div key={section.id} className="card animate-fade-in" style={{ marginBottom: '2rem', borderTop: '4px solid #8b5cf6' }}>
+              <h2 style={{ marginBottom: '1.5rem', borderBottom: '1px solid #eee', paddingBottom: '0.5rem' }}>
               {section.nama_section}
             </h2>
 
@@ -260,15 +288,23 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                 )}
               </div>
             ))}
-          </div>
-        ))}
+            </div>
+          );
+        })}
 
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
-          <button type="button" className="btn btn-outline" onClick={() => router.push('/kegiatan')}>
-            Kembali
-          </button>
+          {currentStep === 0 ? (
+            <button type="button" className="btn btn-outline" onClick={() => router.push('/kegiatan')}>
+              Batal
+            </button>
+          ) : (
+            <button type="button" className="btn btn-outline" onClick={() => { setCurrentStep(prev => prev - 1); window.scrollTo(0, 0); }}>
+              Sebelumnya
+            </button>
+          )}
+          
           <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-            {isSubmitting ? 'Menyimpan Data...' : 'Kirim Form Monev'}
+            {isSubmitting ? 'Menyimpan...' : (currentStep === ((schema.metadata_fields.length > 0 ? 1 : 0) + schema.sections.length - 1) ? 'Kirim Form Monev' : 'Selanjutnya')}
           </button>
         </div>
       </form>

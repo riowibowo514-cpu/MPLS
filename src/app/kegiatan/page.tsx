@@ -51,7 +51,7 @@ export default function DaftarKegiatanPetugas() {
               Instrumen monitoring dan evaluasi Masa Pengenalan Lingkungan Sekolah.
             </p>
             <button 
-              className="btn btn-outline" 
+              className="btn btn-primary" 
               style={{ width: '100%' }}
               onClick={() => router.push('/isi-form')}
             >
