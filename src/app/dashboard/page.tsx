@@ -42,9 +42,9 @@ export default function DashboardIndex() {
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginBottom: '1.5rem', flex: 1 }}>
               Dashboard analitik untuk program Masa Pengenalan Lingkungan Sekolah (data lama).
             </p>
-            <button onClick={() => alert('Fitur ini akan diintegrasikan kembali segera.')} className="btn btn-outline" style={{ width: '100%' }}>
+            <Link href="/dashboard/mpls-lama" className="btn btn-primary" style={{ textAlign: 'center' }}>
               Lihat Analitik
-            </button>
+            </Link>
           </div>
 
           {/* Render Kegiatan Baru */}
