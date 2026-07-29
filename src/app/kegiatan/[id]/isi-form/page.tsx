@@ -5,6 +5,28 @@ import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { InstrumenFull, InstrumenMetadataField, InstrumenSection, InstrumenItem } from '@/lib/types';
 
+const KABUPATEN_KOTA_SUMBAR = [
+  "Kabupaten Agam",
+  "Kabupaten Dharmasraya",
+  "Kabupaten Kepulauan Mentawai",
+  "Kabupaten Lima Puluh Kota",
+  "Kabupaten Padang Pariaman",
+  "Kabupaten Pasaman",
+  "Kabupaten Pasaman Barat",
+  "Kabupaten Pesisir Selatan",
+  "Kabupaten Sijunjung",
+  "Kabupaten Solok",
+  "Kabupaten Solok Selatan",
+  "Kabupaten Tanah Datar",
+  "Kota Bukittinggi",
+  "Kota Padang",
+  "Kota Padang Panjang",
+  "Kota Pariaman",
+  "Kota Payakumbuh",
+  "Kota Sawahlunto",
+  "Kota Solok"
+];
+
 export default function IsiFormDinamis({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
   const unwrappedParams = use(params);
@@ -163,11 +185,55 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
     return (
       <main className="container animate-fade-in" style={{ marginTop: '4rem', textAlign: 'center' }}>
         <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '3rem 2rem' }}>
-          <h2 style={{ color: '#10b981' }}>Berhasil Disimpan!</h2>
-          <p>Terima kasih telah mengisi instrumen <strong>{schema.nama_instrumen}</strong>.</p>
-          <button className="btn btn-primary" onClick={() => router.push('/kegiatan')} style={{ marginTop: '1.5rem' }}>
-            Kembali ke Daftar Kegiatan
-          </button>
+          <div className="no-print">
+            <h2 style={{ color: '#10b981' }}>Berhasil Disimpan!</h2>
+            <p>Terima kasih telah mengisi instrumen <strong>{schema.nama_instrumen}</strong>.</p>
+            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
+              <button className="btn btn-outline" onClick={() => window.print()}>
+                Cetak Bukti (PDF)
+              </button>
+              <button className="btn btn-primary" onClick={() => router.push('/kegiatan')}>
+                Kembali ke Daftar Kegiatan
+              </button>
+            </div>
+          </div>
+          
+          {/* Bagian khusus untuk di-print sebagai PDF (Berita Acara) */}
+          <div className="print-only" style={{ display: 'none', textAlign: 'left', margin: '0 auto', width: '100%' }}>
+            <div style={{ textAlign: 'center', marginBottom: '2rem', borderBottom: '2px solid black', paddingBottom: '1rem' }}>
+              <h2>BERITA ACARA MONEV</h2>
+              <h3>{schema.nama_instrumen}</h3>
+            </div>
+            
+            <p>Pada hari ini, telah dilaksanakan Monitoring dan Evaluasi dengan rincian identitas sebagai berikut:</p>
+            <table style={{ width: '100%', marginBottom: '2rem', borderCollapse: 'collapse' }}>
+              <tbody>
+                {schema.metadata_fields.map(m => (
+                  <tr key={m.id}>
+                    <td style={{ width: '30%', padding: '0.5rem', border: '1px solid black' }}><strong>{m.label_field}</strong></td>
+                    <td style={{ padding: '0.5rem', border: '1px solid black' }}>{metadataValues[m.id]}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            
+            <p style={{ marginBottom: '4rem' }}>Demikian form instrumen ini diisi dengan sebenar-benarnya sesuai dengan kondisi di lapangan.</p>
+            
+            <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', textAlign: 'center' }}>
+              <div style={{ width: '40%' }}>
+                <p>Responden / Pihak Sekolah,</p>
+                <div style={{ height: '80px' }}></div>
+                <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>................................................</p>
+                <p>NIP/NUPTK: ...........................</p>
+              </div>
+              <div style={{ width: '40%' }}>
+                <p>Petugas Monev,</p>
+                <div style={{ height: '80px' }}></div>
+                <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>................................................</p>
+                <p>NIP: ...........................</p>
+              </div>
+            </div>
+          </div>
         </div>
       </main>
     );
@@ -203,13 +269,27 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
               {schema.metadata_fields.map(m => (
                 <div key={m.id} className="form-group">
                   <label>{m.label_field} {m.wajib_diisi && <span style={{color:'red'}}>*</span>}</label>
-                  <input
-                    type={m.tipe_field}
-                    required={m.wajib_diisi}
-                    value={metadataValues[m.id] || ''}
-                    onChange={e => handleMetadataChange(m.id, e.target.value)}
-                    placeholder={`Masukkan ${m.label_field}...`}
-                  />
+                  {m.label_field.toLowerCase().includes('kabupaten') || m.label_field.toLowerCase().includes('kota') ? (
+                    <select
+                      required={m.wajib_diisi}
+                      value={metadataValues[m.id] || ''}
+                      onChange={e => handleMetadataChange(m.id, e.target.value)}
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none' }}
+                    >
+                      <option value="">-- Pilih Kabupaten/Kota --</option>
+                      {KABUPATEN_KOTA_SUMBAR.map(kab => (
+                        <option key={kab} value={kab}>{kab}</option>
+                      ))}
+                    </select>
+                  ) : (
+                    <input
+                      type={m.tipe_field}
+                      required={m.wajib_diisi}
+                      value={metadataValues[m.id] || ''}
+                      onChange={e => handleMetadataChange(m.id, e.target.value)}
+                      placeholder={`Masukkan ${m.label_field}...`}
+                    />
+                  )}
                 </div>
               ))}
             </div>

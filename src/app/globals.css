@@ -368,3 +368,26 @@ textarea:focus {
   align-items: center;
   gap: 0.5rem;
 }
+
+/* Print Styles */
+@media print {
+  .no-print, .app-header, .btn, button {
+    display: none !important;
+  }
+  
+  .print-only {
+    display: block !important;
+  }
+  
+  body {
+    background: white;
+    color: black;
+  }
+  
+  .card {
+    box-shadow: none !important;
+    border: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+}
