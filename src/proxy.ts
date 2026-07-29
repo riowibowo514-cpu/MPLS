@@ -22,7 +22,6 @@ export async function proxy(request: NextRequest) {
     try {
       const { payload } = await jwtVerify(token, SECRET_KEY);
       const role = payload.role as string;
-      const mustChangePassword = payload.must_change_password as boolean;
       
       // Admin protection
       if (isAdminPath && role !== 'admin') {
@@ -33,11 +32,6 @@ export async function proxy(request: NextRequest) {
       if (isDashboardPath) {
         if (role !== 'admin' && role !== 'pimpinan') {
           return NextResponse.redirect(new URL('/login', request.url));
-        }
-
-        // Forced password reset check for Pimpinan
-        if (role === 'pimpinan' && mustChangePassword) {
-          return NextResponse.redirect(new URL('/ubah-password', request.url));
         }
       }
       

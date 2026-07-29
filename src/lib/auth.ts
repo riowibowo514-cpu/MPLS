@@ -12,7 +12,6 @@ export interface SessionPayload {
   nama_lengkap: string;
   role: Role;
   instansi_wilayah?: string;
-  must_change_password?: boolean;
 }
 
 export async function createSession(payload: SessionPayload) {

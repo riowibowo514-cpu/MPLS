@@ -32,17 +32,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Username atau password salah' }, { status: 401 });
     }
 
-    // Cek apakah Pimpinan menggunakan password default
-    const isPimpinanDefault = (user.role === 'pimpinan' && password === 'PimpinanBGTK');
-
     // 3. Buat Sesi JWT
     await createSession({
       id: user.id,
       username: user.username,
       nama_lengkap: user.nama_lengkap,
       role: user.role,
-      instansi_wilayah: user.instansi_wilayah,
-      must_change_password: isPimpinanDefault
+      instansi_wilayah: user.instansi_wilayah
     });
 
     // Tentukan halaman redirect berdasarkan role
