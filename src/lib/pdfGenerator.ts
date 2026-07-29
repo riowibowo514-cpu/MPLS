@@ -189,8 +189,24 @@ export function generatePDF(data: MonevEntryData) {
   doc.setTextColor(0, 0, 0);
   
   // Tampilkan status final jika diperlukan
-  doc.text(`Status Penilaian: ${data.statusFinal || data.statusOtomatis}`, 20, currentY);
+  doc.text(`Status Penilaian Sistem: ${data.statusOtomatis}`, 20, currentY);
   currentY += 6;
+
+  if (data.statusFinal && data.statusFinal !== data.statusOtomatis) {
+    doc.text(`Penilaian Subjektif Petugas: ${data.statusFinal}`, 20, currentY);
+    currentY += 6;
+    if (data.alasanOverride) {
+      const splitAlasan = doc.splitTextToSize(`Alasan Perubahan: ${data.alasanOverride}`, 170);
+      doc.text(splitAlasan, 20, currentY);
+      currentY += (splitAlasan.length * 5) + 2;
+    }
+  } else if (data.alasanOverride) {
+    const splitAlasan = doc.splitTextToSize(`Catatan Penilaian: ${data.alasanOverride}`, 170);
+    doc.text(splitAlasan, 20, currentY);
+    currentY += (splitAlasan.length * 5) + 2;
+  }
+  
+  currentY += 2;
 
   const splitCatatan = doc.splitTextToSize(data.catatanKritis || '........................................................................', 170);
   doc.text(splitCatatan, 20, currentY);
