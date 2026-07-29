@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabase';
-import { createSession } from '@/lib/auth';
+import { createSession, getSession } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
@@ -58,4 +58,12 @@ export async function DELETE() {
   // Hapus admin_token lama jika ada
   response.cookies.delete('admin_token');
   return response;
+}
+
+export async function GET() {
+  const session = await getSession();
+  if (!session) {
+    return NextResponse.json({ user: null }, { status: 401 });
+  }
+  return NextResponse.json({ user: session });
 }

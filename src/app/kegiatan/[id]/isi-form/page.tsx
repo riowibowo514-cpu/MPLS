@@ -43,10 +43,23 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
   const [currentStep, setCurrentStep] = useState(0);
   const [metadataValues, setMetadataValues] = useState<Record<string, string>>({});
   const [jawabanValues, setJawabanValues] = useState<Record<string, any>>({});
+  
+  const [currentUser, setCurrentUser] = useState<any>(null);
 
   useEffect(() => {
     fetchSchema();
+    fetchUser();
   }, [kegiatan_id]);
+
+  const fetchUser = async () => {
+    try {
+      const res = await fetch('/api/auth');
+      if (res.ok) {
+        const data = await res.json();
+        setCurrentUser(data.user);
+      }
+    } catch(err) {}
+  };
 
   const fetchSchema = async () => {
     try {
@@ -140,7 +153,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
         .from('pengisian')
         .insert([{
           instrumen_id: schema.id,
-          // petugas_id di-set via API khusus atau biarkan null jika public form
+          petugas_id: currentUser?.id || null, // gunakan id dari session
           metadata_values: metadataValues
         }])
         .select()
@@ -229,8 +242,8 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
               <div style={{ width: '40%' }}>
                 <p>Petugas Monev,</p>
                 <div style={{ height: '80px' }}></div>
-                <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>................................................</p>
-                <p>NIP: ...........................</p>
+                <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{currentUser?.nama_lengkap || '................................................'}</p>
+                <p>NIP: {currentUser?.username || '...........................'}</p>
               </div>
             </div>
           </div>

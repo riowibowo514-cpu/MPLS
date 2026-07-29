@@ -17,6 +17,7 @@ export type MonevEntryData = {
   kabKota: string;
   alamat: string;
   namaPetugas: string;
+  nipPetugas?: string;
   tanggal: string; // Hari & tanggal Monev
   namaKepsek: string;
   jawabanUmum: Record<string, { jawaban?: boolean | string, catatan?: string }>;

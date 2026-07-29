@@ -15,14 +15,19 @@ export function generatePDF(data: MonevEntryData) {
   doc.setFontSize(11);
   doc.setFont('helvetica', 'normal');
   doc.text('Identitas Sekolah', 20, 38);
-  doc.text(`Nama Sekolah : ${data.namaSekolah}`, 20, 44);
-  doc.text(`NPSN         : ${data.npsn || '-'}`, 20, 50);
-  doc.text(`Kabupaten/Kota: ${data.kabKota || '-'}`, 20, 56);
-  doc.text(`Jenjang      : ${data.jenjang}`, 20, 62);
-  doc.text(`Tanggal      : ${data.tanggal}`, 20, 68);
-  doc.text(`Petugas Monev: ${data.namaPetugas}`, 20, 74);
+  
+  const col1X = 20;
+  const col2X = 55;
+  
+  doc.text('Nama Sekolah', col1X, 44); doc.text(`: ${data.namaSekolah}`, col2X, 44);
+  doc.text('NPSN', col1X, 50); doc.text(`: ${data.npsn || '-'}`, col2X, 50);
+  doc.text('Kabupaten/Kota', col1X, 56); doc.text(`: ${data.kabKota || '-'}`, col2X, 56);
+  doc.text('Jenjang', col1X, 62); doc.text(`: ${data.jenjang}`, col2X, 62);
+  doc.text('Tanggal', col1X, 68); doc.text(`: ${data.tanggal}`, col2X, 68);
+  doc.text('Petugas Monev', col1X, 74); doc.text(`: ${data.namaPetugas}`, col2X, 74);
+  doc.text('NIP Petugas', col1X, 80); doc.text(`: ${data.nipPetugas || '...........................'}`, col2X, 80);
 
-  let currentY = 82;
+  let currentY = 88;
 
   // Render semua kategori instrumen
   INSTRUMEN_BARU.forEach((kategori) => {
@@ -184,7 +189,7 @@ export function generatePDF(data: MonevEntryData) {
   doc.setTextColor(0, 0, 0);
   
   // Tampilkan status final jika diperlukan
-  doc.text(`Status Penilaian: ${data.statusFinal} (${data.statusOtomatis})`, 20, currentY);
+  doc.text(`Status Penilaian: ${data.statusFinal || data.statusOtomatis}`, 20, currentY);
   currentY += 6;
 
   const splitCatatan = doc.splitTextToSize(data.catatanKritis || '........................................................................', 170);
@@ -218,6 +223,9 @@ export function generatePDF(data: MonevEntryData) {
   doc.setFont('helvetica', 'bold');
   doc.text(data.namaKepsek, 40, currentY + 30, { align: 'center' });
   doc.text(data.namaPetugas, 160, currentY + 30, { align: 'center' });
+  
+  doc.setFont('helvetica', 'normal');
+  doc.text(`NIP: ${data.nipPetugas || '...........................'}`, 160, currentY + 36, { align: 'center' });
 
   // Simpan
   doc.save(`Monev_MPLS_${data.namaSekolah.replace(/\s+/g, '_')}_${data.tanggal}.pdf`);

@@ -15,6 +15,9 @@ export default function SearchPage() {
   const [hasSearched, setHasSearched] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  
+  const [petugasMap, setPetugasMap] = useState<Record<string, { nama: string, nip: string }>>({});
+  const [petugasMapByName, setPetugasMapByName] = useState<Record<string, string>>({});
 
   // Untuk keperluan print
   const [schema, setSchema] = useState<InstrumenFull | null>(null);
@@ -22,7 +25,22 @@ export default function SearchPage() {
 
   useEffect(() => {
     fetchKegiatans();
+    fetchUsers();
   }, []);
+
+  const fetchUsers = async () => {
+    const { data } = await supabase.from('users').select('id, nama_lengkap, username');
+    if (data) {
+      const mapId: Record<string, { nama: string, nip: string }> = {};
+      const mapName: Record<string, string> = {};
+      data.forEach(u => {
+        mapId[u.id] = { nama: u.nama_lengkap, nip: u.username };
+        mapName[u.nama_lengkap] = u.username;
+      });
+      setPetugasMap(mapId);
+      setPetugasMapByName(mapName);
+    }
+  };
 
   useEffect(() => {
     if (selectedKegiatanId) {
@@ -208,7 +226,8 @@ export default function SearchPage() {
                 <div>
                   <button className="btn btn-outline" onClick={() => {
                     try {
-                      generatePDF(entry);
+                      const entryWithNip = { ...entry, nipPetugas: petugasMapByName[entry.namaPetugas] };
+                      generatePDF(entryWithNip);
                     } catch(err) {
                       alert('Gagal mencetak PDF format lama');
                     }
@@ -277,8 +296,8 @@ export default function SearchPage() {
             <div style={{ width: '40%' }}>
               <p>Petugas Monev,</p>
               <div style={{ height: '80px' }}></div>
-              <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>................................................</p>
-              <p>NIP: ...........................</p>
+              <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{petugasMap[selectedPengisian.petugas_id || '']?.nama || '................................................'}</p>
+              <p>NIP: {petugasMap[selectedPengisian.petugas_id || '']?.nip || '...........................'}</p>
             </div>
           </div>
         </div>
