@@ -195,7 +195,7 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
             {pieData && (
               <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
                 <h3 style={{ marginBottom: '1rem' }}>{pieTitle}</h3>
-                <div style={{ width: '100%', maxWidth: '250px' }}>
+                <div style={{ width: '100%', maxWidth: '320px' }}>
                   <Pie data={pieData} />
                 </div>
               </div>

@@ -150,7 +150,7 @@ export default function Home() {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
             <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
               <h3 style={{ marginBottom: '1rem' }}>Persentase Status</h3>
-              <div style={{ width: '100%', maxWidth: '250px' }}>
+              <div style={{ width: '100%', maxWidth: '320px' }}>
                 <Pie data={pieData} />
               </div>
             </div>

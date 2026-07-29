@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Link from 'next/link';
 import HeaderActions from '@/components/HeaderActions';
+import BackButton from '@/components/BackButton';
 
 export const metadata: Metadata = {
   title: "Monev MPLS Ramah 2026",
@@ -29,6 +30,7 @@ export default function RootLayout({
           </div>
         </header>
         {children}
+        <BackButton />
       </body>
     </html>
   );
