@@ -396,10 +396,10 @@ textarea:focus {
 @media print {
   @page {
     size: auto;
-    margin: 0mm;
+    margin: 1.5cm;
   }
   body {
-    margin: 1.5cm;
+    margin: 0;
   }
   tr {
     page-break-inside: avoid;
