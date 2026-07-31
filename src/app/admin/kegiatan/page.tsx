@@ -61,6 +61,20 @@ export default function KelolaKegiatan() {
         <p>Memuat data...</p>
       ) : (
         <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
+          {/* Card untuk MPLS Lama (Read Only Placeholder) */}
+          <div className="card" style={{ border: '2px dashed var(--primary)' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <h3 style={{ margin: 0 }}>MPLS (Sistem Lama)</h3>
+              <span style={{ fontSize: '0.75rem', background: 'var(--primary)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '99px' }}>Read Only</span>
+            </div>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+              Data monev MPLS lama yang tidak dapat diedit strukturnya.
+            </p>
+            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+              <button className="btn btn-outline" style={{ flex: 1 }} onClick={() => router.push('/dashboard?kegiatan=mpls_lama')}>Lihat Dashboard</button>
+            </div>
+          </div>
+
           {/* Render Kegiatan Dinamis */}
           {kegiatans.map(k => (
             <div key={k.id} className="card">
