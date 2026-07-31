@@ -80,7 +80,7 @@ export default function KelolaKegiatan() {
                   Kelola Instrumen
                 </button>
                 <button 
-                  className="btn btn-primary" 
+                  className="btn btn-outline" 
                   style={{ flex: 1 }} 
                   onClick={() => router.push('/dashboard/mpls-lama')}
                 >
@@ -121,7 +121,7 @@ export default function KelolaKegiatan() {
               <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
                 <div style={{ display: 'flex', gap: '0.5rem' }}>
                   <button 
-                    className="btn btn-primary" 
+                    className="btn btn-outline" 
                     style={{ flex: 1 }}
                     onClick={() => router.push(`/admin/instrumen/builder?kegiatan_id=${k.id}`)}
                   >

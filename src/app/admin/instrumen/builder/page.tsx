@@ -137,6 +137,25 @@ function BuilderContent() {
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
         <h2>Form Builder (Instrumen)</h2>
         <div style={{ display: 'flex', gap: '1rem' }}>
+          <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".pdf,.doc,.docx" onChange={handleFileUpload} />
+          
+          <button 
+            className="btn btn-outline" 
+            onClick={() => fileInputRef.current?.click()} 
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderColor: '#8b5cf6', color: '#8b5cf6' }} 
+            disabled={isReadingFile}
+          >
+            {isReadingFile ? 'Membaca...' : '✨ Unggah (AI)'}
+          </button>
+          
+          <button 
+            className="btn btn-outline" 
+            onClick={() => alert('Fitur Uji Coba: Instrumen akan dirender dalam bentuk Pop-up Preview sebelum disimpan. Sedang dikembangkan!')}
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+          >
+            👁️ Uji Coba
+          </button>
+
           <button className="btn btn-outline" onClick={() => router.push('/admin/kegiatan')}>Batal</button>
           <button className="btn btn-primary" onClick={handleSave} disabled={isSaving}>
             {isSaving ? 'Menyimpan...' : 'Simpan Instrumen'}
@@ -199,13 +218,7 @@ function BuilderContent() {
       <div className="card" style={{ borderTop: '4px solid #8b5cf6' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <h3>Daftar Pertanyaan (Section)</h3>
-          <div style={{ display: 'flex', gap: '1rem' }}>
-            <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".pdf,.doc,.docx" onChange={handleFileUpload} />
-            <button className="btn btn-outline" onClick={() => fileInputRef.current?.click()} style={{ fontSize: '0.875rem', padding: '0.25rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderColor: '#8b5cf6', color: '#8b5cf6' }} disabled={isReadingFile}>
-              {isReadingFile ? 'AI Sedang Membaca...' : '✨ Unggah PDF/Word (Membaca AI)'}
-            </button>
-            <button className="btn btn-outline" onClick={addSection} style={{ fontSize: '0.875rem', padding: '0.25rem 0.75rem' }} disabled={isReadingFile}>+ Tambah Bagian Baru</button>
-          </div>
+          <button className="btn btn-outline" onClick={addSection} style={{ fontSize: '0.875rem', padding: '0.25rem 0.75rem' }} disabled={isReadingFile}>+ Tambah Bagian Baru</button>
         </div>
 
         {sections.map((section, sIdx) => (
