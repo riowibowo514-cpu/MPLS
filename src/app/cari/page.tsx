@@ -405,7 +405,7 @@ export default function SearchPage() {
           
           <p style={{ marginBottom: '2rem' }}>Demikian form instrumen ini diisi dengan sebenar-benarnya sesuai dengan kondisi di lapangan.</p>
           
-          <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', textAlign: 'center' }}>
+          <div className="signature-block" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', textAlign: 'center' }}>
             <div style={{ width: '40%' }}>
               <p>Responden / Pihak Sekolah,</p>
               <div style={{ height: '80px' }}></div>

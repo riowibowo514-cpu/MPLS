@@ -391,3 +391,22 @@ textarea:focus {
     margin: 0 !important;
   }
 }
+
+
+@media print {
+  @page {
+    size: auto;
+    margin: 0mm;
+  }
+  body {
+    margin: 1.5cm;
+  }
+  tr {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  .signature-block {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+}
