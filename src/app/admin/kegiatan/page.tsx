@@ -62,15 +62,15 @@ export default function KelolaKegiatan() {
       ) : (
         <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
           {/* Card untuk MPLS Lama */}
-          <div className="card">
+          <div className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
               <h3 style={{ margin: 0 }}>Masa Pengenalan Lingkungan Sekolah (MPLS)</h3>
               <span style={{ fontSize: '0.75rem', background: '#10b981', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '99px' }}>AKTIF</span>
             </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem', flex: 1 }}>
               Instrumen monitoring dan evaluasi MPLS bagi Sekolah Dasar dan SMP (2026).
             </p>
-            <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem' }}>
               <button 
                 className="btn btn-primary" 
                 style={{ flex: 1 }} 
@@ -90,17 +90,17 @@ export default function KelolaKegiatan() {
 
           {/* Render Kegiatan Dinamis */}
           {kegiatans.map(k => (
-            <div key={k.id} className="card">
+            <div key={k.id} className="card" style={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                 <h3 style={{ margin: 0 }}>{k.nama_kegiatan}</h3>
                 <span style={{ fontSize: '0.75rem', background: k.status === 'aktif' ? '#10b981' : 'var(--text-secondary)', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '99px' }}>
                   {k.status.toUpperCase()}
                 </span>
               </div>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+              <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem', flex: 1 }}>
                 {k.deskripsi} ({k.tahun})
               </p>
-              <div style={{ marginTop: '1rem', display: 'flex', gap: '0.5rem' }}>
+              <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem' }}>
                 <button 
                   className="btn btn-primary" 
                   style={{ flex: 1 }}
