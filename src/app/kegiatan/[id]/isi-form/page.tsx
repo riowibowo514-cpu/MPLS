@@ -253,18 +253,20 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
           
           {/* Bagian khusus untuk di-print sebagai PDF (Berita Acara) */}
           <div className="print-only" style={{ display: 'none', textAlign: 'left', margin: '0 auto', width: '100%' }}>
-            <div style={{ textAlign: 'center', marginBottom: '2rem', borderBottom: '2px solid black', paddingBottom: '1rem' }}>
-              <h2>BERITA ACARA MONEV</h2>
-              <h3>{schema.nama_instrumen}</h3>
+            <div style={{ textAlign: 'center', marginBottom: '2rem', fontWeight: 'bold', fontSize: '1.1rem', lineHeight: '1.5' }}>
+              INSTRUMEN MONITORING DAN EVALUASI<br/>
+              IMPLEMENTASI MATEMATIKA GEMBIRA BAGI GURU TK DAN GURU SD<br/>
+              TAHUN 2026<br/>
+              PROVINSI SUMATERA BARAT
             </div>
             
-            <p>Pada hari ini, telah dilaksanakan Monitoring dan Evaluasi dengan rincian identitas sebagai berikut:</p>
-            <table style={{ width: '100%', marginBottom: '2rem', borderCollapse: 'collapse' }}>
+            <table style={{ width: '100%', marginBottom: '2rem', borderCollapse: 'collapse', fontSize: '1rem' }}>
               <tbody>
                 {schema.metadata_fields.map(m => (
                   <tr key={m.id}>
-                    <td style={{ width: '30%', padding: '0.5rem', border: '1px solid black' }}><strong>{m.label_field}</strong></td>
-                    <td style={{ padding: '0.5rem', border: '1px solid black' }}>{metadataValues[m.id]}</td>
+                    <td style={{ width: '200px', padding: '0.25rem 0' }}>{m.label_field}</td>
+                    <td style={{ width: '20px', padding: '0.25rem 0' }}>:</td>
+                    <td style={{ padding: '0.25rem 0' }}>{metadataValues[m.id]}</td>
                   </tr>
                 ))}
               </tbody>
