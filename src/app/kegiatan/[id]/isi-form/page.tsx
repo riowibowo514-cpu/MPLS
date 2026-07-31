@@ -367,21 +367,50 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
           </div>
             
             <p style={{ marginBottom: '4rem' }}>Demikian form instrumen ini diisi dengan sebenar-benarnya sesuai dengan kondisi di lapangan.</p>
-            
-            <div className="signature-block" style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem', textAlign: 'center' }}>
-              <div style={{ width: '40%' }}>
-                <p>Responden / Pihak Sekolah,</p>
-                <div style={{ height: '80px' }}></div>
-                <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>................................................</p>
-                <p>NIP/NUPTK: ...........................</p>
-              </div>
-              <div style={{ width: '40%' }}>
-                <p>Petugas Monev,</p>
-                <div style={{ height: '80px' }}></div>
-                <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{currentUser?.nama_lengkap || '................................................'}</p>
-                <p>NIP: {currentUser?.username || '...........................'}</p>
-              </div>
-            </div>
+            {(() => {
+              const getMeta = (lbl: string) => {
+                const f = schema.metadata_fields.find(m => m.label_field.toLowerCase().includes(lbl.toLowerCase()));
+                return f ? metadataValues[f.id] : '';
+              };
+              const kab = getMeta('kabupaten') || '................';
+              const tgl = getMeta('tanggal') || '................';
+              let namaP = getMeta('nama petugas');
+              if (!namaP) namaP = '................................................';
+              let nipP = getMeta('nip');
+              if (!nipP) nipP = '...........................';
+              let namaR = getMeta('nama responden');
+              if (!namaR) namaR = '................................................';
+
+              let formattedTgl = tgl;
+              if (tgl && tgl.includes('-')) {
+                const d = new Date(tgl);
+                if (!isNaN(d.getTime())) {
+                  formattedTgl = d.toLocaleDateString('id-ID', { year: 'numeric', month: 'long', day: 'numeric' });
+                }
+              }
+
+              return (
+                <div className="signature-block">
+                  <div style={{ textAlign: 'right', marginBottom: '1rem', paddingRight: '2rem' }}>
+                    {kab}, {formattedTgl}
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', textAlign: 'center' }}>
+                    <div style={{ width: '40%' }}>
+                      <p>Responden / Pihak Sekolah,</p>
+                      <div style={{ height: '80px' }}></div>
+                      <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{namaR}</p>
+                      <p>NIP/NUPTK: ...........................</p>
+                    </div>
+                    <div style={{ width: '40%' }}>
+                      <p>Petugas Monev,</p>
+                      <div style={{ height: '80px' }}></div>
+                      <p style={{ textDecoration: 'underline', fontWeight: 'bold' }}>{namaP}</p>
+                      <p>NIP: {nipP}</p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </div>
       </main>
