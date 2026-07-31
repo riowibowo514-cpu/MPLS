@@ -4,7 +4,7 @@ import { createSession, getSession } from '@/lib/auth';
 
 export async function POST(request: Request) {
   try {
-    const { username, password } = await request.json();
+    const { username, password, expectedRole } = await request.json();
 
     // 1. Cek di tabel users
     const { data: user, error } = await supabase
@@ -16,6 +16,9 @@ export async function POST(request: Request) {
     if (error || !user) {
       // Fallback sementara untuk super admin jika tabel kosong / belum di-seed
       if (username === 'admin' && password === 'D4t4BgtkSumbar') {
+        if (expectedRole && expectedRole !== 'admin') {
+          return NextResponse.json({ error: `Akses ditolak. Anda login ke portal ${expectedRole}, namun akun ini adalah Admin.` }, { status: 403 });
+        }
         await createSession({
           id: 'super-admin',
           username: 'admin',
@@ -30,6 +33,12 @@ export async function POST(request: Request) {
     // 2. Verifikasi Password (di sistem nyata harus pakai bcrypt.compare)
     if (user.password_hash !== password) {
       return NextResponse.json({ error: 'Username atau password salah' }, { status: 401 });
+    }
+
+    // 3. Verifikasi Role
+    if (expectedRole && user.role !== expectedRole) {
+      const roleCapitalized = user.role.charAt(0).toUpperCase() + user.role.slice(1);
+      return NextResponse.json({ error: `Akses ditolak. Akun Anda terdaftar sebagai ${roleCapitalized}, bukan ${expectedRole.charAt(0).toUpperCase() + expectedRole.slice(1)}.` }, { status: 403 });
     }
 
     // 3. Buat Sesi JWT

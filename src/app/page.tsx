@@ -41,7 +41,7 @@ export default function PortalMonevPage() {
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.875rem', flex: 1 }}>
             Akses dashboard terbatas untuk memantau rekapitulasi data, grafik, dan statistik dari seluruh kegiatan Monev BGTK.
           </p>
-          <Link href="/login" className="btn btn-primary" style={{ width: '100%', background: '#3b82f6' }}>
+          <Link href="/login?role=pimpinan" className="btn btn-primary" style={{ width: '100%', background: '#3b82f6' }}>
             Login Pimpinan
           </Link>
         </div>
@@ -55,7 +55,7 @@ export default function PortalMonevPage() {
           <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.875rem', flex: 1 }}>
             Area khusus untuk membuat kegiatan baru, menyusun form instrumen dinamis, dan mengekspor seluruh data mentah (Excel).
           </p>
-          <Link href="/login" className="btn btn-primary" style={{ width: '100%', background: '#8b5cf6', borderColor: '#8b5cf6', color: 'white' }}>
+          <Link href="/login?role=admin" className="btn btn-primary" style={{ width: '100%', background: '#8b5cf6', borderColor: '#8b5cf6', color: 'white' }}>
             Login Admin
           </Link>
         </div>

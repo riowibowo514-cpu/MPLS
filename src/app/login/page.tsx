@@ -16,10 +16,13 @@ export default function LoginPage() {
     setIsLoading(true);
     
     try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const expectedRole = urlParams.get('role');
+      
       const res = await fetch('/api/auth', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({ username, password, expectedRole })
       });
 
       if (res.ok) {
@@ -42,7 +45,7 @@ export default function LoginPage() {
       <div className="card">
         <h2 style={{ textAlign: 'center', marginBottom: '0.5rem' }}>Login Portal Monev</h2>
         <p style={{ textAlign: 'center', color: 'var(--text-secondary)', marginBottom: '2rem' }}>
-          Silakan masuk menggunakan kredensial Anda.
+          Silakan masuk menggunakan kredensial {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('role') ? new URLSearchParams(window.location.search).get('role') : 'Anda'}.
         </p>
         <form onSubmit={handleLogin}>
           <div className="form-group">
