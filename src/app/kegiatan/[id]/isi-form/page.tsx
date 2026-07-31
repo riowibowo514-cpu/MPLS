@@ -156,21 +156,14 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
       if (scoringConfig && currentStep === totalSteps - 2) {
         const computed = calculateDynamicScore(scoringConfig, jawabanValues, schema.sections);
         setKesimpulanComputed(computed);
-        if (!kesimpulanInputs.statusFinal) {
-          setKesimpulanInputs(prev => ({ ...prev, statusFinal: computed.finalStatus }));
-        }
+        setKesimpulanInputs(prev => ({ ...prev, statusFinal: computed.finalStatus }));
       }
       setCurrentStep(prev => prev + 1);
       window.scrollTo(0, 0);
       return;
     }
 
-    if (scoringConfig) {
-      if (kesimpulanInputs.statusFinal !== kesimpulanComputed?.finalStatus && !kesimpulanInputs.alasanOverride) {
-        setError('Alasan Mengubah Status wajib diisi karena Anda mengubah status yang disarankan sistem.');
-        return;
-      }
-    }
+    // Since status final is auto-computed and hidden, no override check is needed.
 
     setIsSubmitting(true);
     setError('');
@@ -555,46 +548,13 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
           <div className="card animate-fade-in" style={{ marginBottom: '2rem', borderTop: '4px solid #10b981' }}>
             <h2 style={{ marginBottom: '1.5rem' }}>Kesimpulan & Rekapitulasi</h2>
             
-            <div style={{ padding: '1rem', backgroundColor: '#eef2ff', borderRadius: 'var(--radius-md)', borderLeft: '4px solid #10b981', marginBottom: '1.5rem' }}>
-              <p style={{ margin: 0, fontSize: '0.875rem', fontWeight: 600 }}>Total Skor Sistem</p>
-              <div style={{ marginTop: '0.5rem' }}>
-                <span style={{ fontSize: '1.25rem', fontWeight: 700, color: '#10b981', display: 'block' }}>
-                  {kesimpulanComputed?.totalScorePercentage?.toFixed(2)}%
-                </span>
-                <span style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>
-                  Status Disarankan: <strong>{kesimpulanComputed?.finalStatus}</strong>
-                </span>
-              </div>
-            </div>
-
-            <div className="form-group">
-              <label>Konfirmasi Status Final</label>
-              <select 
-                value={kesimpulanInputs.statusFinal}
-                onChange={e => setKesimpulanInputs({ ...kesimpulanInputs, statusFinal: e.target.value })}
-                style={{ fontWeight: 600, padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none', width: '100%' }}
-              >
-                {scoringConfig.status_thresholds.map(t => (
-                  <option key={t.status} value={t.status}>{t.status}</option>
-                ))}
-              </select>
-            </div>
-
-            {kesimpulanInputs.statusFinal !== kesimpulanComputed?.finalStatus && (
-              <div className="form-group animate-fade-in" style={{ marginTop: '1rem' }}>
-                <label style={{ color: 'var(--warning)' }}>Alasan Mengubah Status (Wajib)</label>
-                <textarea 
-                  value={kesimpulanInputs.alasanOverride}
-                  onChange={e => setKesimpulanInputs({ ...kesimpulanInputs, alasanOverride: e.target.value })}
-                  rows={2}
-                  style={{ borderColor: 'var(--warning)', padding: '0.75rem', borderRadius: 'var(--radius-md)', width: '100%' }}
-                />
-              </div>
-            )}
+            {/* Skor dan Status Disembunyikan (Berdasarkan Evaluasi Atasan) */}
+            <input type="hidden" value={kesimpulanInputs.statusFinal} />
 
             <div className="form-group" style={{ marginTop: '1.5rem' }}>
-              <label>Catatan Kritis / Temuan Lapangan</label>
+              <label>Catatan Kritis / Temuan Lapangan <span style={{color:'red'}}>*</span></label>
               <textarea 
+                required
                 value={kesimpulanInputs.catatanKritis}
                 onChange={e => setKesimpulanInputs({ ...kesimpulanInputs, catatanKritis: e.target.value })}
                 rows={3}
@@ -603,8 +563,9 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
             </div>
             
             <div className="form-group" style={{ marginTop: '1rem' }}>
-              <label>Rekomendasi</label>
+              <label>Rekomendasi <span style={{color:'red'}}>*</span></label>
               <textarea 
+                required
                 value={kesimpulanInputs.rekomendasi}
                 onChange={e => setKesimpulanInputs({ ...kesimpulanInputs, rekomendasi: e.target.value })}
                 rows={3}
