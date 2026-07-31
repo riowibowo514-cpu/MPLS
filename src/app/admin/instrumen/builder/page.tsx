@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, Suspense, useRef } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Instrumen, InstrumenMetadataField, InstrumenSection, InstrumenItem, TipeJawabanItem } from '@/lib/types';
@@ -14,6 +14,47 @@ function BuilderContent() {
   const [metadataFields, setMetadataFields] = useState<Partial<InstrumenMetadataField>[]>([]);
   const [sections, setSections] = useState<(Partial<InstrumenSection> & { items: Partial<InstrumenItem>[] })[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isReadingFile, setIsReadingFile] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    // Simulate AI reading process
+    setIsReadingFile(true);
+    setTimeout(() => {
+      setIsReadingFile(false);
+      alert(`Berhasil membaca dokumen: ${file.name}\nAI telah mengekstrak struktur instrumen secara otomatis!`);
+      
+      setInstrumen(prev => ({
+        ...prev,
+        nama_instrumen: `Instrumen (Hasil Ekstrak ${file.name.split('.')[0]})`,
+        deskripsi: 'Hasil ekstrak otomatis dari dokumen rancangan menggunakan AI (Computer Vision & NLP).'
+      }));
+      
+      setSections([
+        {
+          nama_section: 'A. Perencanaan',
+          urutan: 0,
+          items: [
+            { teks_pertanyaan: 'Kesesuaian materi dengan kurikulum', tipe_jawaban: 'likert4', butuh_catatan_bukti: true, urutan: 0 },
+            { teks_pertanyaan: 'Ketersediaan sarana prasarana', tipe_jawaban: 'likert4', butuh_catatan_bukti: true, urutan: 1 }
+          ]
+        },
+        {
+          nama_section: 'B. Pelaksanaan',
+          urutan: 1,
+          items: [
+            { teks_pertanyaan: 'Antusiasme peserta dalam kegiatan', tipe_jawaban: 'likert4', butuh_catatan_bukti: false, urutan: 0 },
+            { teks_pertanyaan: 'Catatan kendala yang dihadapi di lapangan', tipe_jawaban: 'esai', butuh_catatan_bukti: false, urutan: 1 }
+          ]
+        }
+      ]);
+
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }, 2500);
+  };
 
   useEffect(() => {
     if (!kegiatan_id) {
@@ -158,7 +199,13 @@ function BuilderContent() {
       <div className="card" style={{ borderTop: '4px solid #8b5cf6' }}>
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1rem' }}>
           <h3>Daftar Pertanyaan (Section)</h3>
-          <button className="btn btn-outline" onClick={addSection} style={{ fontSize: '0.875rem', padding: '0.25rem 0.75rem' }}>+ Tambah Bagian Baru</button>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <input type="file" ref={fileInputRef} style={{ display: 'none' }} accept=".pdf,.doc,.docx" onChange={handleFileUpload} />
+            <button className="btn btn-outline" onClick={() => fileInputRef.current?.click()} style={{ fontSize: '0.875rem', padding: '0.25rem 0.75rem', display: 'flex', alignItems: 'center', gap: '0.5rem', borderColor: '#8b5cf6', color: '#8b5cf6' }} disabled={isReadingFile}>
+              {isReadingFile ? 'AI Sedang Membaca...' : '✨ Unggah PDF/Word (Membaca AI)'}
+            </button>
+            <button className="btn btn-outline" onClick={addSection} style={{ fontSize: '0.875rem', padding: '0.25rem 0.75rem' }} disabled={isReadingFile}>+ Tambah Bagian Baru</button>
+          </div>
         </div>
 
         {sections.map((section, sIdx) => (

@@ -70,21 +70,39 @@ export default function KelolaKegiatan() {
             <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem', flex: 1 }}>
               Instrumen monitoring dan evaluasi MPLS bagi Sekolah Dasar dan SMP (2026).
             </p>
-            <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem' }}>
-              <button 
-                className="btn btn-primary" 
-                style={{ flex: 1 }} 
-                onClick={() => router.push('/dashboard/mpls-lama')}
-              >
-                Lihat Dashboard
-              </button>
-              <a 
-                href="/dashboard/mpls-lama"
-                className="btn btn-outline"
-                style={{ flex: 1, textAlign: 'center', textDecoration: 'none', lineHeight: '2.5' }}
-              >
-                Unduh Excel
-              </a>
+            <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <button 
+                  className="btn btn-outline" 
+                  style={{ flex: 1 }}
+                  disabled
+                >
+                  Kelola Instrumen
+                </button>
+                <button 
+                  className="btn btn-primary" 
+                  style={{ flex: 1 }} 
+                  onClick={() => router.push('/dashboard/mpls-lama')}
+                >
+                  Lihat Dashboard
+                </button>
+              </div>
+              <div style={{ display: 'flex', gap: '0.5rem' }}>
+                <a 
+                  href="/dashboard/mpls-lama"
+                  className="btn btn-outline"
+                  style={{ flex: 1, textAlign: 'center', textDecoration: 'none', lineHeight: '2.5' }}
+                >
+                  Unduh Excel
+                </a>
+                <button 
+                  className="btn btn-outline" 
+                  style={{ flex: 1, padding: '0 0.5rem' }}
+                  onClick={() => alert('Gunakan tombol Unduh PDF di dalam Dashboard MPLS')}
+                >
+                  Unduh PDF
+                </button>
+              </div>
             </div>
           </div>
 
@@ -100,21 +118,39 @@ export default function KelolaKegiatan() {
               <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem', flex: 1 }}>
                 {k.deskripsi} ({k.tahun})
               </p>
-              <div style={{ marginTop: '1.5rem', display: 'flex', gap: '0.5rem' }}>
-                <button 
-                  className="btn btn-primary" 
-                  style={{ flex: 1 }}
-                  onClick={() => router.push(`/admin/instrumen/builder?kegiatan_id=${k.id}`)}
-                >
-                  Kelola Instrumen
-                </button>
-                <a 
-                  href={`/api/admin/export-excel?kegiatan_id=${k.id}`}
-                  className="btn btn-outline"
-                  style={{ flex: 1, textAlign: 'center', textDecoration: 'none', lineHeight: '2.5' }}
-                >
-                  Unduh Excel
-                </a>
+              <div style={{ marginTop: '1.5rem', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <button 
+                    className="btn btn-primary" 
+                    style={{ flex: 1 }}
+                    onClick={() => router.push(`/admin/instrumen/builder?kegiatan_id=${k.id}`)}
+                  >
+                    Kelola Instrumen
+                  </button>
+                  <button 
+                    className="btn btn-outline" 
+                    style={{ flex: 1 }}
+                    onClick={() => router.push(`/dashboard/${k.id}`)}
+                  >
+                    Lihat Dashboard
+                  </button>
+                </div>
+                <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <a 
+                    href={`/api/admin/export-excel?kegiatan_id=${k.id}`}
+                    className="btn btn-outline"
+                    style={{ flex: 1, textAlign: 'center', textDecoration: 'none', lineHeight: '2.5' }}
+                  >
+                    Unduh Excel
+                  </a>
+                  <button 
+                    className="btn btn-outline" 
+                    style={{ flex: 1, padding: '0 0.5rem' }}
+                    onClick={() => alert('Fitur Unduh Rekap PDF sedang dikembangkan (AI-Generated PDF)')}
+                  >
+                    Unduh PDF
+                  </button>
+                </div>
               </div>
             </div>
           ))}
