@@ -41,24 +41,6 @@ export default function DaftarKegiatanPetugas() {
       ) : (
         <div style={{ display: 'grid', gap: '1rem', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))' }}>
           
-          {/* Card untuk MPLS Lama (Manual Redirect) */}
-          <div className="card" style={{ borderLeft: '4px solid var(--primary)', display: 'flex', flexDirection: 'column', height: '100%' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-              <h3 style={{ margin: 0 }}>MPLS 2026 (Format Lama)</h3>
-              <span style={{ fontSize: '0.75rem', background: '#3b82f6', color: 'white', padding: '0.25rem 0.5rem', borderRadius: '99px' }}>AKTIF</span>
-            </div>
-            <p style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', marginTop: '0.5rem', marginBottom: '1.5rem', flex: 1 }}>
-              Instrumen monitoring dan evaluasi Masa Pengenalan Lingkungan Sekolah.
-            </p>
-            <button 
-              className="btn btn-primary" 
-              style={{ width: '100%' }}
-              onClick={() => router.push('/isi-form')}
-            >
-              Mulai Mengisi
-            </button>
-          </div>
-
           {/* Render Kegiatan Dinamis */}
           {kegiatans.map(k => (
             <div key={k.id} className="card" style={{ borderLeft: '4px solid #10b981', display: 'flex', flexDirection: 'column', height: '100%' }}>
