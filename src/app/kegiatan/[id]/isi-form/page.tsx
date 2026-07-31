@@ -186,7 +186,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
         .from('pengisian')
         .insert([{
           instrumen_id: schema.id,
-          petugas_id: currentUser?.id || null, // gunakan id dari session
+          petugas_id: (currentUser?.id && currentUser.id !== 'super-admin') ? currentUser.id : null,
           metadata_values: finalMetadata
         }])
         .select()
