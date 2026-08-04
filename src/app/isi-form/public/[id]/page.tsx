@@ -98,7 +98,7 @@ export default function PublicFormPKG() {
     let missing = false;
     for (const section of instrumen.sections) {
       for (const item of section.items) {
-        if (item.wajib_diisi && !answers[item.id]) {
+        if (!answers[item.id]) {
           missing = true;
         }
       }
@@ -221,7 +221,7 @@ export default function PublicFormPKG() {
                 {section.items.map((item) => (
                   <div key={item.id}>
                     <p style={{ fontWeight: '500', marginBottom: '0.75rem', color: '#1e293b' }}>
-                      {item.teks_pertanyaan} {item.wajib_diisi && <span style={{ color: '#ef4444' }}>*</span>}
+                      {item.teks_pertanyaan} <span style={{ color: '#ef4444' }}>*</span>
                     </p>
                     
                     {/* Render Input based on type */}
