@@ -14,6 +14,7 @@ export default function PublicFormPKG() {
   const [error, setError] = useState<string | null>(null);
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [currentStep, setCurrentStep] = useState(0);
   
   // State Jawaban { item_id: jawaban (string/number) }
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
@@ -90,22 +91,47 @@ export default function PublicFormPKG() {
     }));
   };
 
+  const validateCurrentStep = (): boolean => {
+    if (!instrumen) return false;
+    const currentSection = instrumen.sections[currentStep];
+    
+    let missingId = null;
+    for (const item of currentSection.items) {
+      if (!answers[item.id]) {
+        missingId = item.id;
+        break; // Cukup temukan yang pertama kosong
+      }
+    }
+    
+    if (missingId) {
+      alert("Mohon lengkapi semua pertanyaan yang wajib diisi (*)");
+      const element = document.getElementById(`item-${missingId}`);
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      return false;
+    }
+    return true;
+  };
+
+  const handleNext = () => {
+    if (validateCurrentStep()) {
+      setCurrentStep(prev => prev + 1);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
+
+  const handlePrev = () => {
+    setCurrentStep(prev => prev - 1);
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!instrumen) return;
     
-    // Validasi item wajib
-    let missing = false;
-    for (const section of instrumen.sections) {
-      for (const item of section.items) {
-        if (!answers[item.id]) {
-          missing = true;
-        }
-      }
-    }
-    
-    if (missing) {
-      alert("Mohon lengkapi semua pertanyaan yang wajib diisi (*)");
+    // Validasi step terakhir
+    if (!validateCurrentStep()) {
       return;
     }
 
@@ -211,15 +237,20 @@ export default function PublicFormPKG() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          {instrumen?.sections.map((section, idx) => (
-            <div key={section.id} className="card animate-slide-up" style={{ marginBottom: '2rem', animationDelay: `${idx * 0.1}s` }}>
-              <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)', color: '#334155' }}>
-                {section.urutan}. {section.nama_section}
-              </h2>
+          {instrumen && (
+            <div className="card animate-slide-up" style={{ marginBottom: '2rem' }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
+                <h2 style={{ fontSize: '1.25rem', color: '#334155', margin: 0 }}>
+                  {instrumen.sections[currentStep].urutan}. {instrumen.sections[currentStep].nama_section}
+                </h2>
+                <span style={{ fontSize: '0.875rem', color: '#64748b', fontWeight: '500' }}>
+                  Bagian {currentStep + 1} dari {instrumen.sections.length}
+                </span>
+              </div>
               
               <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem' }}>
-                {section.items.map((item) => (
-                  <div key={item.id}>
+                {instrumen.sections[currentStep].items.map((item) => (
+                  <div key={item.id} id={`item-${item.id}`} style={{ padding: '0.5rem', borderRadius: 'var(--radius-md)', transition: 'background-color 0.3s' }}>
                     <p style={{ fontWeight: '500', marginBottom: '0.75rem', color: '#1e293b' }}>
                       {item.teks_pertanyaan} <span style={{ color: '#ef4444' }}>*</span>
                     </p>
@@ -290,17 +321,38 @@ export default function PublicFormPKG() {
                 ))}
               </div>
             </div>
-          ))}
+          )}
 
-          <div style={{ position: 'sticky', bottom: '1rem', padding: '1rem', background: 'white', borderRadius: 'var(--radius-md)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'flex-end' }}>
+          <div style={{ position: 'sticky', bottom: '1rem', padding: '1rem', background: 'white', borderRadius: 'var(--radius-md)', boxShadow: '0 10px 25px -5px rgba(0,0,0,0.1)', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
             <button 
-              type="submit" 
-              className="btn btn-primary"
-              disabled={isSubmitting}
-              style={{ padding: '0.75rem 2rem', fontSize: '1rem', background: '#8b5cf6' }}
+              type="button" 
+              className="btn btn-secondary"
+              onClick={handlePrev}
+              disabled={currentStep === 0 || isSubmitting}
+              style={{ padding: '0.75rem 1.5rem', visibility: currentStep === 0 ? 'hidden' : 'visible' }}
             >
-              {isSubmitting ? 'Mengirim...' : 'Kirim Tanggapan'}
+              ← Sebelumnya
             </button>
+            
+            {instrumen && currentStep < instrumen.sections.length - 1 ? (
+              <button 
+                type="button" 
+                className="btn btn-primary"
+                onClick={handleNext}
+                style={{ padding: '0.75rem 2rem', fontSize: '1rem', background: '#8b5cf6' }}
+              >
+                Selanjutnya →
+              </button>
+            ) : (
+              <button 
+                type="submit" 
+                className="btn btn-primary"
+                disabled={isSubmitting}
+                style={{ padding: '0.75rem 2rem', fontSize: '1rem', background: '#10b981' }}
+              >
+                {isSubmitting ? 'Mengirim...' : 'Kirim Tanggapan ✓'}
+              </button>
+            )}
           </div>
         </form>
       </div>
