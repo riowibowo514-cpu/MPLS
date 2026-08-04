@@ -3,6 +3,7 @@ import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { MonevEntryData } from './supabase';
 import { INSTRUMEN_BARU } from '@/config/instruments';
+import { InstrumenFull } from '@/lib/types';
 
 export function generateExcelSummary(dataList: MonevEntryData[]) {
   const questionMap: Record<string, string> = {};
@@ -116,4 +117,47 @@ export function generatePDFSummary(dataList: MonevEntryData[]) {
 
   const today = new Date().toISOString().split('T')[0];
   doc.save(`Rekap_Monev_MPLS_${today}.pdf`);
+}
+
+export function generateDynamicPDFSummary(schema: InstrumenFull, pengisians: any[]) {
+  const doc = new jsPDF('landscape');
+  
+  doc.setFontSize(14);
+  doc.setFont('helvetica', 'bold');
+  doc.text('REKAPITULASI HASIL MONITORING DAN EVALUASI', 148, 15, { align: 'center' });
+  doc.text(schema.nama_instrumen.toUpperCase(), 148, 22, { align: 'center' });
+  
+  const headers = ['No', 'Tanggal Submit'];
+  
+  // Ambil maksimal 5 metadata pertama agar tabel tidak keluar batas
+  const metaToShow = schema.metadata_fields.slice(0, 5);
+  metaToShow.forEach(m => headers.push(m.label_field));
+  
+  headers.push('Status');
+
+  const rows = pengisians.map((p, index) => {
+    const row: any[] = [
+      index + 1,
+      new Date(p.tanggal_pengisian).toLocaleDateString('id-ID')
+    ];
+    
+    metaToShow.forEach(m => {
+      row.push(p.metadata_values[m.id] || '-');
+    });
+
+    row.push(p.metadata_values['_statusFinal'] || p.metadata_values['_statusOtomatis'] || '-');
+    return row;
+  });
+
+  autoTable(doc, {
+    startY: 30,
+    head: [headers],
+    body: rows,
+    theme: 'grid',
+    headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], halign: 'center' }, // Emerald 500
+    styles: { fontSize: 9, cellPadding: 2 },
+  });
+
+  const today = new Date().toISOString().split('T')[0];
+  doc.save(`Rekap_${schema.nama_instrumen.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.pdf`);
 }
