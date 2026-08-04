@@ -60,7 +60,7 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
     }
   };
 
-  const handleExportExcel = () => {
+  const handleExportExcel = async () => {
     if (!schema || pengisians.length === 0) return alert('Tidak ada data untuk diekspor');
 
     // Siapkan Header
@@ -121,11 +121,31 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Data Monev");
     XLSX.writeFile(workbook, `Rekap_Monev_${schema.nama_instrumen.replace(/[^a-zA-Z0-9]/g, '_')}.xlsx`);
+
+    try {
+      await fetch('/api/track-export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aksi: `Export Dashboard Excel: ${schema.nama_instrumen}` })
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
-  const handleExportPDF = () => {
+  const handleExportPDF = async () => {
     if (!schema || pengisians.length === 0) return alert('Tidak ada data untuk diekspor');
     generateDynamicPDFSummary(schema, pengisians);
+    
+    try {
+      await fetch('/api/track-export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aksi: `Export Dashboard PDF: ${schema.nama_instrumen}` })
+      });
+    } catch (e) {
+      console.error(e);
+    }
   };
 
   if (isLoading) return <div className="container" style={{ padding: '2rem' }}>Memuat analitik...</div>;

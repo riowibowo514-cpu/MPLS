@@ -51,6 +51,16 @@ export default function Home() {
       } else {
         generatePDFSummary(entries);
       }
+
+      try {
+        await fetch('/api/track-export', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ aksi: `Export Dashboard ${type.toUpperCase()}: MPLS Lama` })
+        });
+      } catch (e) {
+        console.error(e);
+      }
     } catch (err) {
       console.error(err);
       alert('Gagal mengunduh rekap data');

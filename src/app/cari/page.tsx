@@ -161,6 +161,17 @@ export default function SearchPage() {
     }
     setSelectedJawaban(jMap);
 
+    // Track the download
+    try {
+      await fetch('/api/track-export', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ aksi: `Cetak PDF Hasil: ${getPrimaryLabel(pengisian)}` })
+      });
+    } catch (e) {
+      console.error('Tracking failed', e);
+    }
+
     // Beri waktu sedikit untuk React me-render komponen hidden khusus print
     setTimeout(() => {
       window.print();
@@ -248,10 +259,21 @@ export default function SearchPage() {
                   </p>
                 </div>
                 <div>
-                  <button className="btn btn-outline" onClick={() => {
+                  <button className="btn btn-outline" onClick={async () => {
                     try {
                       const entryWithNip = { ...entry, nipPetugas: petugasMapByName[entry.namaPetugas] };
                       generatePDF(entryWithNip);
+                      
+                      // Track the download
+                      try {
+                        await fetch('/api/track-export', {
+                          method: 'POST',
+                          headers: { 'Content-Type': 'application/json' },
+                          body: JSON.stringify({ aksi: `Cetak PDF Hasil MPLS Lama: ${entry.namaSekolah}` })
+                        });
+                      } catch (e) {
+                        console.error('Tracking failed', e);
+                      }
                     } catch(err) {
                       alert('Gagal mencetak PDF format lama');
                     }

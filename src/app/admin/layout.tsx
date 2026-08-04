@@ -14,6 +14,9 @@ export default function AdminLayout({
         <Link href="/admin/pengguna" className="btn btn-outline" style={{ border: 'none', borderBottom: '2px solid transparent' }}>
           Kelola Pengguna
         </Link>
+        <Link href="/admin/log-unduh" className="btn btn-outline" style={{ border: 'none', borderBottom: '2px solid transparent' }}>
+          Log Unduh & Cetak
+        </Link>
         {/* We can add active state highlighting if needed, but keeping it simple for now */}
       </div>
       {children}
