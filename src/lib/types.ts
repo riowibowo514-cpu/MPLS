@@ -15,6 +15,7 @@ export interface Kegiatan {
   deskripsi?: string;
   tahun: string;
   status: 'aktif' | 'nonaktif';
+  kategori_program?: string;
   created_at: string;
 }
 

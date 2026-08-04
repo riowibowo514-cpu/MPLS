@@ -21,6 +21,7 @@ export default function DaftarKegiatanPetugas() {
       .from('kegiatan')
       .select('*')
       .eq('status', 'aktif')
+      .eq('kategori_program', 'MONEV') // Sembunyikan PKG
       .order('created_at', { ascending: false });
       
     if (data) setKegiatans(data);
