@@ -272,18 +272,30 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
               <h3 style={{ marginBottom: '0.5rem', width: '100%', textAlign: 'center' }}>Kinerja Keseluruhan per Aspek</h3>
               <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.5rem' }}>Skala 1 (Kurang) hingga 4 (Baik Sekali)</p>
               
-              <div style={{ width: '100%', maxWidth: '400px', height: '300px' }}>
+              <div style={{ width: '100%', maxWidth: '600px', height: '350px' }}>
                 <Radar 
                   data={radarData}
                   options={{
                     maintainAspectRatio: false,
+                    layout: {
+                      padding: {
+                        top: 20,
+                        bottom: 20,
+                        left: 40,
+                        right: 40
+                      }
+                    },
                     scales: {
                       r: {
                         min: 1,
                         max: 4,
                         angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
                         grid: { color: 'rgba(0, 0, 0, 0.1)' },
-                        pointLabels: { font: { size: 12, family: "'Inter', sans-serif" }, color: '#475569' },
+                        pointLabels: { 
+                          font: { size: 11, family: "'Inter', sans-serif" }, 
+                          color: '#475569',
+                          padding: 10
+                        },
                         ticks: { stepSize: 1, backdropColor: 'transparent' }
                       }
                     },
