@@ -120,44 +120,153 @@ export function generatePDFSummary(dataList: MonevEntryData[]) {
 }
 
 export function generateDynamicPDFSummary(schema: InstrumenFull, pengisians: any[]) {
-  const doc = new jsPDF('landscape');
+  const doc = new jsPDF('portrait');
   
   doc.setFontSize(14);
   doc.setFont('helvetica', 'bold');
-  doc.text('REKAPITULASI HASIL MONITORING DAN EVALUASI', 148, 15, { align: 'center' });
-  doc.text(schema.nama_instrumen.toUpperCase(), 148, 22, { align: 'center' });
+  doc.text('RINGKASAN EKSEKUTIF (EXECUTIVE SUMMARY)', 105, 15, { align: 'center' });
+  doc.setFontSize(12);
+  doc.text(schema.nama_instrumen.toUpperCase(), 105, 22, { align: 'center' });
   
-  const headers = ['No', 'Tanggal Submit'];
-  
-  // Ambil maksimal 5 metadata pertama agar tabel tidak keluar batas
-  const metaToShow = schema.metadata_fields.slice(0, 5);
-  metaToShow.forEach(m => headers.push(m.label_field));
-  
-  headers.push('Status');
+  doc.setFontSize(10);
+  doc.setFont('helvetica', 'normal');
+  doc.text(`Total Responden: ${pengisians.length} orang`, 105, 29, { align: 'center' });
 
-  const rows = pengisians.map((p, index) => {
-    const row: any[] = [
-      index + 1,
-      new Date(p.tanggal_pengisian).toLocaleDateString('id-ID')
-    ];
-    
-    metaToShow.forEach(m => {
-      row.push(p.metadata_values[m.id] || '-');
+  if (pengisians.length === 0) {
+    doc.text('Belum ada data.', 105, 50, { align: 'center' });
+    doc.save(`Rekap_${schema.nama_instrumen}_Kosong.pdf`);
+    return;
+  }
+
+  // --- PRE-CALCULATE AGGREGATIONS ---
+  const sectionAverages: { nama: string, avg: number }[] = [];
+  const itemStats: { id: string, teks: string, section: string, avg: number }[] = [];
+
+  schema.sections.forEach(sec => {
+    let secTotalScore = 0;
+    let secTotalAnswers = 0;
+
+    sec.items.forEach(item => {
+      if (item.tipe_jawaban.includes('likert')) {
+        let itemTotalScore = 0;
+        let itemAnswersCount = 0;
+
+        pengisians.forEach(p => {
+          const ans = p.jawaban.find((j: any) => j.item_id === item.id);
+          if (ans && ans.nilai_skor) {
+            itemTotalScore += ans.nilai_skor;
+            itemAnswersCount++;
+            secTotalScore += ans.nilai_skor;
+            secTotalAnswers++;
+          }
+        });
+
+        if (itemAnswersCount > 0) {
+          itemStats.push({
+            id: item.id,
+            teks: item.teks_pertanyaan,
+            section: sec.nama_section,
+            avg: itemTotalScore / itemAnswersCount
+          });
+        }
+      }
     });
 
-    row.push(p.metadata_values['_statusFinal'] || p.metadata_values['_statusOtomatis'] || '-');
-    return row;
+    if (secTotalAnswers > 0 && !sec.nama_section.toLowerCase().includes('identitas') && !sec.nama_section.toLowerCase().includes('saran')) {
+      sectionAverages.push({
+        nama: sec.nama_section,
+        avg: secTotalScore / secTotalAnswers
+      });
+    }
   });
+
+  let currentY = 40;
+
+  // 1. KINERJA PER ASPEK (Tabel)
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('1. Kinerja Keseluruhan per Aspek (Skala 1-4)', 14, currentY);
+  
+  const aspectRows = sectionAverages.map((s, idx) => [
+    idx + 1,
+    s.nama,
+    s.avg.toFixed(2)
+  ]);
 
   autoTable(doc, {
-    startY: 30,
-    head: [headers],
-    body: rows,
+    startY: currentY + 5,
+    head: [['No', 'Aspek / Bagian', 'Skor Rata-Rata']],
+    body: aspectRows,
     theme: 'grid',
-    headStyles: { fillColor: [16, 185, 129], textColor: [255, 255, 255], halign: 'center' }, // Emerald 500
-    styles: { fontSize: 9, cellPadding: 2 },
+    headStyles: { fillColor: [139, 92, 246], textColor: [255, 255, 255] }, // Purple
+    styles: { fontSize: 10, cellPadding: 3 },
+    columnStyles: { 
+      0: { cellWidth: 15, halign: 'center' }, 
+      2: { cellWidth: 40, halign: 'center', fontStyle: 'bold' } 
+    }
   });
 
+  // @ts-ignore (doc.lastAutoTable exists)
+  currentY = doc.lastAutoTable.finalY + 15;
+
+  // 2. KEKUATAN & KELEMAHAN
+  const sortedItems = [...itemStats].sort((a, b) => b.avg - a.avg);
+  const top3 = sortedItems.slice(0, 3);
+  const bottom3 = sortedItems.length > 3 ? [...sortedItems].reverse().slice(0, 3) : [];
+
+  doc.setFontSize(12);
+  doc.setFont('helvetica', 'bold');
+  doc.text('2. Wawasan Instan (Kekuatan & Area Perbaikan)', 14, currentY);
+  
+  currentY += 10;
+  
+  // Top 3
+  doc.setFontSize(11);
+  doc.setTextColor(16, 185, 129); // Green
+  doc.text('Kekuatan Utama (3 Tertinggi):', 14, currentY);
+  doc.setTextColor(0, 0, 0);
+  currentY += 6;
+  
+  top3.forEach((item, idx) => {
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    const textLines = doc.splitTextToSize(`${idx + 1}. ${item.teks} (${item.section})`, 160);
+    doc.text(textLines, 14, currentY);
+    
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(16, 185, 129);
+    doc.text(item.avg.toFixed(2), 180, currentY);
+    doc.setTextColor(0, 0, 0);
+    
+    currentY += (textLines.length * 5) + 2;
+  });
+
+  currentY += 5;
+
+  // Bottom 3
+  if (bottom3.length > 0) {
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(239, 68, 68); // Red
+    doc.text('Area Perbaikan (3 Terendah):', 14, currentY);
+    doc.setTextColor(0, 0, 0);
+    currentY += 6;
+    
+    bottom3.forEach((item, idx) => {
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const textLines = doc.splitTextToSize(`${idx + 1}. ${item.teks} (${item.section})`, 160);
+      doc.text(textLines, 14, currentY);
+      
+      doc.setFont('helvetica', 'bold');
+      doc.setTextColor(239, 68, 68);
+      doc.text(item.avg.toFixed(2), 180, currentY);
+      doc.setTextColor(0, 0, 0);
+      
+      currentY += (textLines.length * 5) + 2;
+    });
+  }
+
   const today = new Date().toISOString().split('T')[0];
-  doc.save(`Rekap_${schema.nama_instrumen.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.pdf`);
+  doc.save(`Ringkasan_Eksekutif_${schema.nama_instrumen.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.pdf`);
 }
