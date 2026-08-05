@@ -7,10 +7,16 @@ import Link from 'next/link';
 import * as XLSX from 'xlsx';
 import { generateDynamicPDFSummary } from '@/lib/exportGenerator';
 
-import { Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement } from 'chart.js';
-import { Pie, Bar, Line } from 'react-chartjs-2';
+import { 
+  Chart as ChartJS, ArcElement, Tooltip, Legend, CategoryScale, LinearScale, 
+  BarElement, PointElement, LineElement, RadialLinearScale, RadarController, Filler 
+} from 'chart.js';
+import { Pie, Bar, Line, Radar } from 'react-chartjs-2';
 
-ChartJS.register(ArcElement, Tooltip, Legend, CategoryScale, LinearScale, BarElement, PointElement, LineElement);
+ChartJS.register(
+  ArcElement, Tooltip, Legend, CategoryScale, LinearScale, 
+  BarElement, PointElement, LineElement, RadialLinearScale, RadarController, Filler
+);
 
 export default function DetailDashboardKegiatan({ params }: { params: Promise<{ id: string }> }) {
   const unwrappedParams = use(params);
@@ -63,11 +69,9 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
   const handleExportExcel = async () => {
     if (!schema || pengisians.length === 0) return alert('Tidak ada data untuk diekspor');
 
-    // Siapkan Header
     const headers = ['ID Pengisian', 'Tanggal Submit'];
     schema.metadata_fields.forEach(m => headers.push(m.label_field));
     
-    // Sort items by section and item order to make columns predictable
     const orderedItems: any[] = [];
     schema.sections.forEach(sec => {
       const items = [...sec.items].sort((a, b) => a.urutan - b.urutan);
@@ -80,25 +84,21 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
       });
     });
 
-    // Siapkan Baris Data
     const rows = pengisians.map(p => {
       const row: any = {
         'ID Pengisian': p.id,
         'Tanggal Submit': new Date(p.tanggal_pengisian).toLocaleString('id-ID')
       };
 
-      // Metadata
       schema.metadata_fields.forEach(m => {
         row[m.label_field] = p.metadata_values[m.id] || '';
       });
 
-      // Jawaban mapping
       const ansMap: Record<string, any> = {};
       p.jawaban.forEach((j: any) => {
         ansMap[j.item_id] = j;
       });
 
-      // Pertanyaan
       orderedItems.forEach(item => {
         const headerText = `[${item.section_id ? schema.sections.find(s => s.id === item.section_id)?.nama_section : ''}] ${item.teks_pertanyaan}`;
         const ans = ansMap[item.id];
@@ -151,53 +151,100 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
   if (isLoading) return <div className="container" style={{ padding: '2rem' }}>Memuat analitik...</div>;
   if (!schema) return <div className="container" style={{ padding: '2rem' }}>Data tidak ditemukan.</div>;
 
-  // Chart Data Preparation
-  const dateCounts = pengisians.reduce((acc, p) => {
-    const date = new Date(p.tanggal_pengisian).toLocaleDateString('id-ID');
-    acc[date] = (acc[date] || 0) + 1;
-    return acc;
-  }, {} as Record<string, number>);
+  // --- PRE-CALCULATE AGGREGATIONS ---
+  const sectionAverages: { nama: string, avg: number }[] = [];
+  const itemStats: { id: string, teks: string, section: string, avg: number, total: number }[] = [];
 
-  const lineData = {
-    labels: Object.keys(dateCounts),
+  schema.sections.forEach(sec => {
+    let secTotalScore = 0;
+    let secTotalAnswers = 0;
+
+    sec.items.forEach(item => {
+      if (item.tipe_jawaban.includes('likert')) {
+        let itemTotalScore = 0;
+        let itemAnswersCount = 0;
+
+        pengisians.forEach(p => {
+          const ans = p.jawaban.find((j: any) => j.item_id === item.id);
+          if (ans && ans.nilai_skor) {
+            itemTotalScore += ans.nilai_skor;
+            itemAnswersCount++;
+            secTotalScore += ans.nilai_skor;
+            secTotalAnswers++;
+          }
+        });
+
+        if (itemAnswersCount > 0) {
+          itemStats.push({
+            id: item.id,
+            teks: item.teks_pertanyaan,
+            section: sec.nama_section,
+            avg: itemTotalScore / itemAnswersCount,
+            total: itemAnswersCount
+          });
+        }
+      }
+    });
+
+    if (secTotalAnswers > 0) {
+      // Hanya masukkan section yang punya nilai Likert
+      if (!sec.nama_section.toLowerCase().includes('identitas') && !sec.nama_section.toLowerCase().includes('saran')) {
+        sectionAverages.push({
+          nama: sec.nama_section,
+          avg: secTotalScore / secTotalAnswers
+        });
+      }
+    }
+  });
+
+  // Lapis 1: Radar Data
+  const radarData = {
+    labels: sectionAverages.map(s => s.nama),
     datasets: [{
-      label: 'Pertumbuhan Responden Masuk',
-      data: Object.values(dateCounts),
-      borderColor: '#3b82f6',
-      backgroundColor: 'rgba(59, 130, 246, 0.2)',
-      fill: true,
-      tension: 0.3
+      label: 'Rata-rata Kepuasan (Skala 1-4)',
+      data: sectionAverages.map(s => parseFloat(s.avg.toFixed(2))),
+      backgroundColor: 'rgba(139, 92, 246, 0.2)',
+      borderColor: '#8b5cf6',
+      pointBackgroundColor: '#8b5cf6',
+      pointBorderColor: '#fff',
+      pointHoverBackgroundColor: '#fff',
+      pointHoverBorderColor: '#8b5cf6',
+      borderWidth: 2,
     }]
   };
 
-  let pieData = null;
-  let pieTitle = '';
-  // Coba ambil field metadata pertama (contoh: Jenjang, Kabupaten) untuk chart Pie
-  if (schema.metadata_fields.length > 0) {
-    const firstMeta = schema.metadata_fields[0];
-    pieTitle = `Distribusi by ${firstMeta.label_field}`;
-    const metaCounts = pengisians.reduce((acc, p) => {
-      const val = p.metadata_values[firstMeta.id] || 'Tidak Diisi';
-      acc[val] = (acc[val] || 0) + 1;
-      return acc;
-    }, {} as Record<string, number>);
+  // Lapis 2: Top & Bottom Insights
+  const sortedItems = [...itemStats].sort((a, b) => b.avg - a.avg);
+  const top3 = sortedItems.slice(0, 3);
+  // Ambil 3 terbawah (pastikan tidak duplikat jika item sedikit)
+  const bottom3 = sortedItems.length > 3 ? [...sortedItems].reverse().slice(0, 3) : [];
 
-    pieData = {
-      labels: Object.keys(metaCounts),
-      datasets: [{
-        data: Object.values(metaCounts),
-        backgroundColor: ['#10b981', '#f59e0b', '#ef4444', '#3b82f6', '#8b5cf6', '#ec4899', '#14b8a6'],
-        borderWidth: 0
-      }]
-    };
-  }
+  // Helper untuk Progress Bar Mini
+  const renderProgressBar = (avg: number) => {
+    const percentage = (avg / 4) * 100;
+    let color = '#ef4444'; // Merah
+    if (avg >= 3.5) color = '#10b981'; // Hijau
+    else if (avg >= 2.5) color = '#3b82f6'; // Biru
+    else if (avg >= 1.5) color = '#f59e0b'; // Kuning
+
+    return (
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', width: '100%', maxWidth: '300px' }}>
+        <div style={{ flex: 1, height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+          <div style={{ width: `${percentage}%`, height: '100%', background: color, transition: 'width 1s ease-in-out' }} />
+        </div>
+        <span style={{ fontWeight: '600', fontSize: '0.875rem', color: '#475569', minWidth: '40px' }}>
+          {avg.toFixed(2)}
+        </span>
+      </div>
+    );
+  };
 
   return (
     <main className="container animate-fade-in" style={{ padding: '2rem 1rem', paddingBottom: '4rem' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
         <div>
-          <h1 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>Analitik: {schema.nama_instrumen}</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Total Responden: <strong>{pengisians.length}</strong> sekolah/guru</p>
+          <h1 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>Ringkasan Eksekutif: {schema.nama_instrumen}</h1>
+          <p style={{ color: 'var(--text-secondary)' }}>Total Responden: <strong>{pengisians.length}</strong> orang</p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }} onClick={handleExportPDF}>
@@ -206,7 +253,7 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
           </button>
           <button className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', background: '#10b981', borderColor: '#10b981' }} onClick={handleExportExcel}>
             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><path d="M8 13h2v4H8z"/><path d="M14 13h2v4h-2z"/></svg>
-            Export Excel (.xlsx)
+            Export Excel
           </button>
         </div>
       </div>
@@ -217,168 +264,178 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
         </div>
       ) : (
         <>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-            {pieData && (
-              <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                <h3 style={{ marginBottom: '1rem' }}>{pieTitle}</h3>
-                <div style={{ width: '100%', maxWidth: '320px' }}>
-                  <Pie data={pieData} />
+          {/* LAPIS 1 & 2: Overview (Radar & Insights) */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+            
+            {/* Lapis 1: Radar Chart */}
+            <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+              <h3 style={{ marginBottom: '0.5rem', width: '100%', textAlign: 'center' }}>Kinerja Keseluruhan per Aspek</h3>
+              <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.5rem' }}>Skala 1 (Kurang) hingga 4 (Baik Sekali)</p>
+              
+              <div style={{ width: '100%', maxWidth: '400px', height: '300px' }}>
+                <Radar 
+                  data={radarData}
+                  options={{
+                    maintainAspectRatio: false,
+                    scales: {
+                      r: {
+                        angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                        grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                        pointLabels: { font: { size: 12, family: "'Inter', sans-serif" }, color: '#475569' },
+                        ticks: { min: 1, max: 4, stepSize: 1, backdropColor: 'transparent' }
+                      }
+                    },
+                    plugins: { legend: { display: false } }
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Lapis 2: Insights */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+              <div className="card" style={{ borderLeft: '4px solid #10b981', flex: 1 }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                  <span style={{ fontSize: '1.5rem' }}>🏆</span>
+                  <h3 style={{ margin: 0, color: '#047857' }}>Kekuatan (3 Terbaik)</h3>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                  {top3.map((item, i) => (
+                    <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', borderBottom: i < 2 ? '1px solid #f1f5f9' : 'none', paddingBottom: i < 2 ? '0.75rem' : 0 }}>
+                      <div style={{ flex: 1 }}>
+                        <p style={{ fontSize: '0.875rem', fontWeight: '500', color: '#334155', margin: 0, lineHeight: 1.4 }}>{item.teks}</p>
+                        <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{item.section}</span>
+                      </div>
+                      <div style={{ background: '#ecfdf5', color: '#10b981', padding: '0.25rem 0.5rem', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.875rem' }}>
+                        {item.avg.toFixed(2)}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
-            )}
-            <div className="card">
-              <h3 style={{ marginBottom: '1rem' }}>Pertumbuhan Data Harian</h3>
-              <div style={{ width: '100%', height: '250px' }}>
-                <Line data={lineData} options={{ maintainAspectRatio: false }} />
-              </div>
+
+              {bottom3.length > 0 && (
+                <div className="card" style={{ borderLeft: '4px solid #ef4444', flex: 1 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
+                    <span style={{ fontSize: '1.5rem' }}>⚠️</span>
+                    <h3 style={{ margin: 0, color: '#b91c1c' }}>Area Perbaikan (3 Terendah)</h3>
+                  </div>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
+                    {bottom3.map((item, i) => (
+                      <div key={item.id} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', gap: '1rem', borderBottom: i < 2 ? '1px solid #f1f5f9' : 'none', paddingBottom: i < 2 ? '0.75rem' : 0 }}>
+                        <div style={{ flex: 1 }}>
+                          <p style={{ fontSize: '0.875rem', fontWeight: '500', color: '#334155', margin: 0, lineHeight: 1.4 }}>{item.teks}</p>
+                          <span style={{ fontSize: '0.75rem', color: '#94a3b8' }}>{item.section}</span>
+                        </div>
+                        <div style={{ background: '#fef2f2', color: '#ef4444', padding: '0.25rem 0.5rem', borderRadius: '4px', fontWeight: 'bold', fontSize: '0.875rem' }}>
+                          {item.avg.toFixed(2)}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
           </div>
 
-          {/* Section-based Analytics for PKG */}
-          {schema.sections.map((section) => {
-            const chartableItems = section.items.filter(item => 
-              item.tipe_jawaban.includes('likert') || item.tipe_jawaban === 'pilihan_ganda'
-            );
-            
-            if (chartableItems.length === 0) return null;
+          {/* LAPIS 3: Tabel Progres Mini per Section */}
+          <h2 style={{ fontSize: '1.25rem', marginTop: '3rem', marginBottom: '1.5rem', color: '#1e293b' }}>Rincian Skor per Aspek</h2>
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+            {schema.sections.map((section) => {
+              const likertItems = section.items.filter(item => item.tipe_jawaban.includes('likert'));
+              const choiceItems = section.items.filter(item => item.tipe_jawaban === 'pilihan_ganda');
+              
+              if (likertItems.length === 0 && choiceItems.length === 0) return null;
 
-            return (
-              <div key={section.id} className="card animate-slide-up" style={{ marginBottom: '2rem', borderTop: '4px solid #8b5cf6' }}>
-                <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#1e293b' }}>
-                  {section.urutan}. {section.nama_section}
-                </h2>
-                
-                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
-                  {chartableItems.map(item => {
-                    // Aggregate data
-                    const isLikert = item.tipe_jawaban.includes('likert');
-                    
-                    let labels: string[] = [];
-                    if (isLikert) {
-                      labels = ['Kurang', 'Cukup', 'Baik', 'Baik Sekali'];
-                    } else if (item.tipe_jawaban === 'pilihan_ganda') {
-                      labels = item.opsi_jawaban || [];
-                    }
-
-                    const counts: Record<string, number> = {};
-                    labels.forEach(l => counts[l] = 0);
-                    
-                    let totalAnswers = 0;
-                    
-                    pengisians.forEach(p => {
-                      const answer = p.jawaban.find((j: any) => j.item_id === item.id);
-                      if (answer) {
-                        let valStr = '';
-                        if (isLikert) {
-                          const val = answer.nilai_skor;
-                          if (val === 1) valStr = 'Kurang';
-                          else if (val === 2) valStr = 'Cukup';
-                          else if (val === 3) valStr = 'Baik';
-                          else if (val === 4) valStr = 'Baik Sekali';
-                        } else {
-                          valStr = answer.nilai_teks;
-                        }
-                        
-                        if (valStr && counts[valStr] !== undefined) {
-                          counts[valStr]++;
-                          totalAnswers++;
-                        } else if (valStr) {
-                          counts[valStr] = 1;
-                          totalAnswers++;
-                        }
-                      }
-                    });
-
-                    // Prepare ChartJS Data
-                    const chartData = {
-                      labels: Object.keys(counts),
-                      datasets: [{
-                        label: 'Jumlah Responden',
-                        data: Object.values(counts),
-                        backgroundColor: isLikert 
-                          ? ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'] // Merah, Kuning, Biru, Hijau
-                          : ['#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#3b82f6'],
-                        borderWidth: 0,
-                        borderRadius: isLikert ? 4 : 0
-                      }]
-                    };
-
-                    return (
-                      <div key={item.id} style={{ display: 'flex', flexDirection: 'column' }}>
-                        <p style={{ fontWeight: '500', marginBottom: '1rem', fontSize: '0.9rem', color: '#334155', minHeight: '40px' }}>
-                          {item.teks_pertanyaan}
-                        </p>
-                        {totalAnswers > 0 ? (
-                          <div style={{ height: '200px', width: '100%' }}>
-                            {isLikert ? (
-                              <Bar 
-                                data={chartData} 
-                                options={{ 
-                                  maintainAspectRatio: false,
-                                  plugins: { legend: { display: false } },
-                                  scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-                                }} 
-                              />
-                            ) : (
-                              <Pie 
-                                data={chartData} 
-                                options={{ 
-                                  maintainAspectRatio: false,
-                                  plugins: { legend: { position: 'right' } }
-                                }} 
-                              />
-                            )}
+              return (
+                <div key={section.id} className="card" style={{ padding: '1.5rem' }}>
+                  <h3 style={{ marginBottom: '1rem', color: '#334155', borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem' }}>
+                    {section.urutan}. {section.nama_section}
+                  </h3>
+                  
+                  {/* Tabel Likert */}
+                  {likertItems.length > 0 && (
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
+                      {likertItems.map(item => {
+                        const stat = itemStats.find(s => s.id === item.id);
+                        return (
+                          <div key={item.id} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap' }}>
+                            <p style={{ flex: '1 1 300px', fontSize: '0.9rem', color: '#475569', margin: 0 }}>
+                              {item.teks_pertanyaan}
+                            </p>
+                            <div style={{ flex: '0 0 250px' }}>
+                              {stat ? renderProgressBar(stat.avg) : <span style={{ fontSize: '0.875rem', color: '#cbd5e1' }}>Belum ada data</span>}
+                            </div>
                           </div>
-                        ) : (
-                          <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', borderRadius: '8px' }}>
-                            <span style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Belum ada data</span>
+                        );
+                      })}
+                    </div>
+                  )}
+
+                  {/* Tabel Pilihan Ganda (seperti Rekomendasi) */}
+                  {choiceItems.length > 0 && (
+                    <div style={{ marginTop: likertItems.length > 0 ? '2rem' : '1rem', paddingTop: likertItems.length > 0 ? '1rem' : 0, borderTop: likertItems.length > 0 ? '1px dashed #e2e8f0' : 'none' }}>
+                      {choiceItems.map(item => {
+                        // Hitung distribusi pilihan ganda
+                        const counts: Record<string, number> = {};
+                        if (item.opsi_jawaban) item.opsi_jawaban.forEach(o => counts[o] = 0);
+                        let total = 0;
+                        pengisians.forEach(p => {
+                          const ans = p.jawaban.find((j: any) => j.item_id === item.id);
+                          if (ans && ans.nilai_teks) {
+                            counts[ans.nilai_teks] = (counts[ans.nilai_teks] || 0) + 1;
+                            total++;
+                          }
+                        });
+
+                        const choiceData = {
+                          labels: Object.keys(counts),
+                          datasets: [{
+                            data: Object.values(counts),
+                            backgroundColor: ['#10b981', '#ef4444', '#f59e0b', '#3b82f6', '#8b5cf6'],
+                            borderWidth: 0
+                          }]
+                        };
+
+                        return (
+                          <div key={item.id} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+                            <p style={{ flex: '1 1 300px', fontSize: '0.9rem', color: '#475569', margin: 0, fontWeight: '500' }}>
+                              {item.teks_pertanyaan}
+                            </p>
+                            <div style={{ flex: '0 0 250px', display: 'flex', alignItems: 'center', gap: '1rem' }}>
+                              {total > 0 ? (
+                                <>
+                                  <div style={{ width: '80px', height: '80px' }}>
+                                    <Pie data={choiceData} options={{ plugins: { legend: { display: false } } }} />
+                                  </div>
+                                  <div style={{ display: 'flex', flexDirection: 'column', gap: '0.25rem' }}>
+                                    {Object.entries(counts).map(([key, val]) => (
+                                      val > 0 && (
+                                        <div key={key} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '0.75rem', color: '#64748b' }}>
+                                          <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: choiceData.datasets[0].backgroundColor[Object.keys(counts).indexOf(key) % 5] }} />
+                                          {key}: <strong>{val}</strong>
+                                        </div>
+                                      )
+                                    ))}
+                                  </div>
+                                </>
+                              ) : (
+                                <span style={{ fontSize: '0.875rem', color: '#cbd5e1' }}>Belum ada data</span>
+                              )}
+                            </div>
                           </div>
-                        )}
-                      </div>
-                    );
-                  })}
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
-              </div>
-            );
-          })}
-
-          <div className="card">
-          <h3 style={{ marginBottom: '1rem' }}>Data Terbaru Masuk</h3>
-          <div style={{ overflowX: 'auto' }}>
-            <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-              <thead>
-                <tr style={{ borderBottom: '2px solid #eee' }}>
-                  <th style={{ padding: '0.75rem' }}>Tanggal</th>
-                  {schema.metadata_fields.map(m => (
-                    <th key={m.id} style={{ padding: '0.75rem' }}>{m.label_field}</th>
-                  ))}
-                  <th style={{ padding: '0.75rem' }}>Total Item Terjawab</th>
-                </tr>
-              </thead>
-              <tbody>
-                {pengisians.slice(0, 10).map((p, idx) => (
-                  <tr key={p.id} style={{ borderBottom: '1px solid #eee', background: idx % 2 === 0 ? '#fafafa' : '#fff' }}>
-                    <td style={{ padding: '0.75rem', fontSize: '0.875rem' }}>{new Date(p.tanggal_pengisian).toLocaleDateString('id-ID')}</td>
-                    {schema.metadata_fields.map(m => (
-                      <td key={m.id} style={{ padding: '0.75rem' }}>{p.metadata_values[m.id] || '-'}</td>
-                    ))}
-                    <td style={{ padding: '0.75rem' }}>{p.jawaban.length} item</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
+              );
+            })}
           </div>
-          {pengisians.length > 10 && (
-            <p style={{ textAlign: 'center', fontSize: '0.875rem', color: 'gray', marginTop: '1rem' }}>
-              Menampilkan 10 data terbaru. Silakan Export Excel untuk melihat seluruh {pengisians.length} baris data mentah.
-            </p>
-          )}
-        </div>
         </>
       )}
 
-      <div style={{ textAlign: 'center', marginTop: '3rem' }}>
-        <Link href="/dashboard" className="btn btn-outline" style={{ border: 'none' }}>&larr; Kembali ke Daftar Kegiatan</Link>
+      <div style={{ textAlign: 'center', marginTop: '4rem' }}>
+        <Link href="/dashboard" className="btn btn-outline" style={{ border: 'none', color: '#64748b' }}>&larr; Kembali ke Daftar Kegiatan</Link>
       </div>
     </main>
   );
