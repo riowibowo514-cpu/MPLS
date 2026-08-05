@@ -22,8 +22,7 @@ export default function RootLayout({
             <Link href="/" className="app-logo" style={{ gap: '1rem' }}>
               <img src="/logo-bgtk.png" alt="Logo BGTK Sumbar" style={{ height: '70px', width: 'auto', objectFit: 'contain' }} />
               <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
-                <span style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.02em', textTransform: 'uppercase', lineHeight: '1.2' }}>PORTAL EVALUASI</span>
-                <span style={{ fontSize: '1.1rem', fontWeight: 800, letterSpacing: '-0.02em', textTransform: 'uppercase', lineHeight: '1.2' }}>BGTK SUMATERA BARAT</span>
+                <span style={{ fontSize: '1.3rem', fontWeight: 900, letterSpacing: '-0.02em', textTransform: 'uppercase', lineHeight: '1.2' }}>PERLU BGTK</span>
               </div>
             </Link>
             <HeaderActions />

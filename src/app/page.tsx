@@ -6,9 +6,12 @@ export default function PortalMonevPage() {
   return (
     <main className="container animate-fade-in" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
-        <h1 style={{ fontSize: '2.5rem', fontWeight: 800, color: 'var(--primary)', marginBottom: '1rem' }}>
-          Portal Evaluasi BGTK Provinsi Sumatera Barat
+        <h1 style={{ fontSize: '3.5rem', fontWeight: 900, color: 'var(--primary)', marginBottom: '0.5rem', letterSpacing: '-0.03em' }}>
+          PERLU BGTK
         </h1>
+        <h2 style={{ fontSize: '1.5rem', fontWeight: 600, color: 'var(--text)', marginBottom: '1.5rem' }}>
+          Portal Evaluasi BGTK Provinsi Sumatera Barat
+        </h2>
         <p style={{ fontSize: '1.125rem', color: 'var(--text-secondary)', maxWidth: '700px', margin: '0 auto' }}>
           Sistem Terpadu Monitoring dan Evaluasi (Monev) Kegiatan Guru dan Tenaga Kependidikan. Silakan pilih akses masuk Anda:
         </p>
