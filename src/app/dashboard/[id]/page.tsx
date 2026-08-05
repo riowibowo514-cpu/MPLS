@@ -142,10 +142,10 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
 
   // Lapis 1: Radar Data
   const radarData = {
-    labels: sectionAverages.map(s => s.nama),
+    labels: sectionAverages.map((s: any) => s.nama),
     datasets: [{
       label: 'Rata-rata Kepuasan (Skala 1-4)',
-      data: sectionAverages.map(s => parseFloat(s.avg.toFixed(2))),
+      data: sectionAverages.map((s: any) => parseFloat(s.avg.toFixed(2))),
       backgroundColor: 'rgba(139, 92, 246, 0.2)',
       borderColor: '#8b5cf6',
       pointBackgroundColor: '#8b5cf6',
