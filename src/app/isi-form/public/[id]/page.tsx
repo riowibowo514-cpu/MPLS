@@ -96,17 +96,18 @@ export default function PublicFormPKG() {
     if (!instrumen) return false;
     const currentSection = instrumen.sections[currentStep];
     
-    let missingId = null;
+    let missingItem = null;
     for (const item of currentSection.items) {
-      if (!answers[item.id]) {
-        missingId = item.id;
-        break; // Cukup temukan yang pertama kosong
+      const val = answers[item.id];
+      if (val === undefined || val === null || val === '') {
+        missingItem = item;
+        break; 
       }
     }
     
-    if (missingId) {
-      alert("Mohon lengkapi semua pertanyaan yang wajib diisi (*)");
-      const element = document.getElementById(`item-${missingId}`);
+    if (missingItem) {
+      alert(`Mohon lengkapi pertanyaan wajib: "${missingItem.teks_pertanyaan}"`);
+      const element = document.getElementById(`item-${missingItem.id}`);
       if (element) {
         element.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
