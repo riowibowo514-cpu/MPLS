@@ -234,6 +234,114 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
             </div>
           </div>
 
+          {/* Section-based Analytics for PKG */}
+          {schema.sections.map((section) => {
+            const chartableItems = section.items.filter(item => 
+              item.tipe_jawaban.includes('likert') || item.tipe_jawaban === 'pilihan_ganda'
+            );
+            
+            if (chartableItems.length === 0) return null;
+
+            return (
+              <div key={section.id} className="card animate-slide-up" style={{ marginBottom: '2rem', borderTop: '4px solid #8b5cf6' }}>
+                <h2 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', color: '#1e293b' }}>
+                  {section.urutan}. {section.nama_section}
+                </h2>
+                
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', gap: '2rem' }}>
+                  {chartableItems.map(item => {
+                    // Aggregate data
+                    const isLikert = item.tipe_jawaban.includes('likert');
+                    
+                    let labels: string[] = [];
+                    if (isLikert) {
+                      labels = ['Kurang', 'Cukup', 'Baik', 'Baik Sekali'];
+                    } else if (item.tipe_jawaban === 'pilihan_ganda') {
+                      labels = item.opsi_jawaban || [];
+                    }
+
+                    const counts: Record<string, number> = {};
+                    labels.forEach(l => counts[l] = 0);
+                    
+                    let totalAnswers = 0;
+                    
+                    pengisians.forEach(p => {
+                      const answer = p.jawaban.find((j: any) => j.item_id === item.id);
+                      if (answer) {
+                        let valStr = '';
+                        if (isLikert) {
+                          const val = answer.nilai_skor;
+                          if (val === 1) valStr = 'Kurang';
+                          else if (val === 2) valStr = 'Cukup';
+                          else if (val === 3) valStr = 'Baik';
+                          else if (val === 4) valStr = 'Baik Sekali';
+                        } else {
+                          valStr = answer.nilai_teks;
+                        }
+                        
+                        if (valStr && counts[valStr] !== undefined) {
+                          counts[valStr]++;
+                          totalAnswers++;
+                        } else if (valStr) {
+                          counts[valStr] = 1;
+                          totalAnswers++;
+                        }
+                      }
+                    });
+
+                    // Prepare ChartJS Data
+                    const chartData = {
+                      labels: Object.keys(counts),
+                      datasets: [{
+                        label: 'Jumlah Responden',
+                        data: Object.values(counts),
+                        backgroundColor: isLikert 
+                          ? ['#ef4444', '#f59e0b', '#3b82f6', '#10b981'] // Merah, Kuning, Biru, Hijau
+                          : ['#8b5cf6', '#ec4899', '#14b8a6', '#f59e0b', '#3b82f6'],
+                        borderWidth: 0,
+                        borderRadius: isLikert ? 4 : 0
+                      }]
+                    };
+
+                    return (
+                      <div key={item.id} style={{ display: 'flex', flexDirection: 'column' }}>
+                        <p style={{ fontWeight: '500', marginBottom: '1rem', fontSize: '0.9rem', color: '#334155', minHeight: '40px' }}>
+                          {item.teks_pertanyaan}
+                        </p>
+                        {totalAnswers > 0 ? (
+                          <div style={{ height: '200px', width: '100%' }}>
+                            {isLikert ? (
+                              <Bar 
+                                data={chartData} 
+                                options={{ 
+                                  maintainAspectRatio: false,
+                                  plugins: { legend: { display: false } },
+                                  scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+                                }} 
+                              />
+                            ) : (
+                              <Pie 
+                                data={chartData} 
+                                options={{ 
+                                  maintainAspectRatio: false,
+                                  plugins: { legend: { position: 'right' } }
+                                }} 
+                              />
+                            )}
+                          </div>
+                        ) : (
+                          <div style={{ height: '200px', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#f8fafc', borderRadius: '8px' }}>
+                            <span style={{ color: '#94a3b8', fontSize: '0.875rem' }}>Belum ada data</span>
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            );
+          })}
+
           <div className="card">
           <h3 style={{ marginBottom: '1rem' }}>Data Terbaru Masuk</h3>
           <div style={{ overflowX: 'auto' }}>
