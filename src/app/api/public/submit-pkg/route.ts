@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
   try {
-    const { instrumen_id, answers, honeypot } = await request.json();
+    const { instrumen_id, answers, honeypot, idempotencyKey } = await request.json();
 
     // 1. HONEYPOT VALIDATION
     // If the honeypot field is filled, it's highly likely a bot.
@@ -40,12 +40,28 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Sesi evaluasi sudah ditutup' }, { status: 403 });
     }
 
+    // 2.5 IDEMPOTENCY CHECK (Anti-Spam / Double Submit)
+    if (idempotencyKey) {
+      const { data: existingData } = await supabase
+        .from('pengisian')
+        .select('id')
+        .eq('instrumen_id', instrumen_id)
+        .contains('metadata_values', { idempotency_key: idempotencyKey })
+        .maybeSingle();
+
+      if (existingData) {
+        console.log(`[IDEMPOTENCY] Prevented double submit for key: ${idempotencyKey}`);
+        // Return success so the client thinks it went through and clears their state
+        return NextResponse.json({ success: true, message: 'Already submitted' }, { status: 200 });
+      }
+    }
+
     // 3. Insert Pengisian
     const { data: pengisianData, error: pengisianError } = await supabase
       .from('pengisian')
       .insert([{
         instrumen_id: instrumen_id,
-        metadata_values: {} // Anonim
+        metadata_values: idempotencyKey ? { idempotency_key: idempotencyKey } : {} // Save idempotency key
       }])
       .select()
       .single();

@@ -16,6 +16,7 @@ export default function PublicFormPKG() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
   const [honeypot, setHoneypot] = useState('');
+  const [idempotencyKey, setIdempotencyKey] = useState<string>('');
   
   // State Jawaban { item_id: jawaban (string/number) }
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
@@ -29,6 +30,20 @@ export default function PublicFormPKG() {
         setLoading(false);
         return;
       }
+      
+      // Auto-restore draft jawaban
+      const savedDraft = localStorage.getItem(`draft_pkg_${kegiatan_id}`);
+      if (savedDraft) {
+        try { setAnswers(JSON.parse(savedDraft)); } catch (e) {}
+      }
+
+      // Generate atau restore Idempotency Key
+      let key = localStorage.getItem(`idem_pkg_${kegiatan_id}`);
+      if (!key) {
+        key = crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2);
+        localStorage.setItem(`idem_pkg_${kegiatan_id}`, key);
+      }
+      setIdempotencyKey(key);
     }
 
     fetchInstrumen();
@@ -86,10 +101,13 @@ export default function PublicFormPKG() {
   };
 
   const handleAnswerChange = (itemId: string, value: string | number) => {
-    setAnswers(prev => ({
-      ...prev,
-      [itemId]: value
-    }));
+    setAnswers(prev => {
+      const newAnswers = { ...prev, [itemId]: value };
+      if (typeof window !== 'undefined') {
+        localStorage.setItem(`draft_pkg_${kegiatan_id}`, JSON.stringify(newAnswers));
+      }
+      return newAnswers;
+    });
   };
 
   const validateCurrentStep = (): boolean => {
@@ -148,7 +166,8 @@ export default function PublicFormPKG() {
         body: JSON.stringify({
           instrumen_id: instrumen.id,
           answers: answers,
-          honeypot: honeypot // Lapisan Keamanan
+          honeypot: honeypot, // Lapisan Keamanan
+          idempotencyKey: idempotencyKey // Anti-Spam
         })
       });
 
@@ -161,6 +180,7 @@ export default function PublicFormPKG() {
       // 2. Sukses! Simpan flag di localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem(`submitted_pkg_${kegiatan_id}`, 'true');
+        localStorage.removeItem(`draft_pkg_${kegiatan_id}`); // Hapus draft
       }
       setHasSubmitted(true);
 
@@ -244,12 +264,23 @@ export default function PublicFormPKG() {
 
           {instrumen && (
             <div className="card animate-slide-up" style={{ marginBottom: '2rem' }}>
+              
+              {/* Progress Bar */}
+              <div style={{ marginBottom: '1.5rem', width: '100%', height: '8px', background: '#e2e8f0', borderRadius: '4px', overflow: 'hidden' }}>
+                <div style={{ 
+                  width: `${((currentStep + 1) / instrumen.sections.length) * 100}%`, 
+                  height: '100%', 
+                  background: '#10b981', 
+                  transition: 'width 0.3s ease-in-out' 
+                }} />
+              </div>
+
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>
                 <h2 style={{ fontSize: '1.25rem', color: '#334155', margin: 0 }}>
                   {instrumen.sections[currentStep].urutan}. {instrumen.sections[currentStep].nama_section}
                 </h2>
                 <span style={{ fontSize: '0.875rem', color: '#64748b', fontWeight: '500' }}>
-                  Bagian {currentStep + 1} dari {instrumen.sections.length}
+                  Langkah {currentStep + 1} dari {instrumen.sections.length}
                 </span>
               </div>
               

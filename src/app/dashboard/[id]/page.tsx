@@ -26,6 +26,8 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
   const [pengisians, setPengisians] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  const [analyticsData, setAnalyticsData] = useState<any>(null);
+
   useEffect(() => {
     fetchData();
   }, [kegiatan_id]);
@@ -33,32 +35,16 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
   const fetchData = async () => {
     try {
       setIsLoading(true);
-      // 1. Ambil schema instrumen
-      const { data: inst } = await supabase
-        .from('instrumen')
-        .select('*')
-        .eq('kegiatan_id', kegiatan_id)
-        .single();
+      // Panggil API Analytics yang sudah menggunakan Cache & ISR
+      const res = await fetch(`/api/analytics/${kegiatan_id}`);
+      const json = await res.json();
       
-      if (!inst) throw new Error('Instrumen tidak ditemukan');
-
-      const { data: metaFields } = await supabase.from('instrumen_metadata_field').select('*').eq('instrumen_id', inst.id).order('urutan');
-      const { data: sections } = await supabase.from('instrumen_section').select('*, items:instrumen_item(*)').eq('instrumen_id', inst.id).order('urutan');
-
-      setSchema({
-        ...inst,
-        metadata_fields: metaFields || [],
-        sections: sections || []
-      });
-
-      // 2. Ambil data pengisian dan jawaban
-      const { data: pData } = await supabase
-        .from('pengisian')
-        .select('*, jawaban(*)')
-        .eq('instrumen_id', inst.id)
-        .order('tanggal_pengisian', { ascending: true }); // urutkan waktu
-        
-      setPengisians(pData || []);
+      if (!res.ok) throw new Error(json.error || 'Gagal memuat analitik');
+      
+      setSchema(json.data.schema);
+      setAnalyticsData(json.data);
+      // Kita tetap simpan pengisians untuk keperluan Export Excel
+      setPengisians(json.data.pengisians || []);
     } catch (error) {
       console.error(error);
     } finally {
@@ -148,54 +134,11 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
     }
   };
 
-  if (isLoading) return <div className="container" style={{ padding: '2rem' }}>Memuat analitik...</div>;
+  if (isLoading || !analyticsData) return <div className="container" style={{ padding: '2rem' }}>Memuat analitik...</div>;
   if (!schema) return <div className="container" style={{ padding: '2rem' }}>Data tidak ditemukan.</div>;
 
-  // --- PRE-CALCULATE AGGREGATIONS ---
-  const sectionAverages: { nama: string, avg: number }[] = [];
-  const itemStats: { id: string, teks: string, section: string, avg: number, total: number }[] = [];
-
-  schema.sections.forEach(sec => {
-    let secTotalScore = 0;
-    let secTotalAnswers = 0;
-
-    sec.items.forEach(item => {
-      if (item.tipe_jawaban.includes('likert')) {
-        let itemTotalScore = 0;
-        let itemAnswersCount = 0;
-
-        pengisians.forEach(p => {
-          const ans = p.jawaban.find((j: any) => j.item_id === item.id);
-          if (ans && ans.nilai_skor) {
-            itemTotalScore += ans.nilai_skor;
-            itemAnswersCount++;
-            secTotalScore += ans.nilai_skor;
-            secTotalAnswers++;
-          }
-        });
-
-        if (itemAnswersCount > 0) {
-          itemStats.push({
-            id: item.id,
-            teks: item.teks_pertanyaan,
-            section: sec.nama_section,
-            avg: itemTotalScore / itemAnswersCount,
-            total: itemAnswersCount
-          });
-        }
-      }
-    });
-
-    if (secTotalAnswers > 0) {
-      // Hanya masukkan section yang punya nilai Likert
-      if (!sec.nama_section.toLowerCase().includes('identitas') && !sec.nama_section.toLowerCase().includes('saran')) {
-        sectionAverages.push({
-          nama: sec.nama_section,
-          avg: secTotalScore / secTotalAnswers
-        });
-      }
-    }
-  });
+  // Gunakan agregat hasil pre-calculate dari Server API (Sangat Cepat & Ringan)
+  const { sectionAverages, itemStats, totalResponden, rawChoiceCounts } = analyticsData;
 
   // Lapis 1: Radar Data
   const radarData = {
@@ -244,7 +187,7 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '2rem' }}>
         <div>
           <h1 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>Ringkasan Eksekutif: {schema.nama_instrumen}</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Total Responden: <strong>{pengisians.length}</strong> orang</p>
+          <p style={{ color: 'var(--text-secondary)' }}>Total Responden: <strong>{totalResponden}</strong> orang</p>
         </div>
         <div style={{ display: 'flex', gap: '0.5rem' }}>
           <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }} onClick={handleExportPDF}>
@@ -258,7 +201,7 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
         </div>
       </div>
 
-      {pengisians.length === 0 ? (
+      {totalResponden === 0 ? (
         <div className="card" style={{ textAlign: 'center', padding: '4rem' }}>
           Belum ada data pengisian untuk instrumen ini.
         </div>
@@ -389,17 +332,14 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
                   {choiceItems.length > 0 && (
                     <div style={{ marginTop: likertItems.length > 0 ? '2rem' : '1rem', paddingTop: likertItems.length > 0 ? '1rem' : 0, borderTop: likertItems.length > 0 ? '1px dashed #e2e8f0' : 'none' }}>
                       {choiceItems.map(item => {
-                        // Hitung distribusi pilihan ganda
+                        // Gunakan rawChoiceCounts dari API Server
                         const counts: Record<string, number> = {};
-                        if (item.opsi_jawaban) item.opsi_jawaban.forEach(o => counts[o] = 0);
-                        let total = 0;
-                        pengisians.forEach(p => {
-                          const ans = p.jawaban.find((j: any) => j.item_id === item.id);
-                          if (ans && ans.nilai_teks) {
-                            counts[ans.nilai_teks] = (counts[ans.nilai_teks] || 0) + 1;
-                            total++;
-                          }
-                        });
+                        if (rawChoiceCounts && rawChoiceCounts[item.id]) {
+                          Object.keys(rawChoiceCounts[item.id]).forEach(k => {
+                            if (k !== '_total') counts[k] = rawChoiceCounts[item.id][k];
+                          });
+                        }
+                        const total = rawChoiceCounts?.[item.id]?._total || 0;
 
                         const choiceData = {
                           labels: Object.keys(counts),
