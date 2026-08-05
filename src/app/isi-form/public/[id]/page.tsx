@@ -15,6 +15,7 @@ export default function PublicFormPKG() {
   const [hasSubmitted, setHasSubmitted] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [currentStep, setCurrentStep] = useState(0);
+  const [honeypot, setHoneypot] = useState('');
   
   // State Jawaban { item_id: jawaban (string/number) }
   const [answers, setAnswers] = useState<Record<string, string | number>>({});
@@ -137,38 +138,24 @@ export default function PublicFormPKG() {
 
     setIsSubmitting(true);
     try {
-      // 1. Buat record Pengisian
-      const { data: pengisianData, error: pengisianError } = await supabase
-        .from('pengisian')
-        .insert([{
+      // 1. Submit via Secure API Route
+      const response = await fetch('/api/public/submit-pkg', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
           instrumen_id: instrumen.id,
-          // Tidak ada petugas_id (karena ini anonim publik)
-          metadata_values: {} // Anonim
-        }])
-        .select()
-        .single();
-
-      if (pengisianError) throw pengisianError;
-
-      // 2. Insert semua jawaban
-      const jawabanArray = Object.entries(answers).map(([itemId, val]) => {
-        const item = instrumen.sections.flatMap(s => s.items).find(i => i.id === itemId);
-        const isNum = item?.tipe_jawaban === 'likert4' || item?.tipe_jawaban === 'likert5';
-        return {
-          pengisian_id: pengisianData.id,
-          item_id: itemId,
-          nilai_skor: isNum ? Number(val) : null,
-          nilai_teks: isNum ? null : String(val),
-        };
+          answers: answers,
+          honeypot: honeypot // Lapisan Keamanan
+        })
       });
 
-      const { error: jawabanError } = await supabase
-        .from('jawaban')
-        .insert(jawabanArray);
+      const result = await response.json();
 
-      if (jawabanError) throw jawabanError;
+      if (!response.ok) {
+        throw new Error(result.error || 'Terjadi kesalahan pada server');
+      }
 
-      // 3. Sukses! Simpan flag di localStorage
+      // 2. Sukses! Simpan flag di localStorage
       if (typeof window !== 'undefined') {
         localStorage.setItem(`submitted_pkg_${kegiatan_id}`, 'true');
       }
@@ -176,7 +163,7 @@ export default function PublicFormPKG() {
 
     } catch (err: any) {
       console.error(err);
-      alert("Gagal mengirimkan jawaban. Coba lagi.");
+      alert(err.message || "Gagal mengirimkan jawaban. Coba lagi.");
     } finally {
       setIsSubmitting(false);
     }
@@ -237,6 +224,21 @@ export default function PublicFormPKG() {
         </div>
 
         <form onSubmit={handleSubmit}>
+          
+          {/* HONEYPOT SECURITY FIELD - INVISIBLE TO HUMANS */}
+          <div style={{ opacity: 0, position: 'absolute', top: 0, left: 0, height: 0, width: 0, zIndex: -1, overflow: 'hidden' }}>
+            <label htmlFor="phone_number_ext">Phone Number Extension (Leave Blank)</label>
+            <input 
+              type="text" 
+              id="phone_number_ext" 
+              name="phone_number_ext" 
+              value={honeypot}
+              onChange={(e) => setHoneypot(e.target.value)}
+              tabIndex={-1}
+              autoComplete="off"
+            />
+          </div>
+
           {instrumen && (
             <div className="card animate-slide-up" style={{ marginBottom: '2rem' }}>
               <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', paddingBottom: '0.5rem', borderBottom: '1px solid var(--border-color)' }}>

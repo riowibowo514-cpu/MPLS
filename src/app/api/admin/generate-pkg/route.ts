@@ -13,7 +13,7 @@ const PKG_TEMPLATE = {
       "nama": "Identitas Kegiatan",
       "urutan": 1,
       "items": [
-        { "label": "Nama Kegiatan", "tipe_data": "pilihan_ganda", "wajib": true, "opsi": [] }
+        { "label": "Nama Kegiatan", "tipe_data": "pilihan_ganda", "wajib": true, "opsi": ["Pelatihan Guru SD", "Pelatihan Guru SMP", "Pelatihan Kepala Sekolah"] }
       ]
     },
     {
