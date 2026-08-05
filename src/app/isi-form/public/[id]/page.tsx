@@ -106,11 +106,13 @@ export default function PublicFormPKG() {
     }
     
     if (missingItem) {
-      alert(`Mohon lengkapi pertanyaan wajib: "${missingItem.teks_pertanyaan}"`);
-      const element = document.getElementById(`item-${missingItem.id}`);
-      if (element) {
-        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
+      setTimeout(() => {
+        alert(`Mohon lengkapi pertanyaan wajib: "${missingItem.teks_pertanyaan}"`);
+        const element = document.getElementById(`item-${missingItem?.id}`);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }, 50);
       return false;
     }
     return true;
