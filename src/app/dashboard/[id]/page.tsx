@@ -313,7 +313,7 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
                   {likertItems.length > 0 && (
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', marginTop: '1rem' }}>
                       {likertItems.map(item => {
-                        const stat = itemStats.find(s => s.id === item.id);
+                        const stat = itemStats.find((s: any) => s.id === item.id);
                         return (
                           <div key={item.id} style={{ display: 'flex', flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: '2rem', flexWrap: 'wrap' }}>
                             <p style={{ flex: '1 1 300px', fontSize: '0.9rem', color: '#475569', margin: 0 }}>
