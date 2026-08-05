@@ -279,10 +279,12 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
                     maintainAspectRatio: false,
                     scales: {
                       r: {
+                        min: 1,
+                        max: 4,
                         angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
                         grid: { color: 'rgba(0, 0, 0, 0.1)' },
                         pointLabels: { font: { size: 12, family: "'Inter', sans-serif" }, color: '#475569' },
-                        ticks: { min: 1, max: 4, stepSize: 1, backdropColor: 'transparent' }
+                        ticks: { stepSize: 1, backdropColor: 'transparent' }
                       }
                     },
                     plugins: { legend: { display: false } }
