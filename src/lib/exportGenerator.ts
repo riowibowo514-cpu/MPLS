@@ -185,24 +185,58 @@ export function generateDynamicPDFSummary(schema: InstrumenFull, pengisians: any
   // 1. KINERJA PER ASPEK (Tabel)
   doc.setFontSize(12);
   doc.setFont('helvetica', 'bold');
-  doc.text('1. Kinerja Keseluruhan per Aspek (Skala 1-4)', 14, currentY);
+  doc.text('1. Kinerja Keseluruhan per Aspek (IKP / SKM)', 14, currentY);
   
-  const aspectRows = sectionAverages.map((s, idx) => [
-    idx + 1,
-    s.nama,
-    s.avg.toFixed(2)
-  ]);
+  const getMutu = (nik: number) => {
+    if (nik >= 88.31) return 'Sangat Baik (A)';
+    if (nik >= 76.61) return 'Baik (B)';
+    if (nik >= 65.00) return 'Kurang Baik (C)';
+    return 'Tidak Baik (D)';
+  };
+
+  const aspectRows = sectionAverages.map((s, idx) => {
+    const nik = (s.avg / 4) * 100;
+    return [
+      idx + 1,
+      s.nama,
+      s.avg.toFixed(2),
+      nik.toFixed(2),
+      getMutu(nik)
+    ];
+  });
+
+  // Calculate Overall Averages for Footer
+  let totalScore = 0;
+  sectionAverages.forEach(s => totalScore += s.avg);
+  const overallAvg = sectionAverages.length > 0 ? totalScore / sectionAverages.length : 0;
+  const overallNik = (overallAvg / 4) * 100;
+
+  aspectRows.push([
+    '',
+    'RATA-RATA KESELURUHAN',
+    overallAvg.toFixed(2),
+    overallNik.toFixed(2),
+    getMutu(overallNik)
+  ] as any);
 
   autoTable(doc, {
     startY: currentY + 5,
-    head: [['No', 'Aspek / Bagian', 'Skor Rata-Rata']],
+    head: [['No', 'Aspek / Bagian', 'Skala Asli (1-4)', 'Konversi SKM (25-100)', 'Kategori Mutu']],
     body: aspectRows,
     theme: 'grid',
     headStyles: { fillColor: [139, 92, 246], textColor: [255, 255, 255] }, // Purple
-    styles: { fontSize: 10, cellPadding: 3 },
+    styles: { fontSize: 9, cellPadding: 3 },
     columnStyles: { 
-      0: { cellWidth: 15, halign: 'center' }, 
-      2: { cellWidth: 40, halign: 'center', fontStyle: 'bold' } 
+      0: { cellWidth: 10, halign: 'center' }, 
+      2: { cellWidth: 25, halign: 'center', fontStyle: 'bold' },
+      3: { cellWidth: 35, halign: 'center', fontStyle: 'bold', textColor: [16, 185, 129] },
+      4: { cellWidth: 35, halign: 'center' }
+    },
+    didParseCell: function (data) {
+      if (data.row.index === aspectRows.length - 1) {
+        data.cell.styles.fontStyle = 'bold';
+        data.cell.styles.fillColor = [241, 245, 249];
+      }
     }
   });
 
