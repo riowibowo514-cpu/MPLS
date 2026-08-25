@@ -1,12 +1,13 @@
 "use client";
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, use } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 
-export default function LaporanAnalisisPanitia({ params }: { params: { id: string } }) {
+export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ id: string }> }) {
   const router = useRouter();
-  const kegiatanId = params.id;
+  const unwrappedParams = use(params);
+  const kegiatanId = unwrappedParams.id;
   const [pin, setPin] = useState<string | null>(null);
   
   const [kegiatan, setKegiatan] = useState<any>(null);
