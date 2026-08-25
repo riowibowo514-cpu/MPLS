@@ -568,19 +568,27 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                 {/* Tipe: PILIHAN GANDA */}
                 {item.tipe_jawaban === 'pilihan_ganda' && (
                   <div className="radio-group-likert" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', flexDirection: 'column' }}>
-                    {(item.opsi_jawaban || []).map((opt: string, optIdx: number) => (
-                      <label key={optIdx} className="radio-card" style={{ flex: '1 1 auto', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem', background: '#fff', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer' }}>
-                        <input 
-                          type="radio" 
-                          name={item.id} 
-                          required
-                          value={opt}
-                          checked={jawabanValues[item.id]?.nilai_teks === opt}
-                          onChange={() => handleJawabanChange(item.id, 'nilai_teks', opt)}
-                        />
-                        <span style={{ fontWeight: 'normal' }}>{opt}</span>
-                      </label>
-                    ))}
+                    {(item.opsi_jawaban || []).map((opt: string, optIdx: number) => {
+                      let typeClass = 'default';
+                      if (opt.toLowerCase() === 'ya') typeClass = 'ya';
+                      if (opt.toLowerCase() === 'tidak') typeClass = 'tidak';
+                      
+                      return (
+                        <label key={optIdx} className="radio-card">
+                          <input 
+                            type="radio" 
+                            name={item.id} 
+                            required
+                            value={opt}
+                            checked={jawabanValues[item.id]?.nilai_teks === opt}
+                            onChange={() => handleJawabanChange(item.id, 'nilai_teks', opt)}
+                          />
+                          <div className={`radio-card-content ${typeClass}`}>
+                            {opt}
+                          </div>
+                        </label>
+                      );
+                    })}
                   </div>
                 )}
 
