@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect, use, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { InstrumenFull, InstrumenMetadataField, InstrumenSection, InstrumenItem } from '@/lib/types';
@@ -55,6 +55,28 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
   });
   
   const [currentUser, setCurrentUser] = useState<any>(null);
+
+  const metadataGroups = useMemo(() => {
+    if (!schema || !schema.metadata_fields) return [];
+    const groups: { name: string, fields: any[] }[] = [];
+    schema.metadata_fields.forEach(m => {
+      let groupName = "Informasi Umum";
+      let label = m.label_field;
+      const match = label.match(/^\[(.*?)\]\s*(.*)$/);
+      if (match) {
+        groupName = match[1];
+        label = match[2];
+      }
+      
+      let group = groups.find(g => g.name === groupName);
+      if (!group) {
+        group = { name: groupName, fields: [] };
+        groups.push(group);
+      }
+      group.fields.push({ ...m, parsedLabel: label });
+    });
+    return groups;
+  }, [schema]);
 
   useEffect(() => {
     fetchSchema();
@@ -149,8 +171,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
     e.preventDefault();
     if (!schema) return;
 
-    const hasMeta = schema.metadata_fields.length > 0;
-    const totalSteps = (hasMeta ? 1 : 0) + schema.sections.length + (scoringConfig ? 1 : 0);
+    const totalSteps = metadataGroups.length + schema.sections.length + (scoringConfig ? 1 : 0);
 
     if (currentStep < totalSteps - 1) {
       if (scoringConfig && currentStep === totalSteps - 2) {
@@ -255,13 +276,17 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
             
             <table style={{ width: '100%', marginBottom: '2rem', borderCollapse: 'collapse', fontSize: '1rem' }}>
               <tbody>
-                {schema.metadata_fields.map(m => (
+                {schema.metadata_fields.map(m => {
+                  const match = m.label_field.match(/^\[(.*?)\]\s*(.*)$/);
+                  const lbl = match ? match[2] : m.label_field;
+                  return (
                   <tr key={m.id}>
-                    <td style={{ width: '200px', padding: '0.25rem 0' }}>{m.label_field}</td>
+                    <td style={{ width: '200px', padding: '0.25rem 0' }}>{lbl}</td>
                     <td style={{ width: '20px', padding: '0.25rem 0' }}>:</td>
                     <td style={{ padding: '0.25rem 0' }}>{metadataValues[m.id]}</td>
                   </tr>
-                ))}
+                  );
+                })}
               </tbody>
             </table>
             
@@ -420,56 +445,59 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center', fontSize: '0.875rem' }}>
           <span style={{ fontWeight: 600, color: 'var(--primary)' }}>
-            Langkah {currentStep + 1} dari {(schema.metadata_fields.length > 0 ? 1 : 0) + schema.sections.length + (scoringConfig ? 1 : 0)}
+            Langkah {currentStep + 1} dari {metadataGroups.length + schema.sections.length + (scoringConfig ? 1 : 0)}
           </span>
           <div style={{ background: '#e2e8f0', borderRadius: '99px', height: '8px', flex: 1, marginLeft: '1rem', overflow: 'hidden' }}>
             <div style={{ 
               background: 'var(--primary)', 
               height: '100%', 
-              width: `${((currentStep + 1) / ((schema.metadata_fields.length > 0 ? 1 : 0) + schema.sections.length + (scoringConfig ? 1 : 0))) * 100}%`,
+              width: `${((currentStep + 1) / (metadataGroups.length + schema.sections.length + (scoringConfig ? 1 : 0))) * 100}%`,
               transition: 'width 0.3s ease'
             }} />
           </div>
         </div>
 
         {/* Identitas / Metadata */}
-        {schema.metadata_fields.length > 0 && currentStep === 0 && (
-          <div className="card animate-fade-in" style={{ marginBottom: '2rem', borderTop: '4px solid #3b82f6' }}>
-            <h2 style={{ marginBottom: '1.5rem' }}>Informasi Umum</h2>
-            <div style={{ display: 'grid', gap: '1rem' }}>
-              {schema.metadata_fields.map(m => (
-                <div key={m.id} className="form-group">
-                  <label>{m.label_field} {m.wajib_diisi && <span style={{color:'red'}}>*</span>}</label>
-                  {m.label_field.toLowerCase().includes('kabupaten') || m.label_field.toLowerCase().includes('kota') ? (
-                    <select
-                      required={m.wajib_diisi}
-                      value={metadataValues[m.id] || ''}
-                      onChange={e => handleMetadataChange(m.id, e.target.value)}
-                      style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none' }}
-                    >
-                      <option value="">-- Pilih Kabupaten/Kota --</option>
-                      {KABUPATEN_KOTA_SUMBAR.map(kab => (
-                        <option key={kab} value={kab}>{kab}</option>
-                      ))}
-                    </select>
-                  ) : (
-                    <input
-                      type={m.tipe_field}
-                      required={m.wajib_diisi}
-                      value={metadataValues[m.id] || ''}
-                      onChange={e => handleMetadataChange(m.id, e.target.value)}
-                      placeholder={`Masukkan ${m.label_field}...`}
-                    />
-                  )}
-                </div>
-              ))}
+        {metadataGroups.map((group, gIdx) => {
+          if (currentStep !== gIdx) return null;
+          return (
+            <div key={group.name} className="card animate-fade-in" style={{ marginBottom: '2rem', borderTop: '4px solid #3b82f6' }}>
+              <h2 style={{ marginBottom: '1.5rem' }}>{group.name}</h2>
+              <div style={{ display: 'grid', gap: '1rem' }}>
+                {group.fields.map(m => (
+                  <div key={m.id} className="form-group">
+                    <label>{m.parsedLabel} {m.wajib_diisi && <span style={{color:'red'}}>*</span>}</label>
+                    {m.parsedLabel.toLowerCase().includes('kabupaten') || m.parsedLabel.toLowerCase().includes('kota') ? (
+                      <select
+                        required={m.wajib_diisi}
+                        value={metadataValues[m.id] || ''}
+                        onChange={e => handleMetadataChange(m.id, e.target.value)}
+                        style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none' }}
+                      >
+                        <option value="">-- Pilih Kabupaten/Kota --</option>
+                        {KABUPATEN_KOTA_SUMBAR.map(kab => (
+                          <option key={kab} value={kab}>{kab}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <input
+                        type={m.tipe_field}
+                        required={m.wajib_diisi}
+                        value={metadataValues[m.id] || ''}
+                        onChange={e => handleMetadataChange(m.id, e.target.value)}
+                        placeholder={`Masukkan ${m.parsedLabel}...`}
+                      />
+                    )}
+                  </div>
+                ))}
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })}
 
         {/* Sections & Items */}
         {schema.sections.map((section, sIdx) => {
-          const sectionStepIndex = schema.metadata_fields.length > 0 ? sIdx + 1 : sIdx;
+          const sectionStepIndex = metadataGroups.length + sIdx;
           if (currentStep !== sectionStepIndex) return null;
 
           return (
@@ -523,6 +551,39 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                   </div>
                 )}
 
+                {/* Tipe: TEKS SINGKAT */}
+                {item.tipe_jawaban === 'teks_singkat' && (
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    <input 
+                      type="text"
+                      required
+                      value={jawabanValues[item.id]?.nilai_teks || ''}
+                      onChange={e => handleJawabanChange(item.id, 'nilai_teks', e.target.value)}
+                      placeholder="Ketikkan jawaban singkat..."
+                      style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none' }}
+                    />
+                  </div>
+                )}
+
+                {/* Tipe: PILIHAN GANDA */}
+                {item.tipe_jawaban === 'pilihan_ganda' && (
+                  <div className="radio-group-likert" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', flexDirection: 'column' }}>
+                    {(item.opsi_jawaban || []).map((opt: string, optIdx: number) => (
+                      <label key={optIdx} className="radio-card" style={{ flex: '1 1 auto', display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.75rem', background: '#fff', border: '1px solid #ccc', borderRadius: '6px', cursor: 'pointer' }}>
+                        <input 
+                          type="radio" 
+                          name={item.id} 
+                          required
+                          value={opt}
+                          checked={jawabanValues[item.id]?.nilai_teks === opt}
+                          onChange={() => handleJawabanChange(item.id, 'nilai_teks', opt)}
+                        />
+                        <span style={{ fontWeight: 'normal' }}>{opt}</span>
+                      </label>
+                    ))}
+                  </div>
+                )}
+
                 {/* Catatan Bukti */}
                 {item.butuh_catatan_bukti && (
                   <div className="form-group" style={{ marginTop: '1rem' }}>
@@ -544,7 +605,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
         })}
 
         {/* Kesimpulan Step */}
-        {scoringConfig && currentStep === (schema.metadata_fields.length > 0 ? 1 : 0) + schema.sections.length && (
+        {scoringConfig && currentStep === metadataGroups.length + schema.sections.length && (
           <div className="card animate-fade-in" style={{ marginBottom: '2rem', borderTop: '4px solid #10b981' }}>
             <h2 style={{ marginBottom: '1.5rem' }}>Kesimpulan & Rekapitulasi</h2>
             
@@ -587,7 +648,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
           )}
           
           <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
-            {isSubmitting ? 'Menyimpan...' : (currentStep === ((schema.metadata_fields.length > 0 ? 1 : 0) + schema.sections.length + (scoringConfig ? 1 : 0) - 1) ? 'Kirim Form Monev' : 'Selanjutnya')}
+            {isSubmitting ? 'Menyimpan...' : (currentStep === (metadataGroups.length + schema.sections.length + (scoringConfig ? 1 : 0) - 1) ? 'Kirim Form Monev' : 'Selanjutnya')}
           </button>
         </div>
       </form>
