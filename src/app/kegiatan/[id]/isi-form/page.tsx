@@ -402,6 +402,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                 </>
               );
             })()}
+            </div>
           </div>
             
             <p style={{ marginBottom: '4rem' }}>Demikian form instrumen ini diisi dengan sebenar-benarnya sesuai dengan kondisi di lapangan.</p>

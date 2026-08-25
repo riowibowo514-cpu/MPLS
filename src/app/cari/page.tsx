@@ -443,6 +443,7 @@ export default function SearchPage() {
                 </>
               );
             })()}
+            </div>
           </div>
           
           <p style={{ marginBottom: '2rem' }}>Demikian form instrumen ini diisi dengan sebenar-benarnya sesuai dengan kondisi di lapangan.</p>
