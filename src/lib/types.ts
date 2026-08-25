@@ -46,7 +46,7 @@ export interface InstrumenSection {
   urutan: number;
 }
 
-export type TipeJawabanItem = 'likert4' | 'likert5' | 'esai' | 'pilihan_ganda';
+export type TipeJawabanItem = 'likert4' | 'likert5' | 'esai' | 'pilihan_ganda' | 'teks_singkat' | 'angka';
 
 export interface InstrumenItem {
   id: string;
