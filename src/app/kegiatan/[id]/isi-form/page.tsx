@@ -526,10 +526,14 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
               {section.nama_section}
             </h2>
 
-            {section.items.map((item, iIdx) => (
+            {section.items.map((item, iIdx) => {
+              const isOptional = Array.isArray(item.opsi_jawaban) && item.opsi_jawaban[0] === 'OPTIONAL';
+              const isRequired = !isOptional;
+              
+              return (
               <div key={item.id} style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fafafa', borderRadius: 'var(--radius-md)', border: '1px solid #eaeaea' }}>
                 <p style={{ fontWeight: 600, marginBottom: '1rem' }}>
-                  {iIdx + 1}. {item.teks_pertanyaan}
+                  {iIdx + 1}. {item.teks_pertanyaan} {isRequired && <span style={{color:'red'}}>*</span>}
                 </p>
 
                 {/* Tipe: LIKERT 4 */}
@@ -545,7 +549,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                         <input 
                           type="radio" 
                           name={item.id} 
-                          required
+                          required={isRequired}
                           checked={jawabanValues[item.id]?.nilai_skor === opt.val}
                           onChange={() => handleJawabanChange(item.id, 'nilai_skor', opt.val)}
                         />
@@ -563,7 +567,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                   <div className="form-group" style={{ marginBottom: '1rem' }}>
                     <textarea 
                       rows={3} 
-                      required
+                      required={isRequired}
                       value={jawabanValues[item.id]?.nilai_teks || ''}
                       onChange={e => handleJawabanChange(item.id, 'nilai_teks', e.target.value)}
                       placeholder="Tuliskan jawaban Anda di sini..."
@@ -576,7 +580,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                   <div className="form-group" style={{ marginBottom: '1rem' }}>
                     <input 
                       type="text"
-                      required
+                      required={isRequired}
                       value={jawabanValues[item.id]?.nilai_teks || ''}
                       onChange={e => handleJawabanChange(item.id, 'nilai_teks', e.target.value)}
                       placeholder="Ketikkan jawaban singkat..."
@@ -598,7 +602,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                           <input 
                             type="radio" 
                             name={item.id} 
-                            required
+                            required={isRequired}
                             value={opt}
                             checked={jawabanValues[item.id]?.nilai_teks === opt}
                             onChange={() => handleJawabanChange(item.id, 'nilai_teks', opt)}
@@ -615,10 +619,10 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                 {/* Catatan Bukti */}
                 {item.butuh_catatan_bukti && (
                   <div className="form-group" style={{ marginTop: '1rem' }}>
-                    <label style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Bukti Pembelajaran / Catatan Penting <span style={{color:'red'}}>*</span></label>
+                    <label style={{ fontSize: '0.875rem', color: 'var(--text-secondary)' }}>Bukti Pembelajaran / Catatan Penting {isRequired && <span style={{color:'red'}}>*</span>}</label>
                     <textarea 
-                      rows={2}
-                      required
+                      rows={2} 
+                      required={isRequired}
                       value={jawabanValues[item.id]?.catatan_bukti || ''}
                       onChange={e => handleJawabanChange(item.id, 'catatan_bukti', e.target.value)}
                       placeholder="Masukkan deskripsi bukti atau link drive..."
@@ -627,8 +631,8 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                   </div>
                 )}
               </div>
-            ))}
-            </div>
+            )})}
+          </div>
           );
         })}
 
