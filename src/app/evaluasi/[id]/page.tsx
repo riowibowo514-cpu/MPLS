@@ -255,14 +255,6 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
           <div className="no-print">
             <h2 style={{ color: '#10b981' }}>Berhasil Disimpan!</h2>
             <p>Terima kasih telah mengisi instrumen <strong>{schema.nama_instrumen}</strong>.</p>
-            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1.5rem' }}>
-              <button className="btn btn-outline" onClick={() => window.print()}>
-                Cetak Bukti (PDF)
-              </button>
-              <button className="btn btn-primary" onClick={() => router.push('/kegiatan')}>
-                Kembali ke Daftar Kegiatan
-              </button>
-            </div>
           </div>
           
           {/* Bagian khusus untuk di-print sebagai PDF (Berita Acara) */}
