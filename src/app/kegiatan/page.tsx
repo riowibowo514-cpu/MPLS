@@ -45,8 +45,7 @@ export default function DaftarKegiatanPetugas() {
       deskripsi: 'Instrumen monitoring dan evaluasi Masa Pengenalan Lingkungan Sekolah.',
       status: 'aktif',
       kategori_program: 'MONEV',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      created_at: new Date().toISOString()
     };
 
     if (data) {
