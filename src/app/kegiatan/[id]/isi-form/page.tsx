@@ -320,12 +320,14 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                       
                       return (
                         <div key={section.id} style={{ marginBottom: '2rem' }}>
-                          <h3 style={{ margin: '0 0 0.5rem 0', textDecoration: 'underline', fontSize: '1.1rem' }}>
-                            {section.nama_section}
-                          </h3>
                           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
                             {hasLikert && hasAnyLikert ? (
                               <thead>
+                                <tr>
+                                  <th colSpan={6} style={{ border: 'none', padding: '0 0 0.5rem 0', textAlign: 'left', backgroundColor: 'transparent' }}>
+                                    <h3 style={{ margin: 0, textDecoration: 'underline', fontSize: '1.1rem' }}>{section.nama_section}</h3>
+                                  </th>
+                                </tr>
                                 <tr>
                                   <th rowSpan={2} style={{ border: '1px solid black', padding: '0.5rem', width: '5%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>No</th>
                                   <th rowSpan={2} style={{ border: '1px solid black', padding: '0.5rem', width: '35%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>Aspek yang Diamati</th>
@@ -341,6 +343,11 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                               </thead>
                             ) : (
                               <thead>
+                                <tr>
+                                  <th colSpan={2} style={{ border: 'none', padding: '0 0 0.5rem 0', textAlign: 'left', backgroundColor: 'transparent' }}>
+                                    <h3 style={{ margin: 0, textDecoration: 'underline', fontSize: '1.1rem' }}>{section.nama_section}</h3>
+                                  </th>
+                                </tr>
                                 <tr>
                                   <th style={{ border: '1px solid black', padding: '0.5rem', width: '5%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>No</th>
                                   <th style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center', backgroundColor: '#bfbfbf' }}>Pertanyaan & Jawaban</th>
