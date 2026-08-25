@@ -4,11 +4,16 @@ import { supabase } from '@/lib/supabase';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { namaKegiatan, deskripsi, tahun, adaKonsumsi, adaPenginapan, pin } = body;
+    const { namaKegiatan, deskripsi, tanggal, adaKonsumsi, adaPenginapan, pin } = body;
 
-    if (!namaKegiatan || !tahun || !pin) {
-      return NextResponse.json({ error: 'Data tidak lengkap (Nama, Tahun, dan PIN wajib diisi).' }, { status: 400 });
+    if (!namaKegiatan || !tanggal || !pin) {
+      return NextResponse.json({ error: 'Data tidak lengkap (Nama, Tanggal, dan PIN wajib diisi).' }, { status: 400 });
     }
+
+    // Format tanggal
+    const dateObj = new Date(tanggal);
+    const options = { year: 'numeric', month: 'long', day: 'numeric' } as const;
+    const formattedTanggal = dateObj.toLocaleDateString('id-ID', options);
 
     // 1. Cari Master Template
     const { data: templateKegiatan, error: templateError } = await supabase
@@ -47,7 +52,7 @@ export async function POST(request: Request) {
         id: newKegiatanId,
         nama_kegiatan: namaKegiatan,
         deskripsi: deskripsi || '',
-        tahun: tahun,
+        tahun: formattedTanggal,
         status: 'aktif',
         kategori_program: 'EVALUASI_PANITIA',
         pin_akses: pin, // Kolom PIN rahasia untuk panitia!

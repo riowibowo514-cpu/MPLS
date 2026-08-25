@@ -9,7 +9,7 @@ export default function BuatEvaluasi() {
   const [formData, setFormData] = useState({
     namaKegiatan: '',
     deskripsi: '',
-    tahun: new Date().getFullYear().toString(),
+    tanggal: new Date().toISOString().split('T')[0],
     adaKonsumsi: true,
     adaPenginapan: true,
     pin: ''
@@ -144,13 +144,13 @@ export default function BuatEvaluasi() {
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Tahun Kegiatan</label>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Tanggal Pelaksanaan Kegiatan</label>
             <input 
-              type="text" 
+              type="date" 
               required
               className="form-control"
-              value={formData.tahun}
-              onChange={e => setFormData({...formData, tahun: e.target.value})}
+              value={formData.tanggal}
+              onChange={e => setFormData({...formData, tanggal: e.target.value})}
             />
           </div>
 
