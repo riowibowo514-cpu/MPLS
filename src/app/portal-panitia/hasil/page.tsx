@@ -170,15 +170,27 @@ export default function CekHasilPanitia() {
                 <h3 style={{ color: '#065f46', marginBottom: '0.5rem' }}>Akses Diberikan</h3>
                 <p style={{ color: '#047857', marginBottom: '1.5rem', fontSize: '0.875rem' }}>Anda berhak melihat dan mengunduh data responden untuk kegiatan ini.</p>
                 
-                <a 
-                  href={`/api/admin/export-excel?kegiatan_id=${selectedKegiatan.id}`}
-                  className="btn btn-primary" 
-                  target="_blank"
-                  style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                  Unduh Rekapitulasi (Excel)
-                </a>
+                <div style={{ display: 'flex', gap: '1rem', flexDirection: 'column' }}>
+                  <a 
+                    href={`/api/admin/export-excel?kegiatan_id=${selectedKegiatan.id}`}
+                    className="btn btn-outline" 
+                    target="_blank"
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                    Unduh Rekapitulasi (Excel)
+                  </a>
+
+                  <a 
+                    href={`/portal-panitia/hasil/${selectedKegiatan.id}?pin=${pinInput}`}
+                    className="btn btn-primary" 
+                    target="_blank"
+                    style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+                    Lihat Laporan Analisis (PDF)
+                  </a>
+                </div>
               </div>
             )}
           </div>
