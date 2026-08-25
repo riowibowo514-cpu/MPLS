@@ -83,13 +83,16 @@ export async function GET(req: NextRequest) {
       headers.push(mf.label_field);
     });
 
-    // Header Hasil Skoring (Jika Ada)
-    headers.push('Status Sistem (Otomatis)', 'Skor Total Sistem (%)', 'Status Final (Subjektif)', 'Alasan Perubahan Status', 'Catatan Kritis', 'Rekomendasi');
+    // Header Hasil Skoring (Hanya jika instrumen memiliki sistem skoring)
+    const hasScoring = instrumen.config_skoring ? true : false;
+    if (hasScoring) {
+      headers.push('Status Sistem (Otomatis)', 'Skor Total Sistem (%)', 'Status Final (Subjektif)', 'Alasan Perubahan Status', 'Catatan Kritis', 'Rekomendasi');
+    }
 
     // Header Soal
     sections?.forEach(sec => {
       sec.items.forEach((item: any, idx: number) => {
-        const title = `[${sec.nama_section}] ${item.teks_pertanyaan.substring(0, 50)}...`;
+        const title = `[${sec.nama_section}] ${item.teks_pertanyaan}`;
         if (item.tipe_jawaban === 'likert4') {
           headers.push(`${title} (Nilai 1-4)`);
         } else if (item.tipe_jawaban === 'esai') {
@@ -121,12 +124,14 @@ export async function GET(req: NextRequest) {
       });
 
       // Skoring
-      row.push(p.metadata_values['_statusOtomatis'] || '');
-      row.push(p.metadata_values['_skorTotal'] || '');
-      row.push(p.metadata_values['_statusFinal'] || '');
-      row.push(p.metadata_values['_alasanOverride'] || '');
-      row.push(p.metadata_values['_catatanKritis'] || '');
-      row.push(p.metadata_values['_rekomendasi'] || '');
+      if (hasScoring) {
+        row.push(p.metadata_values['_statusOtomatis'] || '');
+        row.push(p.metadata_values['_skorTotal'] || '');
+        row.push(p.metadata_values['_statusFinal'] || '');
+        row.push(p.metadata_values['_alasanOverride'] || '');
+        row.push(p.metadata_values['_catatanKritis'] || '');
+        row.push(p.metadata_values['_rekomendasi'] || '');
+      }
 
       // Soal & Jawaban
       const jList = jawabanMap[p.id] || [];

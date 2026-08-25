@@ -206,7 +206,7 @@ export default function KelolaKegiatan() {
                         style={{ flex: 1, padding: '0 0.5rem' }}
                         onClick={() => {
                           alert('Mempersiapkan unduhan Excel... Tunggu sebentar ya!');
-                          window.location.href = `/api/admin/export-excel?kegiatan_id=${k.id}`;
+                          window.location.href = `/api/admin/export-excel?kegiatan_id=${k.id}&t=${Date.now()}`;
                         }}
                       >
                         Unduh Excel
