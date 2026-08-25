@@ -171,7 +171,7 @@ export default function CekHasilPanitia() {
                 <p style={{ color: '#047857', marginBottom: '1.5rem', fontSize: '0.875rem' }}>Anda berhak melihat dan mengunduh data responden untuk kegiatan ini.</p>
                 
                 <a 
-                  href={`/api/admin/export-excel?kegiatanId=${selectedKegiatan.id}`}
+                  href={`/api/admin/export-excel?kegiatan_id=${selectedKegiatan.id}`}
                   className="btn btn-primary" 
                   target="_blank"
                   style={{ width: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.5rem' }}
