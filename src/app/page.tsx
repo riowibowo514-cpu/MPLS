@@ -35,6 +35,20 @@ export default function PortalMonevPage() {
           </div>
         </div>
 
+        {/* Card Panitia */}
+        <div className="card" style={{ flex: '1 1 350px', maxWidth: '400px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem 2rem', borderTop: '4px solid #f59e0b' }}>
+          <div style={{ width: '64px', height: '64px', background: '#fef3c7', color: '#f59e0b', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
+            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          </div>
+          <h2 style={{ marginBottom: '1rem' }}>Saya Panitia Kegiatan</h2>
+          <p style={{ color: 'var(--text-secondary)', marginBottom: '2rem', fontSize: '0.875rem', flex: 1 }}>
+            Akses layanan mandiri untuk merakit form evaluasi PKG dan mengunduh rekapitulasi data hasil kegiatan.
+          </p>
+          <Link href="/portal-panitia" className="btn btn-primary" style={{ width: '100%', background: '#f59e0b', borderColor: '#f59e0b', color: 'white' }}>
+            Buka Portal Panitia
+          </Link>
+        </div>
+
         {/* Card Pimpinan */}
         <div className="card" style={{ flex: '1 1 350px', maxWidth: '400px', textAlign: 'center', display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '3rem 2rem', borderTop: '4px solid #3b82f6' }}>
           <div style={{ width: '64px', height: '64px', background: '#dbeafe', color: '#3b82f6', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: '1.5rem' }}>
