@@ -104,17 +104,23 @@ export default function KelolaKegiatan() {
                 </button>
               </div>
               <div style={{ display: 'flex', gap: '0.5rem' }}>
-                <a 
-                  href="/dashboard/mpls-lama"
+                <button 
                   className="btn btn-outline"
-                  style={{ flex: 1, textAlign: 'center', textDecoration: 'none', lineHeight: '2.5' }}
+                  style={{ flex: 1, padding: '0 0.5rem' }}
+                  onClick={() => {
+                    alert('Untuk mengunduh Excel, silakan masuk ke Dashboard MPLS terlebih dahulu.');
+                    router.push('/dashboard/mpls-lama');
+                  }}
                 >
                   Unduh Excel
-                </a>
+                </button>
                 <button 
                   className="btn btn-outline" 
                   style={{ flex: 1, padding: '0 0.5rem' }}
-                  onClick={() => alert('Gunakan tombol Unduh PDF di dalam Dashboard MPLS')}
+                  onClick={() => {
+                    alert('Untuk mengunduh PDF, silakan masuk ke Dashboard MPLS terlebih dahulu.');
+                    router.push('/dashboard/mpls-lama');
+                  }}
                 >
                   Unduh PDF
                 </button>
@@ -195,17 +201,23 @@ export default function KelolaKegiatan() {
                       </button>
                     </div>
                     <div style={{ display: 'flex', gap: '0.5rem' }}>
-                      <a 
-                        href={`/api/admin/export-excel?kegiatan_id=${k.id}`}
+                      <button 
                         className="btn btn-outline"
-                        style={{ flex: 1, textAlign: 'center', textDecoration: 'none', lineHeight: '2.5' }}
+                        style={{ flex: 1, padding: '0 0.5rem' }}
+                        onClick={() => {
+                          alert('Mempersiapkan unduhan Excel... Tunggu sebentar ya!');
+                          window.location.href = `/api/admin/export-excel?kegiatan_id=${k.id}`;
+                        }}
                       >
                         Unduh Excel
-                      </a>
+                      </button>
                       <button 
                         className="btn btn-outline" 
                         style={{ flex: 1, padding: '0 0.5rem' }}
-                        onClick={() => alert('Fitur Unduh Rekap PDF sedang dikembangkan (AI-Generated PDF)')}
+                        onClick={() => {
+                          alert('Untuk mengunduh PDF Executive Summary, Anda akan dialihkan ke Dasbor Analitik. Silakan klik tombol "Export PDF" di sana!');
+                          router.push(`/dashboard/${k.id}`);
+                        }}
                       >
                         Unduh PDF
                       </button>
