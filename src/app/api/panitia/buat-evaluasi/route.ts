@@ -4,16 +4,23 @@ import { supabase } from '@/lib/supabase';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { namaKegiatan, deskripsi, tanggal, adaKonsumsi, adaPenginapan, pin } = body;
+    const { namaKegiatan, deskripsi, tanggalMulai, tanggalSelesai, adaKonsumsi, adaPenginapan, pin } = body;
 
-    if (!namaKegiatan || !tanggal || !pin) {
+    if (!namaKegiatan || !tanggalMulai || !tanggalSelesai || !pin) {
       return NextResponse.json({ error: 'Data tidak lengkap (Nama, Tanggal, dan PIN wajib diisi).' }, { status: 400 });
     }
 
     // Format tanggal
-    const dateObj = new Date(tanggal);
+    const dateMulai = new Date(tanggalMulai);
+    const dateSelesai = new Date(tanggalSelesai);
     const options = { year: 'numeric', month: 'long', day: 'numeric' } as const;
-    const formattedTanggal = dateObj.toLocaleDateString('id-ID', options);
+    
+    let formattedTanggal = '';
+    if (tanggalMulai === tanggalSelesai) {
+      formattedTanggal = dateMulai.toLocaleDateString('id-ID', options);
+    } else {
+      formattedTanggal = `${dateMulai.toLocaleDateString('id-ID', options)} s.d. ${dateSelesai.toLocaleDateString('id-ID', options)}`;
+    }
 
     // 1. Cari Master Template
     const { data: templateKegiatan, error: templateError } = await supabase

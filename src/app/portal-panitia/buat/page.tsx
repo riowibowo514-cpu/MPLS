@@ -9,7 +9,8 @@ export default function BuatEvaluasi() {
   const [formData, setFormData] = useState({
     namaKegiatan: '',
     deskripsi: '',
-    tanggal: new Date().toISOString().split('T')[0],
+    tanggalMulai: new Date().toISOString().split('T')[0],
+    tanggalSelesai: new Date().toISOString().split('T')[0],
     adaKonsumsi: true,
     adaPenginapan: true,
     pin: ''
@@ -143,15 +144,27 @@ export default function BuatEvaluasi() {
             />
           </div>
 
-          <div style={{ marginBottom: '1.5rem' }}>
-            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Tanggal Pelaksanaan Kegiatan</label>
-            <input 
-              type="date" 
-              required
-              className="form-control"
-              value={formData.tanggal}
-              onChange={e => setFormData({...formData, tanggal: e.target.value})}
-            />
+          <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Tanggal Mulai</label>
+              <input 
+                type="date" 
+                required
+                className="form-control"
+                value={formData.tanggalMulai}
+                onChange={e => setFormData({...formData, tanggalMulai: e.target.value})}
+              />
+            </div>
+            <div style={{ flex: 1 }}>
+              <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Tanggal Selesai</label>
+              <input 
+                type="date" 
+                required
+                className="form-control"
+                value={formData.tanggalSelesai}
+                onChange={e => setFormData({...formData, tanggalSelesai: e.target.value})}
+              />
+            </div>
           </div>
 
           <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
