@@ -5,8 +5,8 @@ import HeaderActions from '@/components/HeaderActions';
 import BackButton from '@/components/BackButton';
 
 export const metadata: Metadata = {
-  title: "Monev MPLS Ramah 2026",
-  description: "Aplikasi Monitoring dan Evaluasi MPLS Ramah 2026",
+  title: "PERLU BGTK",
+  description: "Portal Evaluasi Ruang Lingkup BGTK Provinsi Sumatera Barat",
 };
 
 export default function RootLayout({
