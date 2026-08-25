@@ -338,7 +338,6 @@ export default function SearchPage() {
               <p style={{ margin: '0 0 0.5rem 0', color: 'blue' }}>Petunjuk Pengisian :</p>
             {(() => {
               const hasAnyLikert = schema.sections.some(s => s.items.some((i: any) => i.tipe_jawaban.startsWith('likert')));
-              let globalItemIndex = 1;
               return (
                 <>
                   {hasAnyLikert && (
@@ -392,8 +391,8 @@ export default function SearchPage() {
                                   {section.nama_section}
                                 </td>
                               </tr>
-                              {section.items.map((item: any) => {
-                                const currentNumber = globalItemIndex++;
+                              {section.items.map((item: any, iIdx: number) => {
+                                const currentNumber = iIdx + 1;
                                 const ans = selectedJawaban[item.id] || {};
                                 return (
                                   <tr key={item.id}>
@@ -417,8 +416,8 @@ export default function SearchPage() {
                                   <u style={{ fontSize: '1.1rem' }}>{section.nama_section}</u>
                                 </td>
                               </tr>
-                              {section.items.map((item: any) => {
-                                const currentNumber = globalItemIndex++;
+                              {section.items.map((item: any, iIdx: number) => {
+                                const currentNumber = iIdx + 1;
                                 const ans = selectedJawaban[item.id] || {};
                                 return (
                                   <tr key={item.id}>
