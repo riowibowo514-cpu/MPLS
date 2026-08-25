@@ -254,7 +254,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
         <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '3rem 2rem' }}>
           <div className="no-print">
             <h2 style={{ color: '#10b981' }}>Berhasil Disimpan!</h2>
-            <p>Terima kasih telah mengisi instrumen <strong>{schema.nama_instrumen}</strong>.</p>
+            <p>Terima kasih telah berpartisipasi. Jawaban Anda telah berhasil direkam.</p>
           </div>
           
           {/* Bagian khusus untuk di-print sebagai PDF (Berita Acara) */}
