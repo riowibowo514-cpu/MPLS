@@ -94,7 +94,10 @@ export async function GET(req: NextRequest) {
           headers.push(`${title} (Nilai 1-4)`);
         } else if (item.tipe_jawaban === 'esai') {
           headers.push(`${title} (Teks)`);
+        } else if (item.tipe_jawaban === 'pilihan_ganda') {
+          headers.push(`${title} (Pilihan Ganda)`);
         }
+        
         if (item.butuh_catatan_bukti) {
           headers.push(`${title} (Catatan/Bukti)`);
         }
@@ -135,9 +138,10 @@ export async function GET(req: NextRequest) {
           const ans = itemToJawaban[item.id];
           if (item.tipe_jawaban === 'likert4') {
             row.push(ans ? ans.nilai_skor : '');
-          } else if (item.tipe_jawaban === 'esai') {
+          } else if (item.tipe_jawaban === 'esai' || item.tipe_jawaban === 'pilihan_ganda') {
             row.push(ans ? ans.nilai_teks : '');
           }
+          
           if (item.butuh_catatan_bukti) {
             row.push(ans ? ans.catatan_bukti : '');
           }
