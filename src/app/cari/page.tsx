@@ -336,93 +336,113 @@ export default function SearchPage() {
             
             <div style={{ marginBottom: '1rem', fontSize: '0.875rem' }}>
               <p style={{ margin: '0 0 0.5rem 0', color: 'blue' }}>Petunjuk Pengisian :</p>
-              <ol style={{ margin: '0 0 1rem 1rem', padding: 0 }}>
-                <li>Berilah tanda ceklist (√) pada alternatif pilihan jawaban yang tersedia.<br/>
-                  <div style={{ marginLeft: '1rem' }}>
-                    TS = Tidak sesuai<br/>
-                    KS = Kurang Sesuai<br/>
-                    S = Sesuai<br/>
-                    SS = Sangat sesuai
-                  </div>
-                </li>
-                <li style={{ marginTop: '0.5rem' }}>Silahkan melengkapi <strong>Bukti Pembelajaran/Catatan</strong> pilihan jawaban pada kolom yang telah disediakan.</li>
-              </ol>
-            </div>
+            {(() => {
+              const hasAnyLikert = schema.sections.some(s => s.items.some((i: any) => i.tipe_jawaban.startsWith('likert')));
+              let globalItemIndex = 1;
+              return (
+                <>
+                  {hasAnyLikert && (
+                    <ol start={1} style={{ margin: 0, paddingLeft: '1.5rem', marginBottom: '2rem' }}>
+                      <li>
+                        Silahkan melengkapi <strong>Penilaian</strong> dengan memilih salah satu kriteria yang ada.<br/>
+                        <div style={{ marginLeft: '1rem' }}>
+                          TS = Tidak sesuai<br/>
+                          KS = Kurang Sesuai<br/>
+                          S = Sesuai<br/>
+                          SS = Sangat sesuai
+                        </div>
+                      </li>
+                      <li style={{ marginTop: '0.5rem' }}>Silahkan melengkapi <strong>Bukti Pembelajaran/Catatan</strong> pilihan jawaban pada kolom yang telah disediakan.</li>
+                    </ol>
+                  )}
 
-            <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
-              <thead>
-                <tr>
-                  <th rowSpan={2} style={{ border: '1px solid black', padding: '0.5rem', width: '5%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>No</th>
-                  <th rowSpan={2} style={{ border: '1px solid black', padding: '0.5rem', width: '35%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>Aspek yang Diamati</th>
-                  <th colSpan={4} style={{ border: '1px solid black', padding: '0.5rem', width: '20%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>Penilaian</th>
-                  <th rowSpan={2} style={{ border: '1px solid black', padding: '0.5rem', width: '40%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>Bukti Pembelajaran/Catatan</th>
-                </tr>
-                <tr>
-                  <th style={{ border: '1px solid black', padding: '0.25rem', textAlign: 'center', width: '5%', backgroundColor: '#bfbfbf' }}>TS</th>
-                  <th style={{ border: '1px solid black', padding: '0.25rem', textAlign: 'center', width: '5%', backgroundColor: '#bfbfbf' }}>KS</th>
-                  <th style={{ border: '1px solid black', padding: '0.25rem', textAlign: 'center', width: '5%', backgroundColor: '#bfbfbf' }}>S</th>
-                  <th style={{ border: '1px solid black', padding: '0.25rem', textAlign: 'center', width: '5%', backgroundColor: '#bfbfbf' }}>SS</th>
-                </tr>
-              </thead>
-              <tbody>
-                {schema.sections.map((section, sIdx) => {
-                  const hasLikert = section.items.some((i: any) => i.tipe_jawaban === 'likert4');
-                  const hasEsai = section.items.some((i: any) => i.tipe_jawaban === 'esai');
-                  
-                  if (hasLikert) {
-                    return (
-                      <React.Fragment key={section.id}>
+                  <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem', marginBottom: '1.5rem' }}>
+                    {hasAnyLikert ? (
+                      <thead>
                         <tr>
-                          <td colSpan={7} style={{ border: '1px solid black', padding: '0.5rem', fontWeight: 'bold', backgroundColor: '#f2f2f2' }}>
-                            {section.nama_section}
-                          </td>
+                          <th rowSpan={2} style={{ border: '1px solid black', padding: '0.5rem', width: '5%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>No</th>
+                          <th rowSpan={2} style={{ border: '1px solid black', padding: '0.5rem', width: '35%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>Aspek yang Diamati</th>
+                          <th colSpan={4} style={{ border: '1px solid black', padding: '0.5rem', width: '20%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>Penilaian</th>
+                          <th rowSpan={2} style={{ border: '1px solid black', padding: '0.5rem', width: '40%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>Bukti Pembelajaran/Catatan</th>
                         </tr>
-                        {section.items.map((item: any, iIdx: number) => {
-                          const ans = selectedJawaban[item.id] || {};
-                          return (
-                            <tr key={item.id}>
-                              <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{iIdx + 1}</td>
-                              <td style={{ border: '1px solid black', padding: '0.5rem' }}>{item.teks_pertanyaan}</td>
-                              <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 1 ? '√' : ''}</td>
-                              <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 2 ? '√' : ''}</td>
-                              <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 3 ? '√' : ''}</td>
-                              <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 4 ? '√' : ''}</td>
-                              <td style={{ border: '1px solid black', padding: '0.5rem' }}>{ans.catatan_bukti || ''}</td>
-                            </tr>
-                          );
-                        })}
-                      </React.Fragment>
-                    );
-                  } else {
-                    return (
-                      <React.Fragment key={section.id}>
                         <tr>
-                          <td colSpan={7} style={{ padding: '2rem 0 0.5rem 0', fontWeight: 'bold', fontSize: '1rem' }}>
-                            <u style={{ fontSize: '1.1rem' }}>{section.nama_section}</u>
-                          </td>
+                          <th style={{ border: '1px solid black', padding: '0.25rem', textAlign: 'center', width: '5%', backgroundColor: '#bfbfbf' }}>TS</th>
+                          <th style={{ border: '1px solid black', padding: '0.25rem', textAlign: 'center', width: '5%', backgroundColor: '#bfbfbf' }}>KS</th>
+                          <th style={{ border: '1px solid black', padding: '0.25rem', textAlign: 'center', width: '5%', backgroundColor: '#bfbfbf' }}>S</th>
+                          <th style={{ border: '1px solid black', padding: '0.25rem', textAlign: 'center', width: '5%', backgroundColor: '#bfbfbf' }}>SS</th>
                         </tr>
-                        {section.items.map((item: any, iIdx: number) => {
-                          const ans = selectedJawaban[item.id] || {};
+                      </thead>
+                    ) : (
+                      <thead>
+                        <tr>
+                          <th style={{ border: '1px solid black', padding: '0.5rem', width: '5%', textAlign: 'center', backgroundColor: '#bfbfbf' }}>No</th>
+                          <th style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center', backgroundColor: '#bfbfbf' }}>Pertanyaan & Jawaban</th>
+                        </tr>
+                      </thead>
+                    )}
+                    <tbody>
+                      {schema.sections.map((section, sIdx) => {
+                        const hasLikert = section.items.some((i: any) => i.tipe_jawaban.startsWith('likert'));
+                        
+                        if (hasLikert && hasAnyLikert) {
                           return (
-                            <tr key={item.id}>
-                              <td colSpan={7} style={{ border: '1px solid black', padding: '0' }}>
-                                <div style={{ display: 'flex', padding: '0.5rem' }}>
-                                  <div style={{ width: '5%', textAlign: 'center' }}>{21 + iIdx + 1 /* Just simulating the numbering from the PDF */}</div>
-                                  <div style={{ flex: 1, paddingLeft: '0.5rem' }}>{item.teks_pertanyaan}</div>
-                                </div>
-                                <div style={{ borderTop: '1px solid black', padding: '1rem', minHeight: '80px', whiteSpace: 'pre-wrap' }}>
-                                  {ans.nilai_teks || ''}
-                                </div>
-                              </td>
-                            </tr>
+                            <React.Fragment key={section.id}>
+                              <tr>
+                                <td colSpan={7} style={{ border: '1px solid black', padding: '0.5rem', fontWeight: 'bold', backgroundColor: '#f2f2f2' }}>
+                                  {section.nama_section}
+                                </td>
+                              </tr>
+                              {section.items.map((item: any) => {
+                                const currentNumber = globalItemIndex++;
+                                const ans = selectedJawaban[item.id] || {};
+                                return (
+                                  <tr key={item.id}>
+                                    <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{currentNumber}</td>
+                                    <td style={{ border: '1px solid black', padding: '0.5rem' }}>{item.teks_pertanyaan}</td>
+                                    <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 1 ? '√' : ''}</td>
+                                    <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 2 ? '√' : ''}</td>
+                                    <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 3 ? '√' : ''}</td>
+                                    <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 4 ? '√' : ''}</td>
+                                    <td style={{ border: '1px solid black', padding: '0.5rem' }}>{ans.catatan_bukti || ''}</td>
+                                  </tr>
+                                );
+                              })}
+                            </React.Fragment>
                           );
-                        })}
-                      </React.Fragment>
-                    );
-                  }
-                })}
-              </tbody>
-            </table>
+                        } else {
+                          return (
+                            <React.Fragment key={section.id}>
+                              <tr>
+                                <td colSpan={hasAnyLikert ? 7 : 2} style={{ padding: '2rem 0 0.5rem 0', fontWeight: 'bold', fontSize: '1rem' }}>
+                                  <u style={{ fontSize: '1.1rem' }}>{section.nama_section}</u>
+                                </td>
+                              </tr>
+                              {section.items.map((item: any) => {
+                                const currentNumber = globalItemIndex++;
+                                const ans = selectedJawaban[item.id] || {};
+                                return (
+                                  <tr key={item.id}>
+                                    <td colSpan={hasAnyLikert ? 7 : 2} style={{ border: '1px solid black', padding: '0' }}>
+                                      <div style={{ display: 'flex', padding: '0.5rem' }}>
+                                        <div style={{ width: '5%', textAlign: 'center' }}>{currentNumber}</div>
+                                        <div style={{ flex: 1, paddingLeft: '0.5rem' }}>{item.teks_pertanyaan}</div>
+                                      </div>
+                                      <div style={{ borderTop: '1px solid black', padding: '1rem', minHeight: '80px', whiteSpace: 'pre-wrap' }}>
+                                        {ans.nilai_teks || ''}
+                                      </div>
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </React.Fragment>
+                          );
+                        }
+                      })}
+                    </tbody>
+                  </table>
+                </>
+              );
+            })()}
           </div>
           
           <p style={{ marginBottom: '2rem' }}>Demikian form instrumen ini diisi dengan sebenar-benarnya sesuai dengan kondisi di lapangan.</p>
