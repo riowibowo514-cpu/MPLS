@@ -138,7 +138,7 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
   if (!schema) return <div className="container" style={{ padding: '2rem' }}>Data tidak ditemukan.</div>;
 
   // Gunakan agregat hasil pre-calculate dari Server API (Sangat Cepat & Ringan)
-  const { sectionAverages, itemStats, totalResponden, rawChoiceCounts } = analyticsData;
+  const { sectionAverages, itemStats, totalResponden, rawChoiceCounts, userMap } = analyticsData;
 
   // Lapis 1: Radar Data
   const radarData = {
@@ -207,49 +207,87 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
         </div>
       ) : (
         <>
-          {/* LAPIS 1 & 2: Overview (Radar & Insights) */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
-            
-            {/* Lapis 1: Radar Chart */}
-            <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-              <h3 style={{ marginBottom: '0.5rem', width: '100%', textAlign: 'center' }}>Kinerja Keseluruhan per Aspek</h3>
-              <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.5rem' }}>Skala 1 (Kurang) hingga 4 (Baik Sekali)</p>
-              
-              <div style={{ width: '100%', maxWidth: '600px', height: '350px' }}>
-                <Radar 
-                  data={radarData}
-                  options={{
-                    maintainAspectRatio: false,
-                    layout: {
-                      padding: {
-                        top: 20,
-                        bottom: 20,
-                        left: 40,
-                        right: 40
-                      }
-                    },
-                    scales: {
-                      r: {
-                        min: 1,
-                        max: 4,
-                        angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
-                        grid: { color: 'rgba(0, 0, 0, 0.1)' },
-                        pointLabels: { 
-                          font: { size: 11, family: "'Inter', sans-serif" }, 
-                          color: '#475569',
-                          padding: 10
-                        },
-                        ticks: { stepSize: 1, backdropColor: 'transparent' }
-                      }
-                    },
-                    plugins: { legend: { display: false } }
-                  }}
-                />
-              </div>
+          {/* DAFTAR RIWAYAT PENGISIAN */}
+          <div className="card" style={{ marginBottom: '2rem' }}>
+            <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem', color: '#1e293b', borderBottom: '2px solid #f1f5f9', paddingBottom: '0.5rem' }}>
+              Daftar Riwayat Pengisian
+            </h2>
+            <div style={{ overflowX: 'auto' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.875rem' }}>
+                <thead>
+                  <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
+                    <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>No</th>
+                    <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>Nama Petugas Monev</th>
+                    <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>Tanggal Submit</th>
+                    <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>Aksi</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {pengisians.map((p, idx) => (
+                    <tr key={p.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
+                      <td style={{ padding: '0.75rem' }}>{idx + 1}</td>
+                      <td style={{ padding: '0.75rem', fontWeight: '500' }}>
+                        {userMap && userMap[p.petugas_id] ? userMap[p.petugas_id].nama : 'Anonim / Publik'}
+                      </td>
+                      <td style={{ padding: '0.75rem' }}>
+                        {new Date(p.tanggal_pengisian).toLocaleString('id-ID')}
+                      </td>
+                      <td style={{ padding: '0.75rem' }}>
+                        <Link href={`/cari?token=${p.id}`} className="btn btn-outline" style={{ padding: '0.25rem 0.75rem', fontSize: '0.75rem' }}>
+                          Lihat Detail
+                        </Link>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
             </div>
+          </div>
 
-            {/* Lapis 2: Insights */}
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+          {/* LAPIS 1 & 2: Overview (Radar & Insights) - HANYA TAMPIL JIKA ADA DATA LIKERT */}
+          {sectionAverages.length > 0 && (
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(400px, 1fr))', gap: '1.5rem', marginBottom: '2rem' }}>
+              
+              {/* Lapis 1: Radar Chart */}
+              <div className="card" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                <h3 style={{ marginBottom: '0.5rem', width: '100%', textAlign: 'center' }}>Kinerja Keseluruhan per Aspek</h3>
+                <p style={{ fontSize: '0.875rem', color: '#64748b', marginBottom: '1.5rem' }}>Skala 1 (Kurang) hingga 4 (Baik Sekali)</p>
+                
+                <div style={{ width: '100%', maxWidth: '600px', height: '350px' }}>
+                  <Radar 
+                    data={radarData}
+                    options={{
+                      maintainAspectRatio: false,
+                      layout: {
+                        padding: {
+                          top: 20,
+                          bottom: 20,
+                          left: 40,
+                          right: 40
+                        }
+                      },
+                      scales: {
+                        r: {
+                          min: 1,
+                          max: 4,
+                          angleLines: { color: 'rgba(0, 0, 0, 0.1)' },
+                          grid: { color: 'rgba(0, 0, 0, 0.1)' },
+                          pointLabels: { 
+                            font: { size: 11, family: "'Inter', sans-serif" }, 
+                            color: '#475569',
+                            padding: 10
+                          },
+                          ticks: { stepSize: 1, backdropColor: 'transparent' }
+                        }
+                      },
+                      plugins: { legend: { display: false } }
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Lapis 2: Insights */}
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
               <div className="card" style={{ borderLeft: '4px solid #10b981', flex: 1 }}>
                 <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginBottom: '1rem' }}>
                   <span style={{ fontSize: '1.5rem' }}>🏆</span>
@@ -293,6 +331,7 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
               )}
             </div>
           </div>
+          )}
 
           {/* LAPIS 3: Tabel Progres Mini per Section */}
           <h2 style={{ fontSize: '1.25rem', marginTop: '3rem', marginBottom: '1.5rem', color: '#1e293b' }}>Rincian Skor per Aspek</h2>

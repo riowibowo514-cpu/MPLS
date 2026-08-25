@@ -43,6 +43,13 @@ export async function GET(
     if (pError) throw pError;
     const safePengisians = pengisians || [];
 
+    // 2.5 Ambil Data Petugas
+    const { data: users } = await supabase.from('users').select('id, nama_lengkap, username');
+    const userMap: Record<string, { nama: string, nip: string }> = {};
+    if (users) {
+      users.forEach(u => userMap[u.id] = { nama: u.nama_lengkap, nip: u.username });
+    }
+
     // 3. --- PRE-CALCULATE AGGREGATIONS ---
     const sectionAverages: { nama: string, avg: number }[] = [];
     const itemStats: { id: string, teks: string, section: string, avg: number, total: number }[] = [];
@@ -115,8 +122,8 @@ export async function GET(
         rawChoiceCounts,
         // Kirimkan data pengisians hanya untuk export, 
         // tapi di dunia nyata ini harusnya dipisah ke API export tersendiri.
-        // Untuk sekarang kita sertakan agar `page.tsx` tidak rusak.
-        pengisians: safePengisians
+        pengisians: safePengisians,
+        userMap
       }
     }, {
       headers: {
