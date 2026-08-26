@@ -44,7 +44,7 @@ async function injectMasterTemplate() {
   console.log("Menambahkan Metadata Fields Daring...");
   const metadataFields = [
     { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Nama Lengkap', tipe_field: 'text', wajib_diisi: true, urutan: 1 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Pekerjaan (Guru/Kepsek/dll)', tipe_field: 'text', wajib_diisi: true, urutan: 2 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Pekerjaan', tipe_field: 'dropdown', opsi_dropdown: ['Guru', 'Kepala Sekolah', 'Pengawas/Penilik', 'Tenaga Kependidikan', '__OTHER__'], wajib_diisi: true, urutan: 2 },
     { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Asal Instansi', tipe_field: 'text', wajib_diisi: true, urutan: 3 },
     { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Kabupaten/Kota', tipe_field: 'text', wajib_diisi: true, urutan: 4 },
     { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] No WhatsApp', tipe_field: 'text', wajib_diisi: true, urutan: 5 },

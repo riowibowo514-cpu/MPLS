@@ -494,6 +494,55 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                           <option key={kab} value={kab}>{kab}</option>
                         ))}
                       </select>
+                    ) : m.tipe_field === 'dropdown' && m.opsi_dropdown ? (
+                      <div className="radio-group-likert" style={{ display: 'flex', gap: '0.5rem', marginBottom: '0.5rem', flexWrap: 'wrap', flexDirection: 'column' }}>
+                        {(m.opsi_dropdown || []).map((opt: string, optIdx: number) => {
+                          if (opt === '__OTHER__') {
+                            const isOtherSelected = metadataValues[m.id] !== undefined && !m.opsi_dropdown.includes(metadataValues[m.id]) && metadataValues[m.id] !== '';
+                            return (
+                              <label key={optIdx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                                <input 
+                                  type="radio" 
+                                  name={m.id} 
+                                  required={m.wajib_diisi && !metadataValues[m.id]}
+                                  checked={isOtherSelected}
+                                  onChange={() => {
+                                    handleMetadataChange(m.id, 'Lainnya');
+                                  }}
+                                  style={{ width: '1.2rem', height: '1.2rem' }}
+                                />
+                                <span>Lainnya:</span>
+                                {isOtherSelected && (
+                                  <input 
+                                    type="text" 
+                                    autoFocus
+                                    required={m.wajib_diisi}
+                                    value={metadataValues[m.id] === 'Lainnya' ? '' : metadataValues[m.id]}
+                                    onChange={(e) => handleMetadataChange(m.id, e.target.value)}
+                                    placeholder="Tuliskan di sini..."
+                                    style={{ flex: 1, padding: '0.25rem 0.5rem', borderBottom: '1px solid var(--primary)', outline: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', background: 'transparent' }}
+                                  />
+                                )}
+                              </label>
+                            );
+                          }
+                          
+                          return (
+                            <label key={optIdx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer' }}>
+                              <input 
+                                type="radio" 
+                                name={m.id} 
+                                required={m.wajib_diisi && !metadataValues[m.id]}
+                                value={opt}
+                                checked={metadataValues[m.id] === opt}
+                                onChange={() => handleMetadataChange(m.id, opt)}
+                                style={{ width: '1.2rem', height: '1.2rem' }}
+                              />
+                              <span style={{ fontSize: '0.95rem' }}>{opt}</span>
+                            </label>
+                          );
+                        })}
+                      </div>
                     ) : (
                       <input
                         type={m.tipe_field}
