@@ -104,41 +104,45 @@ export async function POST(request: Request) {
       .order('urutan');
 
     if (sections && sections.length > 0) {
-      for (const section of sections) {
+      const validSections = sections.filter(section => {
         const sectionNameLower = section.nama_section.toLowerCase();
-        
-        // Logika Cerdas: Hapus section jika panitia tidak mencentang!
-        if (!adaKonsumsi && (sectionNameLower.includes('konsumsi') || sectionNameLower.includes('makan'))) {
-          continue; // Lewati section ini
-        }
-        if (!adaPenginapan && (sectionNameLower.includes('penginapan') || sectionNameLower.includes('akomodasi') || sectionNameLower.includes('hotel'))) {
-          continue; // Lewati section ini
-        }
+        if (!adaKonsumsi && (sectionNameLower.includes('konsumsi') || sectionNameLower.includes('makan'))) return false;
+        if (!adaPenginapan && (sectionNameLower.includes('penginapan') || sectionNameLower.includes('akomodasi') || sectionNameLower.includes('hotel'))) return false;
+        return true;
+      });
 
+      const sectionIdMap = new Map<string, string>(); // oldId -> newId
+      const newSectionsToInsert = validSections.map(section => {
         const newSectionId = crypto.randomUUID();
-        
-        // Simpan Section Baru
-        await supabase.from('instrumen_section').insert({
+        sectionIdMap.set(section.id, newSectionId);
+        return {
           id: newSectionId,
           instrumen_id: newInstrumenId,
           nama_section: section.nama_section,
           urutan: section.urutan
-        });
+        };
+      });
 
-        // Ambil Items dari Section Lama
-        const { data: items } = await supabase
+      if (newSectionsToInsert.length > 0) {
+        // Bulk Insert Sections
+        await supabase.from('instrumen_section').insert(newSectionsToInsert);
+
+        // Fetch all items for the valid sections
+        const validSectionIds = validSections.map(s => s.id);
+        const { data: allItems } = await supabase
           .from('instrumen_item')
           .select('*')
-          .eq('section_id', section.id)
-          .order('urutan');
+          .in('section_id', validSectionIds);
 
-        if (items && items.length > 0) {
-          const newItems = items.map(item => ({
+        if (allItems && allItems.length > 0) {
+          const newItemsToInsert = allItems.map(item => ({
             ...item,
             id: crypto.randomUUID(),
-            section_id: newSectionId
+            section_id: sectionIdMap.get(item.section_id)
           }));
-          await supabase.from('instrumen_item').insert(newItems);
+          
+          // Bulk Insert Items
+          await supabase.from('instrumen_item').insert(newItemsToInsert);
         }
       }
     }
