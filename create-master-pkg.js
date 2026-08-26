@@ -112,6 +112,22 @@ async function injectMasterTemplate() {
       { pertanyaan: 'Secara keseluruhan, seberapa puas Anda dengan penyelenggaraan kegiatan ini?', tipe_jawaban: 'likert4', max_skor: 4 },
       { pertanyaan: 'Apakah Anda akan merekomendasikan pelatihan ini kepada rekan sejawat? (1=Tidak, 2=Ragu-ragu, 4=Ya)', tipe_jawaban: 'likert4', max_skor: 4 }
     ]},
+    { nama_section: 'Indeks Persepsi Anti Korupsi (IPAK)', items: [
+      { pertanyaan: 'Petugas/panitia memberikan pelayanan kepada peserta secara jujur, transparan, dan berintegritas.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Selama mengikuti kegiatan, saya tidak pernah diminta memberikan uang, hadiah, atau imbalan dalam bentuk apa pun untuk memperoleh pelayanan.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Petugas/panitia tidak melakukan pungutan di luar ketentuan yang telah diinformasikan kepada peserta.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Petugas/panitia memberikan pelayanan kepada seluruh peserta secara adil dan tidak diskriminatif.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Informasi mengenai hak, kewajiban, ketentuan, dan biaya (jika ada) disampaikan secara jelas dan transparan.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Saya mengetahui bahwa BGTK Provinsi Sumatera Barat menolak segala bentuk gratifikasi, suap, pungutan liar, dan praktik korupsi lainnya dalam penyelenggaraan kegiatan.', tipe_jawaban: 'likert4', max_skor: 4 }
+    ]},
+    { nama_section: 'Indeks Persepsi Kualitas Pelayanan (IPKP)', items: [
+      { pertanyaan: 'Informasi mengenai pelaksanaan kegiatan, jadwal, persyaratan, dan ketentuan disampaikan dengan jelas dan mudah dipahami.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Proses pendaftaran dan administrasi kegiatan mudah, sederhana, dan tidak berbelit-belit.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Petugas/panitia memberikan pelayanan dengan ramah, sopan, responsif, dan profesional.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Petugas/panitia memberikan pelayanan dan informasi sesuai dengan kebutuhan peserta.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Pelaksanaan kegiatan berlangsung tepat waktu dan sesuai dengan jadwal/informasi yang telah disampaikan.', tipe_jawaban: 'likert4', max_skor: 4 },
+      { pertanyaan: 'Sarana, prasarana, fasilitas, dan layanan pendukung selama kegiatan telah memadai dan mendukung kenyamanan peserta.', tipe_jawaban: 'likert4', max_skor: 4 }
+    ]},
     { nama_section: 'Catatan dan Saran', items: [
       { pertanyaan: 'Masukan atau saran terhadap penyelenggaraan kegiatan (sarana, pelaksanaan, materi, narasumber, konsumsi, atau hal lain):', tipe_jawaban: 'esai', max_skor: 0 }
     ]}
