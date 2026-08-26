@@ -61,7 +61,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
     const groups: { name: string, fields: any[] }[] = [];
     schema.metadata_fields.forEach(m => {
       let groupName = "Informasi Umum";
-      let label = m.label_field || m.nama_field || "Metadata";
+      let label = m.label_field || "Metadata";
       if (!label) label = "";
       const match = label.match(/^\[(.*?)\]\s*(.*)$/);
       if (match) {
@@ -270,7 +270,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
             <table style={{ width: '100%', marginBottom: '2rem', borderCollapse: 'collapse', fontSize: '1rem' }}>
               <tbody>
                 {schema.metadata_fields.map(m => {
-                  const labelField = m.label_field || m.nama_field || '';
+                  const labelField = m.label_field || '';
                   const match = labelField.match(/^\[(.*?)\]\s*(.*)$/);
                   const lbl = match ? match[2] : labelField;
                   return (
@@ -397,7 +397,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
             {(() => {
               const getMeta = (lbl: string) => {
                 const f = schema.metadata_fields.find(m => {
-                   const txt = m.label_field || m.nama_field || '';
+                   const txt = m.label_field || '';
                    return txt.toLowerCase().includes(lbl.toLowerCase());
                 });
                 return f ? metadataValues[f.id] : '';
