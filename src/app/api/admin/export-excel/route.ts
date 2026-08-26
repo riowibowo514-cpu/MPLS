@@ -99,6 +99,8 @@ export async function GET(req: NextRequest) {
           headers.push(`${title} (Teks)`);
         } else if (item.tipe_jawaban === 'pilihan_ganda') {
           headers.push(`${title} (Pilihan Ganda)`);
+        } else if (item.tipe_jawaban === 'checkbox') {
+          headers.push(`${title} (Multikriteria)`);
         }
         
         if (item.butuh_catatan_bukti) {
@@ -143,7 +145,7 @@ export async function GET(req: NextRequest) {
           const ans = itemToJawaban[item.id];
           if (item.tipe_jawaban === 'likert4') {
             row.push(ans ? ans.nilai_skor : '');
-          } else if (item.tipe_jawaban === 'esai' || item.tipe_jawaban === 'pilihan_ganda') {
+          } else if (item.tipe_jawaban === 'esai' || item.tipe_jawaban === 'pilihan_ganda' || item.tipe_jawaban === 'checkbox') {
             row.push(ans ? ans.nilai_teks : '');
           }
           

@@ -61,7 +61,8 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
     const groups: { name: string, fields: any[] }[] = [];
     schema.metadata_fields.forEach(m => {
       let groupName = "Informasi Umum";
-      let label = m.label_field;
+      let label = m.label_field || m.nama_field || "Metadata";
+      if (!label) label = "";
       const match = label.match(/^\[(.*?)\]\s*(.*)$/);
       if (match) {
         groupName = match[1];
@@ -269,8 +270,9 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
             <table style={{ width: '100%', marginBottom: '2rem', borderCollapse: 'collapse', fontSize: '1rem' }}>
               <tbody>
                 {schema.metadata_fields.map(m => {
-                  const match = m.label_field.match(/^\[(.*?)\]\s*(.*)$/);
-                  const lbl = match ? match[2] : m.label_field;
+                  const labelField = m.label_field || m.nama_field || '';
+                  const match = labelField.match(/^\[(.*?)\]\s*(.*)$/);
+                  const lbl = match ? match[2] : labelField;
                   return (
                   <tr key={m.id}>
                     <td style={{ width: '200px', padding: '0.25rem 0' }}>{lbl}</td>
@@ -394,7 +396,10 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
             <p style={{ marginBottom: '4rem' }}>Demikian form instrumen ini diisi dengan sebenar-benarnya sesuai dengan kondisi di lapangan.</p>
             {(() => {
               const getMeta = (lbl: string) => {
-                const f = schema.metadata_fields.find(m => m.label_field.toLowerCase().includes(lbl.toLowerCase()));
+                const f = schema.metadata_fields.find(m => {
+                   const txt = m.label_field || m.nama_field || '';
+                   return txt.toLowerCase().includes(lbl.toLowerCase());
+                });
                 return f ? metadataValues[f.id] : '';
               };
               const kab = getMeta('kabupaten') || '................';
@@ -580,7 +585,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                 )}
 
                 {/* Tipe: PILIHAN GANDA */}
-                {item.tipe_jawaban === 'pilihan_ganda' && (
+                {item.tipe_jawaban === 'pilihan_ganda' && item.opsi_jawaban?.[0] !== '__CHECKBOX__' && (
                   <div className="radio-group-likert" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', flexDirection: 'column' }}>
                     {(item.opsi_jawaban || []).map((opt: string, optIdx: number) => {
                       let typeClass = 'default';
@@ -600,6 +605,35 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                           <div className={`radio-card-content ${typeClass}`}>
                             {opt}
                           </div>
+                        </label>
+                      );
+                    })}
+                  </div>
+                )}
+
+                {/* Tipe: CHECKBOX (Multiple Choice) */}
+                {item.tipe_jawaban === 'pilihan_ganda' && item.opsi_jawaban?.[0] === '__CHECKBOX__' && (
+                  <div className="checkbox-group" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexDirection: 'column' }}>
+                    {(item.opsi_jawaban || []).filter((o: string) => o !== '__CHECKBOX__').map((opt: string, optIdx: number) => {
+                      const currentVals = jawabanValues[item.id]?.nilai_teks ? jawabanValues[item.id].nilai_teks.split('|||') : [];
+                      const isChecked = currentVals.includes(opt);
+                      
+                      const toggleCheck = () => {
+                        const newVals = isChecked 
+                          ? currentVals.filter((v: string) => v !== opt) 
+                          : [...currentVals, opt];
+                        handleJawabanChange(item.id, 'nilai_teks', newVals.join('|||'));
+                      };
+
+                      return (
+                        <label key={optIdx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '4px', background: isChecked ? '#e0e7ff' : '#fff' }}>
+                          <input 
+                            type="checkbox" 
+                            checked={isChecked}
+                            onChange={toggleCheck}
+                            style={{ width: '1.2rem', height: '1.2rem' }}
+                          />
+                          <span style={{ fontSize: '0.95rem' }}>{opt}</span>
                         </label>
                       );
                     })}

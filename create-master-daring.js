@@ -43,12 +43,12 @@ async function injectMasterTemplate() {
   // 3. Insert Metadata Fields (Biodata Diri - Standar BGTK)
   console.log("Menambahkan Metadata Fields Daring...");
   const metadataFields = [
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Nama Lengkap', tipe_field: 'text', wajib: true, urutan: 1 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Pekerjaan (Guru/Kepala Sekolah/Pengawas/Tenaga Kependidikan/Lainnya)', tipe_field: 'text', wajib: true, urutan: 2 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Asal Instansi', tipe_field: 'text', wajib: true, urutan: 3 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Kabupaten/Kota', tipe_field: 'text', wajib: true, urutan: 4 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'No WhatsApp', tipe_field: 'text', wajib: true, urutan: 5 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Email Aktif', tipe_field: 'text', wajib: true, urutan: 6 }
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Nama Lengkap', label_field: '[Data Peserta] Nama Lengkap', tipe_field: 'text', wajib_diisi: true, urutan: 1 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Pekerjaan', label_field: '[Data Peserta] Pekerjaan (Guru/Kepsek/dll)', tipe_field: 'text', wajib_diisi: true, urutan: 2 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Asal Instansi', label_field: '[Data Peserta] Asal Instansi', tipe_field: 'text', wajib_diisi: true, urutan: 3 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Kabupaten/Kota', label_field: '[Data Peserta] Kabupaten/Kota', tipe_field: 'text', wajib_diisi: true, urutan: 4 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'No WhatsApp', label_field: '[Data Peserta] No WhatsApp', tipe_field: 'text', wajib_diisi: true, urutan: 5 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Email Aktif', label_field: '[Data Peserta] Email Aktif', tipe_field: 'text', wajib_diisi: true, urutan: 6 }
   ];
   await supabase.from('instrumen_metadata_field').insert(metadataFields);
 
@@ -62,17 +62,17 @@ async function injectMasterTemplate() {
       { pertanyaan: 'Apakah media yang dipakai narasumber dalam menyajikan materi dapat membantu peserta dalam memahami materi?', tipe_jawaban: 'likert4', max_skor: 4 },
       { pertanyaan: 'Apakah cara komunikasi narasumber dalam menyajikan materi menyenangkan dan mudah dipahami?', tipe_jawaban: 'likert4', max_skor: 4 },
       { pertanyaan: 'Apakah narasumber dapat dengan baik memberikan motivasi kepada peserta kegiatan?', tipe_jawaban: 'likert4', max_skor: 4 },
-      { pertanyaan: 'Menurut Anda, apa yang perlu diperbaiki dari penyampaian materi oleh narasumber? (Kecepatan penyampaian, Interaksi, Teks slide, dll)', tipe_jawaban: 'esai', max_skor: 0 },
+      { pertanyaan: 'Menurut Anda, apa yang perlu diperbaiki dari penyampaian materi oleh narasumber? (Kecepatan penyampaian, Interaksi, Teks slide, dll)', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['__CHECKBOX__', 'Kecepatan Penyampaian', 'Interaksi dengan Peserta', 'Teks Slide/Materi Presentasi', 'Penguasaan Materi', 'Kualitas Suara/Video', 'Lainnya'], max_skor: 0 },
       { pertanyaan: 'Menurut Anda, apa yang sudah baik dari narasumber?', tipe_jawaban: 'esai', max_skor: 0 }
     ]},
     { nama_section: 'Tema Webinar Selanjutnya', items: [
-      { pertanyaan: 'Apakah anda tertarik untuk mengikuti kegiatan kami selanjutnya? (Ya / Tidak / Mungkin)', tipe_jawaban: 'esai', max_skor: 0 },
+      { pertanyaan: 'Apakah anda tertarik untuk mengikuti kegiatan kami selanjutnya?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['Ya', 'Tidak', 'Mungkin'], max_skor: 0 },
       { pertanyaan: 'Apa rekomendasi tema webinar kami selanjutnya?', tipe_jawaban: 'esai', max_skor: 0 }
     ]},
     { nama_section: 'Media Sosial', items: [
-      { pertanyaan: 'Apakah akses komunikasi untuk menyampaikan keluhan/komplain telah tersedia dan mudah diperoleh? (Ya / Tidak)', tipe_jawaban: 'esai', max_skor: 0 },
-      { pertanyaan: 'Apa media sosial BGTK Provinsi Sumbar yang telah anda ketahui?', tipe_jawaban: 'esai', max_skor: 0 },
-      { pertanyaan: 'Apa media informasi atau media sosial yang anda harapkan untuk mendapatkan berita-berita terbaru mengenai BGTK Provinsi Sumbar?', tipe_jawaban: 'esai', max_skor: 0 }
+      { pertanyaan: 'Apakah akses komunikasi untuk menyampaikan keluhan/komplain telah tersedia dan mudah diperoleh?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['Ya', 'Tidak'], max_skor: 0 },
+      { pertanyaan: 'Apa media sosial BGTK Provinsi Sumbar yang telah anda ketahui?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['__CHECKBOX__', 'Instagram', 'Facebook', 'Youtube', 'Tiktok', 'Twitter/X'], max_skor: 0 },
+      { pertanyaan: 'Apa media informasi atau media sosial yang anda harapkan untuk mendapatkan berita-berita terbaru mengenai BGTK Provinsi Sumbar?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['__CHECKBOX__', 'Instagram', 'Facebook', 'Youtube', 'Tiktok', 'Twitter/X', 'Website BGTK', 'WhatsApp Group'], max_skor: 0 }
     ]},
     { nama_section: 'Indeks Persepsi Anti Korupsi (IPAK)', items: [
       { pertanyaan: 'Petugas/panitia memberikan pelayanan kepada peserta secara jujur, transparan, dan berintegritas.', tipe_jawaban: 'likert4', max_skor: 4 },
