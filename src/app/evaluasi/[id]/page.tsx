@@ -545,7 +545,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                       </div>
                     ) : (
                       <input
-                        type={m.tipe_field}
+                        type={m.parsedLabel.toLowerCase().includes('whatsapp') || m.parsedLabel.toLowerCase().includes('telepon') || m.parsedLabel.toLowerCase().includes('hp') ? 'number' : m.tipe_field}
                         required={m.wajib_diisi}
                         value={metadataValues[m.id] || ''}
                         onChange={e => handleMetadataChange(m.id, e.target.value)}
@@ -570,14 +570,15 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
               {section.nama_section}
             </h2>
 
-            {section.items.map((item, iIdx) => {
+            {section.items.map((item, idx) => {
               const isOptional = Array.isArray(item.opsi_jawaban) && item.opsi_jawaban[0] === 'OPTIONAL';
               const isRequired = !isOptional;
-              
+              const isPernyataan = item.teks_pertanyaan.startsWith('PERNYATAAN:');
+
               return (
-              <div key={item.id} style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fafafa', borderRadius: 'var(--radius-md)', border: '1px solid #eaeaea' }}>
-                <p style={{ fontWeight: 600, marginBottom: '1rem' }}>
-                  {iIdx + 1}. {item.teks_pertanyaan} {isRequired && <span style={{color:'red'}}>*</span>}
+              <div key={item.id} className="card" style={{ marginBottom: '1.5rem', ...(isPernyataan ? {background: '#f8fafc', border: '1px solid #93c5fd', borderRadius: '12px', boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1)'} : {}) }}>
+                <p style={{ fontWeight: '500', marginBottom: '1rem', lineHeight: isPernyataan ? '1.6' : '1.5', color: isPernyataan ? '#1e293b' : 'inherit' }}>
+                  {!isPernyataan && `${idx + 1}. `}{isPernyataan ? item.teks_pertanyaan.replace('PERNYATAAN:', '').trim() : item.teks_pertanyaan} {isRequired && <span style={{color:'red'}}>*</span>}
                 </p>
 
                 {/* Tipe: LIKERT 4 */}
@@ -660,19 +661,30 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                   </div>
                 )}
 
-                {/* Tipe: CHECKBOX (Multiple Choice) */}
                 {item.tipe_jawaban === 'pilihan_ganda' && item.opsi_jawaban?.[0] === '__CHECKBOX__' && (
                   <div className="checkbox-group" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexDirection: 'column' }}>
                     {(item.opsi_jawaban || []).filter((o: string) => o !== '__CHECKBOX__').map((opt: string, optIdx: number) => {
                       const currentVals = jawabanValues[item.id]?.nilai_teks ? jawabanValues[item.id].nilai_teks.split('|||') : [];
-                      const isChecked = currentVals.includes(opt);
+                      
+                      const isLainnya = opt.toLowerCase() === 'lainnya' || opt === '__OTHER__';
+                      const isChecked = isLainnya ? currentVals.some((v: string) => v.startsWith('Lainnya')) : currentVals.includes(opt);
                       
                       const toggleCheck = () => {
-                        const newVals = isChecked 
-                          ? currentVals.filter((v: string) => v !== opt) 
-                          : [...currentVals, opt];
+                        let newVals;
+                        if (isChecked) {
+                           newVals = currentVals.filter((v: string) => isLainnya ? !v.startsWith('Lainnya') : v !== opt);
+                        } else {
+                           newVals = [...currentVals, isLainnya ? 'Lainnya' : opt];
+                        }
                         handleJawabanChange(item.id, 'nilai_teks', newVals.join('|||'));
                       };
+                      
+                      const handleLainnyaTextChange = (text: string) => {
+                         const newVals = currentVals.map((v: string) => v.startsWith('Lainnya') ? `Lainnya: ${text}` : v);
+                         handleJawabanChange(item.id, 'nilai_teks', newVals.join('|||'));
+                      };
+                      
+                      const lainnyaText = currentVals.find((v: string) => v.startsWith('Lainnya'))?.replace(/^Lainnya(:\s*)?/, '') || '';
 
                       return (
                         <label key={optIdx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '4px', background: isChecked ? '#e0e7ff' : '#fff' }}>
@@ -681,9 +693,20 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                             required={isRequired && currentVals.length === 0}
                             checked={isChecked}
                             onChange={toggleCheck}
-                            style={{ width: '1.2rem', height: '1.2rem' }}
+                            style={{ width: '1.2rem', height: '1.2rem', flexShrink: 0 }}
                           />
-                          <span style={{ fontSize: '0.95rem' }}>{opt}</span>
+                          <span style={{ fontSize: '0.95rem', whiteSpace: isLainnya ? 'nowrap' : 'normal' }}>{isLainnya ? 'Lainnya:' : opt}</span>
+                          {isLainnya && isChecked && (
+                             <input 
+                               type="text" 
+                               autoFocus
+                               required={isRequired}
+                               value={lainnyaText}
+                               onChange={(e) => handleLainnyaTextChange(e.target.value)}
+                               placeholder="Tuliskan jawaban Anda..."
+                               style={{ flex: 1, padding: '0.25rem 0.5rem', borderBottom: '1px solid var(--primary)', outline: 'none', borderTop: 'none', borderLeft: 'none', borderRight: 'none', background: 'transparent' }}
+                             />
+                          )}
                         </label>
                       );
                     })}
