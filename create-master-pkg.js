@@ -58,14 +58,15 @@ async function injectMasterTemplate() {
   // 3. Insert Metadata Fields (Biodata Diri - Standar BGTK)
   console.log("Menambahkan Metadata Fields...");
   const metadataFields = [
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Nama Lengkap', tipe_field: 'text', wajib: true, urutan: 1 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Pekerjaan (Guru/Kepala Sekolah/Pengawas/Tenaga Kependidikan/Lainnya)', tipe_field: 'text', wajib: true, urutan: 2 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Asal Instansi', tipe_field: 'text', wajib: true, urutan: 3 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Kabupaten/Kota', tipe_field: 'text', wajib: true, urutan: 4 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'No WhatsApp', tipe_field: 'text', wajib: true, urutan: 5 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Email Aktif', tipe_field: 'text', wajib: true, urutan: 6 }
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: 'Nama Lengkap', tipe_field: 'text', wajib_diisi: true, urutan: 1 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: 'Pekerjaan (Guru/Kepala Sekolah/Pengawas/Tenaga Kependidikan/Lainnya)', tipe_field: 'text', wajib_diisi: true, urutan: 2 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: 'Asal Instansi', tipe_field: 'text', wajib_diisi: true, urutan: 3 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: 'Kabupaten/Kota', tipe_field: 'text', wajib_diisi: true, urutan: 4 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: 'No WhatsApp', tipe_field: 'text', wajib_diisi: true, urutan: 5 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: 'Email Aktif', tipe_field: 'text', wajib_diisi: true, urutan: 6 }
   ];
-  await supabase.from('instrumen_metadata_field').insert(metadataFields);
+  const { error: errMeta } = await supabase.from('instrumen_metadata_field').insert(metadataFields);
+  if (errMeta) throw errMeta;
 
   // 4. Insert Sections
   const sectionsData = [

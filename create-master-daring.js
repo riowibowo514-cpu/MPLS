@@ -43,14 +43,15 @@ async function injectMasterTemplate() {
   // 3. Insert Metadata Fields (Biodata Diri - Standar BGTK)
   console.log("Menambahkan Metadata Fields Daring...");
   const metadataFields = [
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Nama Lengkap', label_field: '[Data Peserta] Nama Lengkap', tipe_field: 'text', wajib_diisi: true, urutan: 1 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Pekerjaan', label_field: '[Data Peserta] Pekerjaan (Guru/Kepsek/dll)', tipe_field: 'text', wajib_diisi: true, urutan: 2 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Asal Instansi', label_field: '[Data Peserta] Asal Instansi', tipe_field: 'text', wajib_diisi: true, urutan: 3 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Kabupaten/Kota', label_field: '[Data Peserta] Kabupaten/Kota', tipe_field: 'text', wajib_diisi: true, urutan: 4 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'No WhatsApp', label_field: '[Data Peserta] No WhatsApp', tipe_field: 'text', wajib_diisi: true, urutan: 5 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Email Aktif', label_field: '[Data Peserta] Email Aktif', tipe_field: 'text', wajib_diisi: true, urutan: 6 }
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Nama Lengkap', tipe_field: 'text', wajib_diisi: true, urutan: 1 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Pekerjaan (Guru/Kepsek/dll)', tipe_field: 'text', wajib_diisi: true, urutan: 2 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Asal Instansi', tipe_field: 'text', wajib_diisi: true, urutan: 3 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Kabupaten/Kota', tipe_field: 'text', wajib_diisi: true, urutan: 4 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] No WhatsApp', tipe_field: 'text', wajib_diisi: true, urutan: 5 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, label_field: '[Data Peserta] Email Aktif', tipe_field: 'text', wajib_diisi: true, urutan: 6 }
   ];
-  await supabase.from('instrumen_metadata_field').insert(metadataFields);
+  const { error: errMeta } = await supabase.from('instrumen_metadata_field').insert(metadataFields);
+  if (errMeta) throw errMeta;
 
   // 4. Insert Sections
   const sectionsData = [
