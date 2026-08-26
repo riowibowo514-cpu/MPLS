@@ -629,6 +629,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                         <label key={optIdx} style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', cursor: 'pointer', padding: '0.5rem', border: '1px solid #d1d5db', borderRadius: '4px', background: isChecked ? '#e0e7ff' : '#fff' }}>
                           <input 
                             type="checkbox" 
+                            required={isRequired && currentVals.length === 0}
                             checked={isChecked}
                             onChange={toggleCheck}
                             style={{ width: '1.2rem', height: '1.2rem' }}

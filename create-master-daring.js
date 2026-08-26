@@ -92,7 +92,7 @@ async function injectMasterTemplate() {
     ]},
     { nama_section: 'Kritik dan Saran', items: [
       { pertanyaan: 'Mohon berikan kami kritik dan saran secara umum untuk peningkatan penyelenggaraan kegiatan kami kedepannya.', tipe_jawaban: 'esai', max_skor: 0 },
-      { pertanyaan: 'PERNYATAAN: Dengan ini saya menyatakan dengan sadar bahwa informasi data diri yang saya inputkan pada formulir ini sudah sesuai dengan data yang sebenarnya dan menjadi dasar untuk pencantuman nama pada sertifikat kegiatan. (Ketik SETUJU jika Anda setuju)', tipe_jawaban: 'esai', max_skor: 0 }
+      { pertanyaan: 'PERNYATAAN: Dengan ini saya menyatakan dengan sadar bahwa informasi data diri yang saya inputkan pada formulir ini sudah sesuai dengan data yang sebenarnya dan menjadi dasar untuk pencantuman nama pada sertifikat kegiatan.', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['__CHECKBOX__', 'Saya Setuju'], max_skor: 0 }
     ]}
   ];
 
