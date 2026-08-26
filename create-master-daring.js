@@ -114,6 +114,7 @@ async function injectMasterTemplate() {
       section_id: sectionId,
       teks_pertanyaan: item.pertanyaan,
       tipe_jawaban: item.tipe_jawaban,
+      opsi_jawaban: item.opsi_jawaban || null,
       butuh_catatan_bukti: false,
       urutan: index + 1
     }));
