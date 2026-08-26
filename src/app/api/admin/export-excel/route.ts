@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
     // Header Identitas
     headers.push('ID Pengisian', 'Tanggal Submit', 'Nama Petugas Akun', 'NIP Akun');
     metaFields?.forEach(mf => {
-      headers.push(mf.label_field);
+      headers.push(mf.nama_field || mf.label_field);
     });
 
     // Header Hasil Skoring (Hanya jika instrumen memiliki sistem skoring)

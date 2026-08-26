@@ -13,7 +13,9 @@ export default function BuatEvaluasi() {
     tanggalSelesai: new Date().toISOString().split('T')[0],
     adaKonsumsi: true,
     adaPenginapan: true,
-    pin: ''
+    pin: '',
+    tipeKuesioner: 'reguler', // 'reguler' atau 'daring'
+    tarikBiodata: false
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -134,6 +136,19 @@ export default function BuatEvaluasi() {
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Tipe Kuesioner</label>
+            <select 
+              className="form-control"
+              value={formData.tipeKuesioner}
+              onChange={e => setFormData({...formData, tipeKuesioner: e.target.value})}
+              style={{ padding: '0.75rem', width: '100%', borderRadius: '6px', border: '1px solid #d1d5db', fontSize: '1rem' }}
+            >
+              <option value="reguler">Kegiatan Luring / Reguler</option>
+              <option value="daring">Kegiatan Daring Khusus (Webinar)</option>
+            </select>
+          </div>
+
+          <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Deskripsi (Opsional)</label>
             <textarea 
               className="form-control"
@@ -189,8 +204,26 @@ export default function BuatEvaluasi() {
                 checked={formData.adaPenginapan}
                 onChange={e => setFormData({...formData, adaPenginapan: e.target.checked})}
                 style={{ width: '1.25rem', height: '1.25rem' }}
+                disabled={formData.tipeKuesioner === 'daring'}
               />
               <span style={{ fontWeight: 'bold' }}>Sertakan Evaluasi Penginapan / Akomodasi</span>
+            </label>
+          </div>
+
+          <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#eff6ff', border: '1px solid #bfdbfe', borderRadius: '8px' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '0.5rem', fontSize: '1.1rem', color: '#1e3a8a' }}>Pengumpulan Data Peserta</h3>
+            <p style={{ fontSize: '0.875rem', color: '#3b82f6', marginBottom: '1rem' }}>
+              Aktifkan ini jika kegiatan Anda memerlukan penerbitan sertifikat BGTK. Peserta akan diminta mengisi biodata (Nama, Instansi, dll) sebelum mengisi evaluasi.
+            </p>
+            
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', cursor: 'pointer' }}>
+              <input 
+                type="checkbox" 
+                checked={formData.tarikBiodata}
+                onChange={e => setFormData({...formData, tarikBiodata: e.target.checked})}
+                style={{ width: '1.25rem', height: '1.25rem' }}
+              />
+              <span style={{ fontWeight: 'bold', color: '#1e40af' }}>Wajibkan pengisian biodata peserta (Tarik Biodata)</span>
             </label>
           </div>
 

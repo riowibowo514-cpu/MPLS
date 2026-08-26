@@ -4,10 +4,10 @@ import { supabase } from '@/lib/supabase';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { namaKegiatan, deskripsi, tanggalMulai, tanggalSelesai, adaKonsumsi, adaPenginapan, pin } = body;
+    const { namaKegiatan, deskripsi, tanggalMulai, tanggalSelesai, adaKonsumsi, adaPenginapan, pin, tipeKuesioner, tarikBiodata } = body;
 
-    if (!namaKegiatan || !tanggalMulai || !tanggalSelesai || !pin) {
-      return NextResponse.json({ error: 'Data tidak lengkap (Nama, Tanggal, dan PIN wajib diisi).' }, { status: 400 });
+    if (!namaKegiatan || !tanggalMulai || !tanggalSelesai || !pin || !tipeKuesioner) {
+      return NextResponse.json({ error: 'Data tidak lengkap (Nama, Tanggal, Tipe, dan PIN wajib diisi).' }, { status: 400 });
     }
 
     // Format tanggal
@@ -22,10 +22,12 @@ export async function POST(request: Request) {
       formattedTanggal = `${dateMulai.toLocaleDateString('id-ID', options)} s.d. ${dateSelesai.toLocaleDateString('id-ID', options)}`;
     }
 
-    // 1. Cari Master Template
+    // 1. Cari Master Template yang sesuai
+    const targetMasterName = tipeKuesioner === 'daring' ? 'MASTER TEMPLATE EVALUASI DARING' : 'MASTER TEMPLATE EVALUASI PKG';
     const { data: templateKegiatan, error: templateError } = await supabase
       .from('kegiatan')
       .select('*')
+      .eq('nama_kegiatan', targetMasterName)
       .eq('kategori_program', 'TEMPLATE_EVALUASI')
       .limit(1)
       .single();
@@ -81,19 +83,21 @@ export async function POST(request: Request) {
 
     if (insertInstrumenError) throw insertInstrumenError;
 
-    // 5. Kloning Metadata Fields (Data Peserta/Asal Sekolah dll)
-    const { data: metaFields } = await supabase
-      .from('instrumen_metadata_field')
-      .select('*')
-      .eq('instrumen_id', templateInstrumen.id);
+    // 5. Kloning Metadata Fields JIKA tarikBiodata dicentang
+    if (tarikBiodata) {
+      const { data: metaFields } = await supabase
+        .from('instrumen_metadata_field')
+        .select('*')
+        .eq('instrumen_id', templateInstrumen.id);
 
-    if (metaFields && metaFields.length > 0) {
-      const newMetaFields = metaFields.map(field => ({
-        ...field,
-        id: crypto.randomUUID(),
-        instrumen_id: newInstrumenId
-      }));
-      await supabase.from('instrumen_metadata_field').insert(newMetaFields);
+      if (metaFields && metaFields.length > 0) {
+        const newMetaFields = metaFields.map(field => ({
+          ...field,
+          id: crypto.randomUUID(),
+          instrumen_id: newInstrumenId
+        }));
+        await supabase.from('instrumen_metadata_field').insert(newMetaFields);
+      }
     }
 
     // 6. Kloning Sections & Items

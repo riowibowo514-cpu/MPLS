@@ -18,13 +18,13 @@ async function injectMasterTemplate() {
   const { data: existing } = await supabase
     .from('kegiatan')
     .select('id')
-    .eq('kategori_program', 'TEMPLATE_EVALUASI')
+    .eq('nama_kegiatan', 'MASTER TEMPLATE PKG (JANGAN DIHAPUS)')
     .limit(1)
     .single();
 
   if (existing) {
     console.log("Template evaluasi sudah ada. Menghapus yang lama...");
-    await supabase.from('kegiatan').delete().eq('id', existing.id);
+    await supabase.from('kegiatan').delete().eq('nama_kegiatan', 'MASTER TEMPLATE PKG (JANGAN DIHAPUS)');
   }
 
   const kegiatanId = crypto.randomUUID();
@@ -55,11 +55,15 @@ async function injectMasterTemplate() {
   });
   if (errInst) throw errInst;
 
-  // 3. Insert Metadata Fields (Tidak meminta identitas, tapi butuh basic info)
+  // 3. Insert Metadata Fields (Biodata Diri - Standar BGTK)
   console.log("Menambahkan Metadata Fields...");
   const metadataFields = [
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'jenjang_peserta', label_field: '[Data Peserta] Jenjang Mengajar', tipe_field: 'text', wajib: false, urutan: 1 },
-    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'mata_pelajaran', label_field: '[Data Peserta] Mata Pelajaran yang Diampu', tipe_field: 'text', wajib: false, urutan: 2 }
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Nama Lengkap', tipe_field: 'text', wajib: true, urutan: 1 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Pekerjaan (Guru/Kepala Sekolah/Pengawas/Tenaga Kependidikan/Lainnya)', tipe_field: 'text', wajib: true, urutan: 2 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Asal Instansi', tipe_field: 'text', wajib: true, urutan: 3 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Kabupaten/Kota', tipe_field: 'text', wajib: true, urutan: 4 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'No WhatsApp', tipe_field: 'text', wajib: true, urutan: 5 },
+    { id: crypto.randomUUID(), instrumen_id: instrumenId, nama_field: 'Email Aktif', tipe_field: 'text', wajib: true, urutan: 6 }
   ];
   await supabase.from('instrumen_metadata_field').insert(metadataFields);
 
