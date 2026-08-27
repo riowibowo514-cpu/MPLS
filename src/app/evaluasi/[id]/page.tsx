@@ -105,7 +105,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
         .single();
       
       if (errKeg || !keg) throw new Error('Kegiatan tidak ditemukan.');
-      if (keg.status === 'ditutup') {
+      if (keg.status === 'nonaktif') {
         throw new Error('Mohon Maaf, formulir evaluasi untuk kegiatan ini telah ditutup oleh panitia.');
       }
 

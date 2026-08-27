@@ -94,8 +94,8 @@ export default function CekHasilPanitia() {
 
   const handleToggleStatus = async () => {
     if (!selectedKegiatan) return;
-    const newStatus = selectedKegiatan.status === 'aktif' ? 'ditutup' : 'aktif';
-    const confirmMsg = newStatus === 'ditutup' 
+    const newStatus = selectedKegiatan.status === 'aktif' ? 'nonaktif' : 'aktif';
+    const confirmMsg = newStatus === 'nonaktif' 
       ? 'Apakah Anda yakin ingin MENUTUP form ini? Peserta tidak akan bisa lagi mengisi form.' 
       : 'Apakah Anda yakin ingin MEMBUKA KEMBALI form ini?';
       
