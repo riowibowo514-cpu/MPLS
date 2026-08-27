@@ -117,7 +117,7 @@ export async function GET(req: NextRequest) {
       
       // Identitas
       row.push(p.id);
-      row.push(new Date(p.created_at).toLocaleString('id-ID'));
+      row.push(new Date(p.tanggal_pengisian).toLocaleString('id-ID'));
       row.push(userMap[p.petugas_id]?.nama || '-');
       row.push(userMap[p.petugas_id]?.nip || '-');
       
