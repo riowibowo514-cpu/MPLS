@@ -190,6 +190,10 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
     setError('');
 
     const finalMetadata = { ...metadataValues };
+    Object.keys(finalMetadata).forEach(k => {
+      if (k.endsWith('_isOther')) delete finalMetadata[k];
+    });
+
     if (scoringConfig) {
        finalMetadata['_statusOtomatis'] = kesimpulanComputed?.finalStatus || '';
        finalMetadata['_statusFinal'] = kesimpulanInputs.statusFinal;
@@ -486,17 +490,38 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                   <div key={m.id} className="form-group">
                     <label>{m.parsedLabel} {m.wajib_diisi && <span style={{color:'red'}}>*</span>}</label>
                     {m.parsedLabel.toLowerCase().includes('kabupaten') || m.parsedLabel.toLowerCase().includes('kota') ? (
-                      <select
-                        required={m.wajib_diisi}
-                        value={metadataValues[m.id] || ''}
-                        onChange={e => handleMetadataChange(m.id, e.target.value)}
-                        style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none' }}
-                      >
-                        <option value="">-- Pilih Kabupaten/Kota --</option>
-                        {KABUPATEN_KOTA_SUMBAR.map(kab => (
-                          <option key={kab} value={kab}>{kab}</option>
-                        ))}
-                      </select>
+                      <>
+                        <select
+                          required={m.wajib_diisi && !metadataValues[m.id + '_isOther']}
+                          value={metadataValues[m.id + '_isOther'] ? 'Lainnya' : (metadataValues[m.id] || '')}
+                          onChange={e => {
+                            if (e.target.value === 'Lainnya') {
+                              handleMetadataChange(m.id + '_isOther', 'true');
+                              handleMetadataChange(m.id, '');
+                            } else {
+                              handleMetadataChange(m.id + '_isOther', '');
+                              handleMetadataChange(m.id, e.target.value);
+                            }
+                          }}
+                          style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none' }}
+                        >
+                          <option value="">-- Pilih Kabupaten/Kota --</option>
+                          {KABUPATEN_KOTA_SUMBAR.map(kab => (
+                            <option key={kab} value={kab}>{kab}</option>
+                          ))}
+                          <option value="Lainnya">Lainnya (Luar Sumatera Barat)</option>
+                        </select>
+                        {metadataValues[m.id + '_isOther'] === 'true' && (
+                          <input
+                            type="text"
+                            required={m.wajib_diisi}
+                            placeholder="Tuliskan nama provinsi atau kabupaten/kota Anda..."
+                            value={metadataValues[m.id] || ''}
+                            onChange={e => handleMetadataChange(m.id, e.target.value)}
+                            style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none', marginTop: '0.5rem' }}
+                          />
+                        )}
+                      </>
                     ) : (
                       <input
                         type={m.tipe_field}

@@ -92,6 +92,32 @@ export default function CekHasilPanitia() {
     setIsVerifying(false);
   };
 
+  const handleToggleStatus = async () => {
+    if (!selectedKegiatan) return;
+    const newStatus = selectedKegiatan.status === 'aktif' ? 'ditutup' : 'aktif';
+    const confirmMsg = newStatus === 'ditutup' 
+      ? 'Apakah Anda yakin ingin MENUTUP form ini? Peserta tidak akan bisa lagi mengisi form.' 
+      : 'Apakah Anda yakin ingin MEMBUKA KEMBALI form ini?';
+      
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      const { error } = await supabase
+        .from('kegiatan')
+        .update({ status: newStatus })
+        .eq('id', selectedKegiatan.id);
+        
+      if (error) throw error;
+      setSelectedKegiatan({ ...selectedKegiatan, status: newStatus });
+      alert(`Status form berhasil diubah menjadi: ${newStatus.toUpperCase()}`);
+      
+      // Update in the list as well
+      setDaftarKegiatan(prev => prev.map(k => k.id === selectedKegiatan.id ? { ...k, status: newStatus } : k));
+    } catch (err: any) {
+      alert("Gagal mengubah status: " + err.message);
+    }
+  };
+
   return (
     <div className="container" style={{ padding: '2rem 1rem', maxWidth: '800px', margin: '0 auto' }}>
       <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
@@ -232,6 +258,25 @@ export default function CekHasilPanitia() {
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
                     Lihat Laporan Analisis (PDF)
                   </a>
+
+                  <button 
+                    onClick={handleToggleStatus}
+                    className="btn btn-outline"
+                    style={{ 
+                      width: '100%', 
+                      display: 'flex', 
+                      alignItems: 'center', 
+                      justifyContent: 'center', 
+                      gap: '0.5rem',
+                      background: selectedKegiatan.status === 'aktif' ? '#fee2e2' : '#d1fae5',
+                      borderColor: selectedKegiatan.status === 'aktif' ? '#ef4444' : '#10b981',
+                      color: selectedKegiatan.status === 'aktif' ? '#dc2626' : '#059669',
+                      marginTop: '0.5rem'
+                    }}
+                  >
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+                    {selectedKegiatan.status === 'aktif' ? 'Tutup Akses Form (Non-aktifkan)' : 'Buka Kembali Form (Aktifkan)'}
+                  </button>
                 </div>
               </div>
             )}

@@ -73,8 +73,8 @@ async function injectMasterTemplate() {
     ]},
     { nama_section: 'Media Sosial', items: [
       { pertanyaan: 'Apakah akses komunikasi untuk menyampaikan keluhan/komplain telah tersedia dan mudah diperoleh?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['Ya', 'Tidak'], max_skor: 0 },
-      { pertanyaan: 'Apa media sosial BGTK Provinsi Sumbar yang telah anda ketahui?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['__CHECKBOX__', 'Instagram', 'Facebook', 'Youtube', 'Tiktok', 'Twitter/X'], max_skor: 0 },
-      { pertanyaan: 'Apa media informasi atau media sosial yang anda harapkan untuk mendapatkan berita-berita terbaru mengenai BGTK Provinsi Sumbar?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['__CHECKBOX__', 'Instagram', 'Facebook', 'Youtube', 'Tiktok', 'Twitter/X', 'Website BGTK', 'WhatsApp Group'], max_skor: 0 }
+      { pertanyaan: 'Apa media sosial BGTK Provinsi Sumbar yang telah anda ketahui?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['__CHECKBOX__', 'Instagram', 'Facebook', 'Youtube', 'Tiktok', 'LAMAN/WEB'], max_skor: 0 },
+      { pertanyaan: 'Apa media informasi atau media sosial yang anda harapkan untuk mendapatkan berita-berita terbaru mengenai BGTK Provinsi Sumbar?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['__CHECKBOX__', 'Instagram', 'Facebook', 'Youtube', 'Tiktok', 'LAMAN/WEB', 'Website BGTK', 'WhatsApp Group'], max_skor: 0 }
     ]},
     { nama_section: 'Indeks Persepsi Anti Korupsi (IPAK)', items: [
       { pertanyaan: 'Petugas/panitia memberikan pelayanan kepada peserta secara jujur, transparan, dan berintegritas.', tipe_jawaban: 'likert4', max_skor: 4 },
