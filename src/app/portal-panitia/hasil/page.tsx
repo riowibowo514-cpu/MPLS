@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import { Kegiatan } from '@/lib/types';
@@ -9,15 +9,26 @@ export default function CekHasilPanitia() {
   const [kegiatanList, setKegiatanList] = useState<Kegiatan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   
   const [selectedKegiatan, setSelectedKegiatan] = useState<Kegiatan | null>(null);
   const [pinInput, setPinInput] = useState('');
   const [pinError, setPinError] = useState('');
   const [isVerifying, setIsVerifying] = useState(false);
   const [isVerified, setIsVerified] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const passInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchKegiatanPanitia();
+    
+    const handleClickOutside = (event: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+        setIsDropdownOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   const fetchKegiatanPanitia = async () => {
@@ -40,9 +51,16 @@ export default function CekHasilPanitia() {
 
   const handleSelectKegiatan = (k: Kegiatan) => {
     setSelectedKegiatan(k);
+    setSearchQuery(k.nama_kegiatan);
     setPinInput('');
     setPinError('');
     setIsVerified(false);
+    setIsDropdownOpen(false);
+    
+    setTimeout(() => {
+      document.getElementById('password-section')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      passInputRef.current?.focus();
+    }, 150);
   };
 
   const handleVerifyPIN = async (e: React.FormEvent) => {
@@ -86,7 +104,7 @@ export default function CekHasilPanitia() {
       <div style={{ display: 'flex', gap: '2rem', flexDirection: 'column' }}>
         
         {/* Kolom Kiri / Atas: Daftar Kegiatan */}
-        <div className="card" style={{ padding: '1.5rem', flex: 1 }}>
+        <div className="card" style={{ padding: '1.5rem', flex: 1, position: 'relative' }} ref={dropdownRef}>
           <h2 style={{ fontSize: '1.25rem', marginBottom: '1rem' }}>Pilih Kegiatan Anda</h2>
           
           <input 
@@ -94,37 +112,60 @@ export default function CekHasilPanitia() {
             placeholder="🔍 Cari nama kegiatan evaluasi..."
             className="form-control"
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setIsDropdownOpen(true);
+            }}
+            onClick={() => setIsDropdownOpen(true)}
             style={{ marginBottom: '1rem' }}
           />
 
-          {isLoading ? (
-            <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>Memuat daftar kegiatan...</div>
-          ) : (
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', maxHeight: '300px', overflowY: 'auto', paddingRight: '0.5rem' }}>
-              {filteredKegiatan.length === 0 ? (
-                <p style={{ color: '#6b7280', textAlign: 'center', padding: '1rem' }}>Tidak ada kegiatan evaluasi panitia yang ditemukan.</p>
+          {isDropdownOpen && (
+            <div style={{
+              position: 'absolute',
+              top: '110px',
+              left: '1.5rem',
+              right: '1.5rem',
+              background: 'white',
+              border: '1px solid #e5e7eb',
+              borderRadius: '8px',
+              boxShadow: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
+              zIndex: 50,
+              maxHeight: '300px',
+              overflowY: 'auto'
+            }}>
+              {isLoading ? (
+                <div style={{ textAlign: 'center', padding: '2rem', color: '#6b7280' }}>Memuat daftar kegiatan...</div>
               ) : (
-                filteredKegiatan.map(kegiatan => (
-                  <button
-                    key={kegiatan.id}
-                    onClick={() => handleSelectKegiatan(kegiatan)}
-                    style={{
-                      padding: '1rem',
-                      textAlign: 'left',
-                      background: selectedKegiatan?.id === kegiatan.id ? '#fef3c7' : 'white',
-                      border: `1px solid ${selectedKegiatan?.id === kegiatan.id ? '#f59e0b' : '#e5e7eb'}`,
-                      borderRadius: '8px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                    }}
-                  >
-                    <div style={{ fontWeight: 'bold', color: '#111827', marginBottom: '0.25rem' }}>{kegiatan.nama_kegiatan}</div>
-                    <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
-                      Dibuat: {new Date(kegiatan.created_at).toLocaleDateString('id-ID')}
-                    </div>
-                  </button>
-                ))
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0' }}>
+                  {filteredKegiatan.length === 0 ? (
+                    <p style={{ color: '#6b7280', textAlign: 'center', padding: '1rem' }}>Tidak ada kegiatan evaluasi panitia yang ditemukan.</p>
+                  ) : (
+                    filteredKegiatan.map(kegiatan => (
+                      <button
+                        key={kegiatan.id}
+                        onClick={() => handleSelectKegiatan(kegiatan)}
+                        style={{
+                          padding: '1rem',
+                          textAlign: 'left',
+                          background: selectedKegiatan?.id === kegiatan.id ? '#fef3c7' : 'white',
+                          borderBottom: '1px solid #e5e7eb',
+                          cursor: 'pointer',
+                          transition: 'all 0.2s',
+                          border: 'none',
+                          outline: 'none'
+                        }}
+                        onMouseEnter={(e) => e.currentTarget.style.background = selectedKegiatan?.id === kegiatan.id ? '#fef3c7' : '#f9fafb'}
+                        onMouseLeave={(e) => e.currentTarget.style.background = selectedKegiatan?.id === kegiatan.id ? '#fef3c7' : 'white'}
+                      >
+                        <div style={{ fontWeight: 'bold', color: '#111827', marginBottom: '0.25rem' }}>{kegiatan.nama_kegiatan}</div>
+                        <div style={{ fontSize: '0.75rem', color: '#6b7280' }}>
+                          Dibuat: {new Date(kegiatan.created_at).toLocaleDateString('id-ID')}
+                        </div>
+                      </button>
+                    ))
+                  )}
+                </div>
               )}
             </div>
           )}
@@ -132,7 +173,7 @@ export default function CekHasilPanitia() {
 
         {/* Kolom Kanan / Bawah: Verifikasi PIN & Unduh */}
         {selectedKegiatan && (
-          <div className="card" style={{ padding: '1.5rem', flex: 1, borderTop: '4px solid #f59e0b' }}>
+          <div id="password-section" className="card animate-fade-in" style={{ padding: '1.5rem', flex: 1, borderTop: '4px solid #f59e0b' }}>
             <h2 style={{ fontSize: '1.25rem', marginBottom: '0.5rem' }}>Akses Data:</h2>
             <p style={{ fontWeight: 'bold', color: '#111827', marginBottom: '1.5rem' }}>{selectedKegiatan.nama_kegiatan}</p>
 
@@ -143,6 +184,7 @@ export default function CekHasilPanitia() {
                   <input 
                     type="password" 
                     required
+                    ref={passInputRef}
                     className="form-control"
                     placeholder="Ketik PIN yang Anda buat..."
                     value={pinInput}
