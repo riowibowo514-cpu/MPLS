@@ -117,7 +117,9 @@ export async function GET(req: NextRequest) {
       
       // Identitas
       row.push(p.id);
-      row.push(new Date(p.tanggal_pengisian).toLocaleString('id-ID'));
+      const d = new Date(p.tanggal_pengisian);
+      const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+      row.push(formattedDate);
       row.push(userMap[p.petugas_id]?.nama || '-');
       row.push(userMap[p.petugas_id]?.nip || '-');
       
