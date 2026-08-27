@@ -160,6 +160,13 @@ export async function GET(req: NextRequest) {
 
     // Buat Workbook
     const worksheet = XLSX.utils.aoa_to_sheet(rows);
+    
+    // Set Column Widths based on header length (max 50 chars to avoid absurdly wide columns)
+    const colWidths = headers.map(header => {
+      return { wch: Math.min(50, Math.max(15, String(header).length + 2)) };
+    });
+    worksheet['!cols'] = colWidths;
+
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, 'Data Monev');
 
