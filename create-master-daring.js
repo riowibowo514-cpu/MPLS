@@ -56,7 +56,8 @@ async function injectMasterTemplate() {
   // 4. Insert Sections
   const sectionsData = [
     { nama_section: 'Evaluasi Tema Webinar', items: [
-      { pertanyaan: 'Apakah webinar kali ini sudah memberikan gambaran yang jelas tentang tema webinar terkait? (Sudah Jelas / Sebagian besar sudah tergambarkan / Masih perlu ditingkatkan untuk sosialisasinya / Belum jelas)', tipe_jawaban: 'esai', max_skor: 0 }
+      { pertanyaan: 'Apakah webinar kali ini sudah memberikan gambaran yang jelas tentang tema webinar terkait?', tipe_jawaban: 'pilihan_ganda', opsi_jawaban: ['Sudah Jelas', 'Sebagian besar sudah tergambarkan', 'Masih perlu ditingkatkan untuk sosialisasinya', 'Belum jelas'], max_skor: 0 },
+      { pertanyaan: 'Apa informasi yang anda harapkan dan ingin dapatkan mengenai tema webinar terkait?', tipe_jawaban: 'esai', max_skor: 0 }
     ]},
     { nama_section: 'Penilaian Narasumber / Fasilitator', items: [
       { pertanyaan: 'Apakah Narasumber dapat menyajikan materi sesuai dengan kebutuhan peserta?', tipe_jawaban: 'likert4', max_skor: 4 },

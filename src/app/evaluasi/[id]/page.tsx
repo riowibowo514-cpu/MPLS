@@ -97,6 +97,18 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
   const fetchSchema = async () => {
     try {
       setIsLoading(true);
+
+      const { data: keg, error: errKeg } = await supabase
+        .from('kegiatan')
+        .select('status')
+        .eq('id', kegiatan_id)
+        .single();
+      
+      if (errKeg || !keg) throw new Error('Kegiatan tidak ditemukan.');
+      if (keg.status === 'ditutup') {
+        throw new Error('Mohon Maaf, formulir evaluasi untuk kegiatan ini telah ditutup oleh panitia.');
+      }
+
       // 1. Dapatkan instrumen dari kegiatan_id
       const { data: inst, error: errInst } = await supabase
         .from('instrumen')

@@ -117,8 +117,14 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
           }
         });
 
+        // Sort answers by length descending and take top 5
+        Object.values(masukan).forEach((m: any) => {
+          m.jawaban.sort((a: string, b: string) => b.length - a.length);
+          m.jawaban = m.jawaban.slice(0, 5);
+        });
+
         setRataRataAspek(rataRata);
-        setDaftarSaran(Object.values(masukan).filter(m => m.jawaban.length > 0));
+        setDaftarSaran(Object.values(masukan).filter((m: any) => m.jawaban.length > 0));
       }
       
     } catch (err: any) {
@@ -159,6 +165,29 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
   const grandAvg = grandTotalCount > 0 ? (grandTotalScore / grandTotalCount).toFixed(2) : "0.00";
   const grandPercentage = grandTotalCount > 0 ? ((grandTotalScore / (grandTotalCount * 4)) * 100).toFixed(1) : "0.0";
 
+  const handleToggleStatus = async () => {
+    if (!kegiatan) return;
+    const newStatus = kegiatan.status === 'aktif' ? 'ditutup' : 'aktif';
+    const confirmMsg = newStatus === 'ditutup' 
+      ? 'Apakah Anda yakin ingin MENUTUP form ini? Peserta tidak akan bisa lagi mengisi form.' 
+      : 'Apakah Anda yakin ingin MEMBUKA KEMBALI form ini?';
+      
+    if (!window.confirm(confirmMsg)) return;
+
+    try {
+      const { error } = await supabase
+        .from('kegiatan')
+        .update({ status: newStatus })
+        .eq('id', kegiatan.id);
+        
+      if (error) throw error;
+      setKegiatan({ ...kegiatan, status: newStatus });
+      alert(`Status form berhasil diubah menjadi: ${newStatus.toUpperCase()}`);
+    } catch (err: any) {
+      alert("Gagal mengubah status: " + err.message);
+    }
+  };
+
   return (
     <div style={{ background: 'white', minHeight: '100vh' }}>
       {/* Header Khusus Web (Disembunyikan saat print) */}
@@ -167,14 +196,36 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
           <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Portal Panitia: Laporan Analisis</h1>
           <p style={{ margin: '0.5rem 0 0 0', opacity: 0.8 }}>Siap untuk dicetak sebagai bahan evaluasi kegiatan.</p>
         </div>
-        <button 
-          onClick={() => window.print()}
-          className="btn btn-primary"
-          style={{ background: '#f59e0b', borderColor: '#f59e0b', color: 'white', fontSize: '1.1rem', display: 'flex', gap: '0.5rem' }}
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-          Cetak PDF
-        </button>
+        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
+          {/* Toggle Button */}
+          {kegiatan && (
+            <button 
+              onClick={handleToggleStatus}
+              className="btn btn-outline"
+              style={{ 
+                background: kegiatan.status === 'aktif' ? '#ef4444' : '#10b981', 
+                borderColor: kegiatan.status === 'aktif' ? '#ef4444' : '#10b981', 
+                color: 'white', 
+                fontSize: '1rem', 
+                display: 'flex', 
+                gap: '0.5rem',
+                alignItems: 'center'
+              }}
+            >
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
+              {kegiatan.status === 'aktif' ? 'Tutup Akses Form' : 'Buka Kembali Form'}
+            </button>
+          )}
+
+          <button 
+            onClick={() => window.print()}
+            className="btn btn-primary"
+            style={{ background: '#f59e0b', borderColor: '#f59e0b', color: 'white', fontSize: '1.1rem', display: 'flex', gap: '0.5rem' }}
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            Cetak PDF
+          </button>
+        </div>
       </div>
 
       {/* Konten Laporan (Kertas A4) */}
