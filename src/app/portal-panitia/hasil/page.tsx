@@ -112,7 +112,7 @@ export default function CekHasilPanitia() {
       alert(`Status form berhasil diubah menjadi: ${newStatus.toUpperCase()}`);
       
       // Update in the list as well
-      setDaftarKegiatan(prev => prev.map(k => k.id === selectedKegiatan.id ? { ...k, status: newStatus } : k));
+      setKegiatanList(prev => prev.map(k => k.id === selectedKegiatan.id ? { ...k, status: newStatus as any } : k));
     } catch (err: any) {
       alert("Gagal mengubah status: " + err.message);
     }

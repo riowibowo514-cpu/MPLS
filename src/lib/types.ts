@@ -14,7 +14,7 @@ export interface Kegiatan {
   nama_kegiatan: string;
   deskripsi?: string;
   tahun: string;
-  status: 'aktif' | 'nonaktif';
+  status: 'aktif' | 'nonaktif' | 'ditutup';
   kategori_program?: 'MONEV' | 'TEMPLATE_EVALUASI' | 'EVALUASI_PANITIA' | string;
   pin_akses?: string;
   created_at: string;
