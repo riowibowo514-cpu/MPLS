@@ -217,17 +217,26 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
                 <thead>
                   <tr style={{ background: '#f8fafc', textAlign: 'left' }}>
                     <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>No</th>
-                    <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>Nama Petugas Monev</th>
+                    <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>Nama Pengisi / Responden</th>
                     <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>Tanggal Submit</th>
                     <th style={{ padding: '0.75rem', borderBottom: '1px solid #e2e8f0' }}>Aksi</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {pengisians.map((p, idx) => (
+                  {pengisians.map((p, idx) => {
+                    let namaPengisi = userMap && userMap[p.petugas_id] ? userMap[p.petugas_id].nama : null;
+                    if (!namaPengisi && p.metadata_values) {
+                      // Try to find any metadata field that looks like a name
+                      const nameFieldId = schema?.metadata_fields?.find((m: any) => m.label_field.toLowerCase().includes('nama'))?.id;
+                      if (nameFieldId && p.metadata_values[nameFieldId]) {
+                        namaPengisi = p.metadata_values[nameFieldId];
+                      }
+                    }
+                    return (
                     <tr key={p.id} style={{ borderBottom: '1px solid #e2e8f0' }}>
                       <td style={{ padding: '0.75rem' }}>{idx + 1}</td>
                       <td style={{ padding: '0.75rem', fontWeight: '500' }}>
-                        {userMap && userMap[p.petugas_id] ? userMap[p.petugas_id].nama : 'Anonim / Publik'}
+                        {namaPengisi || 'Anonim / Publik'}
                       </td>
                       <td style={{ padding: '0.75rem' }}>
                         {new Date(p.tanggal_pengisian).toLocaleString('id-ID')}
