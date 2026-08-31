@@ -250,7 +250,8 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
                         </Link>
                       </td>
                     </tr>
-                  ))}
+                    );
+                  })}
                 </tbody>
               </table>
             </div>
