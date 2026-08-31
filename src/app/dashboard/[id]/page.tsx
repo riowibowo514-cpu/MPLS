@@ -226,10 +226,13 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
                   {pengisians.map((p, idx) => {
                     let namaPengisi = userMap && userMap[p.petugas_id] ? userMap[p.petugas_id].nama : null;
                     if (!namaPengisi && p.metadata_values) {
-                      // Try to find any metadata field that looks like a name
-                      const nameFieldId = schema?.metadata_fields?.find((m: any) => m.label_field.toLowerCase().includes('nama'))?.id;
-                      if (nameFieldId && p.metadata_values[nameFieldId]) {
-                        namaPengisi = p.metadata_values[nameFieldId];
+                      // Cari SEMUA field metadata yang berlabel 'nama'
+                      const nameFields = schema?.metadata_fields?.filter((m: any) => m.label_field.toLowerCase().includes('nama')) || [];
+                      for (const field of nameFields) {
+                        if (p.metadata_values[field.id] && p.metadata_values[field.id].trim() !== '') {
+                          namaPengisi = p.metadata_values[field.id];
+                          break; // Ambil yang pertama kali ada isinya
+                        }
                       }
                     }
                     return (
@@ -435,10 +438,6 @@ export default function DetailDashboardKegiatan({ params }: { params: Promise<{ 
           </div>
         </>
       )}
-
-      <div style={{ textAlign: 'center', marginTop: '4rem' }}>
-        <Link href="/dashboard" className="btn btn-outline" style={{ border: 'none', color: '#64748b' }}>&larr; Kembali ke Daftar Kegiatan</Link>
-      </div>
     </main>
   );
 }
