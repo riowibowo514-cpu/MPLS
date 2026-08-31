@@ -118,7 +118,9 @@ export async function GET(req: NextRequest) {
       // Identitas
       row.push(p.id);
       const d = new Date(p.tanggal_pengisian);
-      const formattedDate = `${d.getDate().toString().padStart(2, '0')}/${(d.getMonth()+1).toString().padStart(2, '0')}/${d.getFullYear()} ${d.getHours().toString().padStart(2, '0')}:${d.getMinutes().toString().padStart(2, '0')}:${d.getSeconds().toString().padStart(2, '0')}`;
+      // Offset by 7 hours for WIB (Asia/Jakarta)
+      const dJakarta = new Date(d.getTime() + 7 * 60 * 60 * 1000);
+      const formattedDate = `${dJakarta.getUTCDate().toString().padStart(2, '0')}/${(dJakarta.getUTCMonth()+1).toString().padStart(2, '0')}/${dJakarta.getUTCFullYear()} ${dJakarta.getUTCHours().toString().padStart(2, '0')}:${dJakarta.getUTCMinutes().toString().padStart(2, '0')}:${dJakarta.getUTCSeconds().toString().padStart(2, '0')}`;
       row.push(formattedDate);
       row.push(userMap[p.petugas_id]?.nama || '-');
       row.push(userMap[p.petugas_id]?.nip || '-');
