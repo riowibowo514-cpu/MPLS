@@ -18,7 +18,24 @@ export default function BackButton() {
     ) {
       router.push('/');
     } else {
-      router.back();
+      // Deteksi jika halaman ini dibuka di tab baru (history length sangat pendek)
+      // Ini biasa terjadi pada fitur Cetak PDF yang menggunakan target="_blank"
+      if (typeof window !== 'undefined' && window.history.length <= 2) {
+        // Coba tutup tab
+        window.close();
+        
+        // Sebagai fallback jika browser menolak menutup tab (karena strict policy),
+        // paksa pindah ke halaman sebelumnya secara logis.
+        setTimeout(() => {
+          if (pathname.includes('/portal-panitia/hasil/')) {
+            router.push('/portal-panitia/hasil');
+          } else {
+            router.push('/');
+          }
+        }, 100);
+      } else {
+        router.back();
+      }
     }
   };
 
