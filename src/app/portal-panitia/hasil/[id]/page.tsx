@@ -165,29 +165,6 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
   const grandAvg = grandTotalCount > 0 ? (grandTotalScore / grandTotalCount).toFixed(2) : "0.00";
   const grandPercentage = grandTotalCount > 0 ? ((grandTotalScore / (grandTotalCount * 4)) * 100).toFixed(1) : "0.0";
 
-  const handleToggleStatus = async () => {
-    if (!kegiatan) return;
-    const newStatus = kegiatan.status === 'aktif' ? 'ditutup' : 'aktif';
-    const confirmMsg = newStatus === 'ditutup' 
-      ? 'Apakah Anda yakin ingin MENUTUP form ini? Peserta tidak akan bisa lagi mengisi form.' 
-      : 'Apakah Anda yakin ingin MEMBUKA KEMBALI form ini?';
-      
-    if (!window.confirm(confirmMsg)) return;
-
-    try {
-      const { error } = await supabase
-        .from('kegiatan')
-        .update({ status: newStatus })
-        .eq('id', kegiatan.id);
-        
-      if (error) throw error;
-      setKegiatan({ ...kegiatan, status: newStatus });
-      alert(`Status form berhasil diubah menjadi: ${newStatus.toUpperCase()}`);
-    } catch (err: any) {
-      alert("Gagal mengubah status: " + err.message);
-    }
-  };
-
   return (
     <div style={{ background: 'white', minHeight: '100vh' }}>
       {/* Header Khusus Web (Disembunyikan saat print) */}
@@ -197,26 +174,6 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
           <p style={{ margin: '0.5rem 0 0 0', opacity: 0.8 }}>Siap untuk dicetak sebagai bahan evaluasi kegiatan.</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          {/* Toggle Button */}
-          {kegiatan && (
-            <button 
-              onClick={handleToggleStatus}
-              className="btn btn-outline"
-              style={{ 
-                background: kegiatan.status === 'aktif' ? '#ef4444' : '#10b981', 
-                borderColor: kegiatan.status === 'aktif' ? '#ef4444' : '#10b981', 
-                color: 'white', 
-                fontSize: '1rem', 
-                display: 'flex', 
-                gap: '0.5rem',
-                alignItems: 'center'
-              }}
-            >
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M18.36 6.64a9 9 0 1 1-12.73 0"></path><line x1="12" y1="2" x2="12" y2="12"></line></svg>
-              {kegiatan.status === 'aktif' ? 'Tutup Akses Form' : 'Buka Kembali Form'}
-            </button>
-          )}
-
           <button 
             onClick={() => window.print()}
             className="btn btn-primary"
