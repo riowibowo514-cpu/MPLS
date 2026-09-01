@@ -1,17 +1,18 @@
 "use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Kegiatan } from '@/lib/types';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function DaftarKegiatanPetugas() {
+function DaftarKegiatanPetugasContent() {
   const [kegiatans, setKegiatans] = useState<Kegiatan[]>([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedKegiatan, setSelectedKegiatan] = useState<Kegiatan | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
+  const searchParams = useSearchParams();
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,11 +50,22 @@ export default function DaftarKegiatanPetugas() {
       created_at: new Date().toISOString()
     };
 
+    let allKegiatans = [mplsLama];
     if (data) {
-      setKegiatans([mplsLama, ...data]);
-    } else {
-      setKegiatans([mplsLama]);
+      allKegiatans = [mplsLama, ...data];
     }
+    setKegiatans(allKegiatans);
+    
+    // Auto-select jika ada ID di URL
+    const urlId = searchParams.get('id');
+    if (urlId) {
+      const found = allKegiatans.find(k => k.id === urlId);
+      if (found) {
+        setSelectedKegiatan(found);
+        setSearchQuery(found.nama_kegiatan);
+      }
+    }
+    
     setIsLoading(false);
   };
 
@@ -65,6 +77,8 @@ export default function DaftarKegiatanPetugas() {
     setSelectedKegiatan(k);
     setSearchQuery(k.nama_kegiatan);
     setIsDropdownOpen(false);
+    // Push ke URL tanpa me-reload agar tersimpan di history
+    router.replace(`/kegiatan?id=${k.id}`);
   };
 
   const handleMulai = () => {
@@ -216,5 +230,13 @@ export default function DaftarKegiatanPetugas() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function DaftarKegiatanPetugas() {
+  return (
+    <Suspense fallback={<div style={{ textAlign: 'center', padding: '3rem' }}>Memuat...</div>}>
+      <DaftarKegiatanPetugasContent />
+    </Suspense>
   );
 }
