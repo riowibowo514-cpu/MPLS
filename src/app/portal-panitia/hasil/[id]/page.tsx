@@ -99,7 +99,7 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
         sections.forEach((sec: any) => {
           sec.instrumen_item.forEach((item: any) => {
             const isScorable = item.tipe_jawaban.startsWith('likert') || item.tipe_jawaban === 'angka';
-            const isText = item.tipe_jawaban === 'esai' || item.tipe_jawaban === 'teks_singkat';
+            const isText = item.tipe_jawaban === 'esai' || item.tipe_jawaban === 'teks_singkat' || item.tipe_jawaban === 'pilihan_ganda';
             
             // Siapkan wadah
             if (isScorable) rataRata[item.id] = { total_skor: 0, count: 0 };

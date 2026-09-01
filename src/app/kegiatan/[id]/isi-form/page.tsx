@@ -372,38 +372,49 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                               </thead>
                             )}
                             <tbody>
-                              {section.items.map((item: any, iIdx: number) => {
-                                const currentNumber = iIdx + 1;
-                                const ans = jawabanValues[item.id] || {};
-                                
-                                if (hasLikert && hasAnyLikert) {
-                                  return (
-                                    <tr key={item.id} style={{ pageBreakInside: 'avoid' }}>
-                                      <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{currentNumber}</td>
-                                      <td style={{ border: '1px solid black', padding: '0.5rem' }}>{item.teks_pertanyaan}</td>
-                                      <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 1 ? '√' : ''}</td>
-                                      <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 2 ? '√' : ''}</td>
-                                      <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 3 ? '√' : ''}</td>
-                                      <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 4 ? '√' : ''}</td>
-                                      <td style={{ border: '1px solid black', padding: '0.5rem' }}>{ans.catatan_bukti || ''}</td>
-                                    </tr>
-                                  );
-                                } else {
-                                  return (
-                                    <tr key={item.id} style={{ pageBreakInside: 'avoid' }}>
-                                      <td colSpan={2} style={{ border: '1px solid black', padding: '0' }}>
-                                        <div style={{ display: 'flex', padding: '0.5rem', backgroundColor: '#fafafa' }}>
-                                          <div style={{ width: '5%', textAlign: 'center', fontWeight: 'bold' }}>{currentNumber}</div>
-                                          <div style={{ flex: 1, paddingLeft: '0.5rem', fontWeight: 'bold' }}>{item.teks_pertanyaan}</div>
-                                        </div>
-                                        <div style={{ borderTop: '1px solid black', padding: '1rem', minHeight: '60px', whiteSpace: 'pre-wrap' }}>
-                                          {ans.nilai_teks || ''}
-                                        </div>
-                                      </td>
-                                    </tr>
-                                  );
-                                }
-                              })}
+                              {(() => {
+                                let mainCounter = 0;
+                                return section.items.map((item: any, iIdx: number) => {
+                                  let displayNumber = '';
+                                  if (item.teks_pertanyaan.includes('berapa persen guru yang hadir?')) {
+                                    displayNumber = mainCounter + 'a';
+                                  } else {
+                                    mainCounter++;
+                                    displayNumber = mainCounter.toString();
+                                  }
+                                  
+                                  const currentNumber = displayNumber;
+                                  const ans = jawabanValues[item.id] || {};
+                                  
+                                  if (hasLikert && hasAnyLikert) {
+                                    return (
+                                      <tr key={item.id} style={{ pageBreakInside: 'avoid' }}>
+                                        <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{currentNumber}</td>
+                                        <td style={{ border: '1px solid black', padding: '0.5rem' }}>{item.teks_pertanyaan}</td>
+                                        <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 1 ? '√' : ''}</td>
+                                        <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 2 ? '√' : ''}</td>
+                                        <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 3 ? '√' : ''}</td>
+                                        <td style={{ border: '1px solid black', padding: '0.5rem', textAlign: 'center' }}>{ans.nilai_skor === 4 ? '√' : ''}</td>
+                                        <td style={{ border: '1px solid black', padding: '0.5rem' }}>{ans.catatan_bukti || ''}</td>
+                                      </tr>
+                                    );
+                                  } else {
+                                    return (
+                                      <tr key={item.id} style={{ pageBreakInside: 'avoid' }}>
+                                        <td colSpan={2} style={{ border: '1px solid black', padding: '0' }}>
+                                          <div style={{ display: 'flex', padding: '0.5rem', backgroundColor: '#fafafa' }}>
+                                            <div style={{ width: '5%', textAlign: 'center', fontWeight: 'bold' }}>{currentNumber}</div>
+                                            <div style={{ flex: 1, paddingLeft: '0.5rem', fontWeight: 'bold' }}>{item.teks_pertanyaan}</div>
+                                          </div>
+                                          <div style={{ borderTop: '1px solid black', padding: '1rem', minHeight: '60px', whiteSpace: 'pre-wrap' }}>
+                                            {ans.nilai_teks || ''}
+                                          </div>
+                                        </td>
+                                      </tr>
+                                    );
+                                  }
+                                });
+                              })()}
                             </tbody>
                           </table>
                         </div>
@@ -562,26 +573,36 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
               {section.nama_section}
             </h2>
 
-            {section.items.map((item, iIdx) => {
-              // Logika Kondisional Khusus untuk 7 Jurus BK
-              if (item.teks_pertanyaan.includes('berapa persen guru yang hadir?')) {
-                const parentItem = section.items.find((i: any) => i.teks_pertanyaan.includes('disosialisasikan ke Pihak Sekolah?'));
-                if (parentItem) {
-                  const parentAns = jawabanValues[parentItem.id]?.nilai_teks;
-                  if (parentAns !== 'Ya') {
-                    return null; // Sembunyikan pertanyaan ini jika induknya bukan "Ya"
+            {(() => {
+              let mainCounter = 0;
+              return section.items.map((item, iIdx) => {
+                // Logika Kondisional Khusus untuk 7 Jurus BK
+                if (item.teks_pertanyaan.includes('berapa persen guru yang hadir?')) {
+                  const parentItem = section.items.find((i: any) => i.teks_pertanyaan.includes('disosialisasikan ke Pihak Sekolah?'));
+                  if (parentItem) {
+                    const parentAns = jawabanValues[parentItem.id]?.nilai_teks;
+                    if (parentAns !== 'Ya') {
+                      return null; // Sembunyikan pertanyaan ini jika induknya bukan "Ya"
+                    }
                   }
                 }
-              }
 
-              const isOptional = Array.isArray(item.opsi_jawaban) && item.opsi_jawaban[0] === 'OPTIONAL';
-              const isRequired = !isOptional;
-              
-              return (
-              <div key={item.id} style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fafafa', borderRadius: 'var(--radius-md)', border: '1px solid #eaeaea' }}>
-                <p style={{ fontWeight: 600, marginBottom: '1rem' }}>
-                  {iIdx + 1}. {item.teks_pertanyaan} {isRequired && <span style={{color:'red'}}>*</span>}
-                </p>
+                let displayNumber = '';
+                if (item.teks_pertanyaan.includes('berapa persen guru yang hadir?')) {
+                  displayNumber = mainCounter + 'a';
+                } else {
+                  mainCounter++;
+                  displayNumber = mainCounter.toString();
+                }
+
+                const isOptional = Array.isArray(item.opsi_jawaban) && item.opsi_jawaban[0] === 'OPTIONAL';
+                const isRequired = !isOptional;
+                
+                return (
+                <div key={item.id} style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fafafa', borderRadius: 'var(--radius-md)', border: '1px solid #eaeaea' }}>
+                  <p style={{ fontWeight: 600, marginBottom: '1rem' }}>
+                    {displayNumber}. {item.teks_pertanyaan} {isRequired && <span style={{color:'red'}}>*</span>}
+                  </p>
 
                 {/* Tipe: LIKERT 4 */}
                 {item.tipe_jawaban === 'likert4' && (
@@ -705,8 +726,9 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                   </div>
                 )}
               </div>
-            )})}
-          </div>
+              );
+            })})()}
+            </div>
           );
         })}
 
