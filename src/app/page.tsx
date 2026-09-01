@@ -1,8 +1,14 @@
 "use client";
 
 import Link from 'next/link';
+import { useEffect } from 'react';
 
 export default function PortalMonevPage() {
+  // Opsi C: Hapus memori PIN Panitia setiap kali user kembali ke Beranda
+  useEffect(() => {
+    sessionStorage.removeItem('panitia_pin_auth');
+  }, []);
+
   return (
     <main className="container animate-fade-in" style={{ paddingBottom: '4rem', paddingTop: '2rem' }}>
       <div style={{ textAlign: 'center', marginBottom: '4rem' }}>
