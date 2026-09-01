@@ -485,6 +485,11 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
 
   return (
     <main className="container" style={{ padding: '2rem 1rem' }}>
+      <style>{`
+        #global-back-button {
+          display: none !important;
+        }
+      `}</style>
       <div style={{ marginBottom: '2rem' }}>
         <h1 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>{schema.nama_instrumen}</h1>
         <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>{schema.deskripsi}</p>
