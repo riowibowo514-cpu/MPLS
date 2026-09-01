@@ -38,6 +38,9 @@ export default function PortalMonevPage() {
             <Link href="/kegiatan" className="btn btn-primary" style={{ width: '100%' }}>
               Isi Instrumen Baru
             </Link>
+            <Link href="/cari" className="btn btn-outline" style={{ width: '100%', borderColor: '#10b981', color: '#10b981' }}>
+              Cari Hasil & Unduh PDF
+            </Link>
           </div>
         </div>
 
