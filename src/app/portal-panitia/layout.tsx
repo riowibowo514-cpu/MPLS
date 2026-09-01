@@ -8,6 +8,8 @@ export default function PortalPanitiaLayout({ children }: { children: React.Reac
   const [error, setError] = useState('');
   const [isMounted, setIsMounted] = useState(false);
 
+  const [isVerifying, setIsVerifying] = useState(false);
+
   useEffect(() => {
     setIsMounted(true);
     const auth = sessionStorage.getItem('panitia_pin_auth');
@@ -16,17 +18,31 @@ export default function PortalPanitiaLayout({ children }: { children: React.Reac
     }
   }, []);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    const correctPin = process.env.NEXT_PUBLIC_PANITIA_PIN || 'BGTK2026';
+    setIsVerifying(true);
+    setError('');
     
-    if (pin === correctPin) {
-      sessionStorage.setItem('panitia_pin_auth', 'true');
-      setIsAuthenticated(true);
-      setError('');
-    } else {
-      setError('PIN tidak valid. Silakan coba lagi.');
-      setPin('');
+    try {
+      const res = await fetch('/api/panitia/verify-pin', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin })
+      });
+      
+      const data = await res.json();
+      
+      if (res.ok && data.success) {
+        sessionStorage.setItem('panitia_pin_auth', 'true');
+        setIsAuthenticated(true);
+      } else {
+        setError(data.error || 'PIN tidak valid. Silakan coba lagi.');
+        setPin('');
+      }
+    } catch (err) {
+      setError('Koneksi bermasalah. Coba lagi.');
+    } finally {
+      setIsVerifying(false);
     }
   };
 
@@ -64,8 +80,8 @@ export default function PortalPanitiaLayout({ children }: { children: React.Reac
               {error && <p style={{ color: 'red', fontSize: '0.8rem', marginTop: '0.5rem', textAlign: 'center' }}>{error}</p>}
             </div>
             
-            <button type="submit" className="btn btn-primary" style={{ width: '100%', background: '#f59e0b', borderColor: '#f59e0b' }}>
-              Buka Kunci Akses
+            <button type="submit" disabled={isVerifying} className="btn btn-primary" style={{ width: '100%', background: '#f59e0b', borderColor: '#f59e0b', opacity: isVerifying ? 0.7 : 1 }}>
+              {isVerifying ? 'Memverifikasi...' : 'Buka Kunci Akses'}
             </button>
           </form>
           
