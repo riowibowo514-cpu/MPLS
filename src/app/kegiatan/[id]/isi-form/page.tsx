@@ -276,10 +276,15 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
               <button className="btn btn-outline" onClick={() => window.print()}>
                 Cetak Bukti (PDF)
               </button>
-              <button className="btn btn-primary" onClick={() => router.push('/kegiatan')}>
-                Kembali ke Daftar Kegiatan
+              <button className="btn btn-primary" onClick={() => router.push('/')}>
+                Kembali ke Halaman Utama
               </button>
             </div>
+            <style>{`
+              #global-back-button {
+                display: none !important;
+              }
+            `}</style>
           </div>
           
           {/* Bagian khusus untuk di-print sebagai PDF (Berita Acara) */}

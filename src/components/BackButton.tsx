@@ -9,6 +9,11 @@ export default function BackButton() {
   if (pathname === '/') return null;
 
   const handleBack = () => {
+    if (pathname.includes('/isi-form')) {
+      router.back();
+      return;
+    }
+
     // Jika berada di halaman utama masing-masing role, kembali langsung ke Beranda (root)
     if (
       pathname === '/admin/kegiatan' || 
@@ -40,7 +45,7 @@ export default function BackButton() {
   };
 
   return (
-    <div style={{ textAlign: 'center', margin: '3rem auto 2rem' }} className="container">
+    <div id="global-back-button" style={{ textAlign: 'center', margin: '3rem auto 2rem' }} className="container no-print">
       <button 
         onClick={handleBack} 
         className="btn btn-outline"
