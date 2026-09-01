@@ -147,7 +147,7 @@ async function run() {
   const { data: kegData, error: kegErr } = await supabase
     .from('kegiatan')
     .insert([{
-      nama_kegiatan: 'Monitoring 7 Jurus BK Hebat 2026',
+      nama_kegiatan: 'Monitoring dan Evaluasi Implementasi dan Diseminasi 7 Jurus BK Hebat 2026',
       kategori_program: 'MONEV',
       status: 'aktif',
       tahun: new Date().getFullYear()

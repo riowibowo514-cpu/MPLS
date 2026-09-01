@@ -19,12 +19,6 @@ export default function HeaderActions() {
 
   return (
     <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center', whiteSpace: 'nowrap' }}>
-      <Link href="/" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
-        Beranda
-      </Link>
-      <Link href="/cari" className="btn btn-outline" style={{ padding: '0.4rem 0.75rem', fontSize: '0.875rem' }}>
-        Cari Hasil
-      </Link>
       {isAdmin && (
         <button 
           className="btn" 
