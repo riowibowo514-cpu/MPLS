@@ -5,18 +5,16 @@ import { supabase } from '@/lib/supabase';
 import { Kegiatan } from '@/lib/types';
 import { useRouter } from 'next/navigation';
 
-export default function KelolaKegiatan() {
+export default function KelolaTemplate() {
   const [kegiatans, setKegiatans] = useState<Kegiatan[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [activeTab, setActiveTab] = useState<'MONEV' | 'EVALUASI'>('MONEV');
   const [searchQuery, setSearchQuery] = useState('');
-  
   const [form, setForm] = useState({
     nama_kegiatan: '',
     deskripsi: '',
     tahun: new Date().getFullYear().toString(),
-    kategori_program: 'MONEV',
+    kategori_program: 'TEMPLATE_EVALUASI',
   });
 
   const router = useRouter();
@@ -45,7 +43,7 @@ export default function KelolaKegiatan() {
       
     if (!error) {
       setIsModalOpen(false);
-      setForm({ nama_kegiatan: '', deskripsi: '', tahun: new Date().getFullYear().toString(), kategori_program: 'MONEV' });
+      setForm({ nama_kegiatan: '', deskripsi: '', tahun: new Date().getFullYear().toString(), kategori_program: 'TEMPLATE_EVALUASI' });
       
       // Auto-generate PKG Instrument if category is PKG
       if (form.kategori_program === 'PKG' && data && data[0]) {
@@ -66,32 +64,10 @@ export default function KelolaKegiatan() {
     }
   };
 
-  // MPLS Lama (Hardcoded legacy)
-  const mplsLama: Kegiatan = {
-    id: 'mpls-lama',
-    nama_kegiatan: 'Masa Pengenalan Lingkungan Sekolah (MPLS)',
-    deskripsi: 'Instrumen monitoring dan evaluasi MPLS bagi Sekolah Dasar dan SMP.',
-    status: 'aktif',
-    kategori_program: 'MONEV',
-    tahun: '2026',
-    created_at: new Date().toISOString()
-  };
-
-  // 1. Gabungkan MPLS lama dengan data dari database
-  const allData = [mplsLama, ...kegiatans];
-
-  // 2. Filter berdasarkan Tab (MONEV vs EVALUASI KEGIATAN BGTK)
-  const tabFilteredData = allData.filter(k => {
-    // MONEV = MONEV atau null/empty
-    const isMonev = k.kategori_program === 'MONEV' || !k.kategori_program;
-    
-    if (activeTab === 'MONEV') return isMonev;
-    if (activeTab === 'EVALUASI') return !isMonev && k.kategori_program !== 'TEMPLATE_EVALUASI'; // PKG, EVALUASI_PANITIA, dll.
-    return true;
-  });
+  const templateData = kegiatans.filter(k => k.kategori_program === 'TEMPLATE_EVALUASI');
 
   // 3. Filter berdasarkan Pencarian
-  const finalData = tabFilteredData.filter(k => 
+  const finalData = templateData.filter(k => 
     k.nama_kegiatan.toLowerCase().includes(searchQuery.toLowerCase()) || 
     (k.deskripsi && k.deskripsi.toLowerCase().includes(searchQuery.toLowerCase()))
   );
@@ -102,47 +78,11 @@ export default function KelolaKegiatan() {
       {/* Header & Tombol Buat */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Dasbor Kegiatan</h2>
-          <p style={{ color: '#6b7280', margin: 0 }}>Kelola dan pantau seluruh instrumen aplikasi</p>
+          <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Master Template Instrumen</h2>
+          <p style={{ color: '#6b7280', margin: 0 }}>Kelola template master untuk form PKG dan Daring</p>
         </div>
         <button className="btn btn-primary" onClick={() => setIsModalOpen(true)} style={{ background: '#1d4ed8', border: 'none', boxShadow: '0 4px 6px -1px rgba(29, 78, 216, 0.4)' }}>
-          + Tambah Kegiatan Baru
-        </button>
-      </div>
-
-      {/* TABS NAVIGATION */}
-      <div style={{ display: 'flex', borderBottom: '2px solid #e5e7eb', marginBottom: '1.5rem' }}>
-        <button
-          onClick={() => setActiveTab('MONEV')}
-          style={{
-            padding: '1rem 2rem',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'MONEV' ? '3px solid #2563eb' : '3px solid transparent',
-            color: activeTab === 'MONEV' ? '#1e40af' : '#6b7280',
-            fontWeight: activeTab === 'MONEV' ? 'bold' : 'normal',
-            fontSize: '1rem',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-        >
-          MONEV BGTK
-        </button>
-        <button
-          onClick={() => setActiveTab('EVALUASI')}
-          style={{
-            padding: '1rem 2rem',
-            background: 'none',
-            border: 'none',
-            borderBottom: activeTab === 'EVALUASI' ? '3px solid #8b5cf6' : '3px solid transparent',
-            color: activeTab === 'EVALUASI' ? '#6d28d9' : '#6b7280',
-            fontWeight: activeTab === 'EVALUASI' ? 'bold' : 'normal',
-            fontSize: '1rem',
-            cursor: 'pointer',
-            transition: 'all 0.2s'
-          }}
-        >
-          Evaluasi Kegiatan BGTK
+          + Tambah Template Baru
         </button>
       </div>
 
