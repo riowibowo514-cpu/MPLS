@@ -223,7 +223,20 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
       const listJawaban = [];
       for (const section of schema.sections) {
         for (const item of section.items) {
-          const ans = jawabanValues[item.id] || {};
+          let ans = jawabanValues[item.id] || {};
+          
+          // Logika Kondisional Khusus untuk 7 Jurus BK
+          if (item.teks_pertanyaan.includes('berapa persen guru yang hadir?')) {
+            const parentItem = section.items.find((i: any) => i.teks_pertanyaan.includes('disosialisasikan ke Pihak Sekolah?'));
+            if (parentItem) {
+              const parentAns = jawabanValues[parentItem.id]?.nilai_teks;
+              if (parentAns !== 'Ya') {
+                // Jika tidak dipilih Ya, set otomatis 0 agar tidak kosong di supabase
+                ans = { ...ans, nilai_teks: '0' };
+              }
+            }
+          }
+
           listJawaban.push({
             pengisian_id: pengisianData.id,
             item_id: item.id,
@@ -550,6 +563,17 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
             </h2>
 
             {section.items.map((item, iIdx) => {
+              // Logika Kondisional Khusus untuk 7 Jurus BK
+              if (item.teks_pertanyaan.includes('berapa persen guru yang hadir?')) {
+                const parentItem = section.items.find((i: any) => i.teks_pertanyaan.includes('disosialisasikan ke Pihak Sekolah?'));
+                if (parentItem) {
+                  const parentAns = jawabanValues[parentItem.id]?.nilai_teks;
+                  if (parentAns !== 'Ya') {
+                    return null; // Sembunyikan pertanyaan ini jika induknya bukan "Ya"
+                  }
+                }
+              }
+
               const isOptional = Array.isArray(item.opsi_jawaban) && item.opsi_jawaban[0] === 'OPTIONAL';
               const isRequired = !isOptional;
               
@@ -588,13 +612,24 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
                 {/* Tipe: ESAI */}
                 {item.tipe_jawaban === 'esai' && (
                   <div className="form-group" style={{ marginBottom: '1rem' }}>
-                    <textarea 
-                      rows={3} 
-                      required={isRequired}
-                      value={jawabanValues[item.id]?.nilai_teks || ''}
-                      onChange={e => handleJawabanChange(item.id, 'nilai_teks', e.target.value)}
-                      placeholder="Tuliskan jawaban Anda di sini..."
-                    />
+                    {item.teks_pertanyaan.includes('berapa persen') ? (
+                      <input 
+                        type="number"
+                        required={isRequired}
+                        value={jawabanValues[item.id]?.nilai_teks || ''}
+                        onChange={e => handleJawabanChange(item.id, 'nilai_teks', e.target.value)}
+                        placeholder="Masukkan angka persentase..."
+                        style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none' }}
+                      />
+                    ) : (
+                      <textarea 
+                        rows={3} 
+                        required={isRequired}
+                        value={jawabanValues[item.id]?.nilai_teks || ''}
+                        onChange={e => handleJawabanChange(item.id, 'nilai_teks', e.target.value)}
+                        placeholder="Tuliskan jawaban Anda di sini..."
+                      />
+                    )}
                   </div>
                 )}
 
@@ -614,28 +649,44 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
 
                 {/* Tipe: PILIHAN GANDA */}
                 {item.tipe_jawaban === 'pilihan_ganda' && (
-                  <div className="radio-group-likert" style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem', flexWrap: 'wrap', flexDirection: 'column' }}>
-                    {(item.opsi_jawaban || []).map((opt: string, optIdx: number) => {
-                      let typeClass = 'default';
-                      if (opt.toLowerCase() === 'ya') typeClass = 'ya';
-                      if (opt.toLowerCase() === 'tidak') typeClass = 'tidak';
-                      
-                      return (
-                        <label key={optIdx} className="radio-card">
-                          <input 
-                            type="radio" 
-                            name={item.id} 
-                            required={isRequired}
-                            value={opt}
-                            checked={jawabanValues[item.id]?.nilai_teks === opt}
-                            onChange={() => handleJawabanChange(item.id, 'nilai_teks', opt)}
-                          />
-                          <div className={`radio-card-content ${typeClass}`}>
-                            {opt}
-                          </div>
-                        </label>
-                      );
-                    })}
+                  <div className="form-group" style={{ marginBottom: '1rem' }}>
+                    {item.teks_pertanyaan.includes('Jurus berapa yang sudah di implementasikan') ? (
+                      <select
+                        required={isRequired}
+                        value={jawabanValues[item.id]?.nilai_teks || ''}
+                        onChange={e => handleJawabanChange(item.id, 'nilai_teks', e.target.value)}
+                        style={{ width: '100%', padding: '0.75rem', borderRadius: 'var(--radius-md)', border: '1px solid var(--border-color)', outline: 'none', background: 'white' }}
+                      >
+                        <option value="">-- Pilih Jurus --</option>
+                        {(item.opsi_jawaban || []).map((opt: string, optIdx: number) => (
+                          <option key={optIdx} value={opt}>{opt}</option>
+                        ))}
+                      </select>
+                    ) : (
+                      <div className="radio-group-likert" style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', flexDirection: 'column' }}>
+                        {(item.opsi_jawaban || []).map((opt: string, optIdx: number) => {
+                          let typeClass = 'default';
+                          if (opt.toLowerCase() === 'ya') typeClass = 'ya';
+                          if (opt.toLowerCase() === 'tidak') typeClass = 'tidak';
+                          
+                          return (
+                            <label key={optIdx} className="radio-card">
+                              <input 
+                                type="radio" 
+                                name={item.id} 
+                                required={isRequired}
+                                value={opt}
+                                checked={jawabanValues[item.id]?.nilai_teks === opt}
+                                onChange={() => handleJawabanChange(item.id, 'nilai_teks', opt)}
+                              />
+                              <div className={`radio-card-content ${typeClass}`}>
+                                {opt}
+                              </div>
+                            </label>
+                          );
+                        })}
+                      </div>
+                    )}
                   </div>
                 )}
 
