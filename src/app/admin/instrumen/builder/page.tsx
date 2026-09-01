@@ -17,43 +17,61 @@ function BuilderContent() {
   const [isReadingFile, setIsReadingFile] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (!file) return;
+    if (!file || !kegiatan_id) return;
 
-    // Simulate AI reading process
     setIsReadingFile(true);
-    setTimeout(() => {
-      setIsReadingFile(false);
-      alert(`Berhasil membaca dokumen: ${file.name}\nAI telah mengekstrak struktur instrumen secara otomatis!`);
+    
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      formData.append('kegiatan_id', kegiatan_id);
+
+      const response = await fetch('/api/admin/auto-build', {
+        method: 'POST',
+        body: formData,
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        throw new Error(result.error || 'Gagal mengekstrak PDF');
+      }
+
+      alert(`Sukses! AI berhasil membangun form instrumen dari PDF.`);
       
+      // Update form di UI
       setInstrumen(prev => ({
         ...prev,
         nama_instrumen: `Instrumen (Hasil Ekstrak ${file.name.split('.')[0]})`,
-        deskripsi: 'Hasil ekstrak otomatis dari dokumen rancangan menggunakan AI (Computer Vision & NLP).'
+        deskripsi: 'Hasil ekstrak otomatis menggunakan kecerdasan buatan (AI).'
       }));
-      
-      setSections([
-        {
-          nama_section: 'A. Perencanaan',
-          urutan: 0,
-          items: [
-            { teks_pertanyaan: 'Kesesuaian materi dengan kurikulum', tipe_jawaban: 'likert4', butuh_catatan_bukti: true, urutan: 0 },
-            { teks_pertanyaan: 'Ketersediaan sarana prasarana', tipe_jawaban: 'likert4', butuh_catatan_bukti: true, urutan: 1 }
-          ]
-        },
-        {
-          nama_section: 'B. Pelaksanaan',
-          urutan: 1,
-          items: [
-            { teks_pertanyaan: 'Antusiasme peserta dalam kegiatan', tipe_jawaban: 'likert4', butuh_catatan_bukti: false, urutan: 0 },
-            { teks_pertanyaan: 'Catatan kendala yang dihadapi di lapangan', tipe_jawaban: 'esai', butuh_catatan_bukti: false, urutan: 1 }
-          ]
-        }
-      ]);
 
+      // Load format ke array yang sudah kompatibel dengan Builder
+      const aiSections = result.data;
+      if (Array.isArray(aiSections)) {
+        const builtSections = aiSections.map((sec: any, sIdx: number) => ({
+          nama_section: sec.nama_section || `Bagian ${sIdx + 1}`,
+          urutan: sIdx,
+          items: Array.isArray(sec.items) ? sec.items.map((item: any, iIdx: number) => ({
+            teks_pertanyaan: item.teks_pertanyaan || 'Pertanyaan',
+            tipe_jawaban: item.tipe_jawaban || 'teks_singkat',
+            opsi_jawaban: item.opsi_jawaban || null,
+            butuh_catatan_bukti: !!item.butuh_catatan_bukti,
+            urutan: iIdx
+          })) : []
+        }));
+        
+        setSections(builtSections);
+      }
+      
+    } catch (err: any) {
+      alert(`Error AI: ${err.message}`);
+    } finally {
+      setIsReadingFile(false);
       if (fileInputRef.current) fileInputRef.current.value = '';
-    }, 2500);
+    }
   };
 
   useEffect(() => {
