@@ -53,7 +53,8 @@ function DaftarKegiatanPetugasContent() {
 
     let allKegiatans = [mplsLama];
     if (data) {
-      allKegiatans = [mplsLama, ...data];
+      const validData = data.filter(k => !k.nama_kegiatan.toLowerCase().includes('master template'));
+      allKegiatans = [mplsLama, ...validData];
     }
     setKegiatans(allKegiatans);
     

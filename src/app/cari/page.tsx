@@ -57,8 +57,15 @@ export default function SearchPage() {
   }, [selectedKegiatanId]);
 
   const fetchKegiatans = async () => {
-    const { data } = await supabase.from('kegiatan').select('*').eq('status', 'aktif').order('created_at', { ascending: false });
-    const dynamicKegiatans = data || [];
+    const { data } = await supabase
+      .from('kegiatan')
+      .select('*')
+      .eq('status', 'aktif')
+      .eq('kategori_program', 'MONEV')
+      .order('created_at', { ascending: false });
+      
+    // Filter out master templates manually in case they are tagged incorrectly in the DB
+    const dynamicKegiatans = (data || []).filter(k => !k.nama_kegiatan.toLowerCase().includes('master template'));
     
     // Tambahkan MPLS lama secara manual (karena struktur data lama tidak ada di tabel kegiatan)
     const mplsLama = {
