@@ -25,14 +25,15 @@ async function seedUsers() {
   // Check if panitia exists
   const { data: panitiaData } = await supabase.from('users').select('*').eq('username', 'panitia').single();
   if (!panitiaData) {
-    await supabase.from('users').insert({
+    const { error } = await supabase.from('users').insert({
       id: 'e10b5c7a-e8d3-4f10-bcd1-457d2fd43310',
       username: 'panitia',
       password_hash: 'BGTK2026',
       nama_lengkap: 'Akses Portal Panitia',
-      role: 'panitia'
+      role: 'petugas'
     });
-    console.log('Seeded panitia user');
+    if (error) console.error('Error inserting panitia:', error);
+    else console.log('Seeded panitia user');
   } else {
     console.log('Panitia user already exists');
   }
