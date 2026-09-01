@@ -164,7 +164,7 @@ export default function KelolaTemplate() {
                         {/* Tombol Kelola Instrumen */}
                         {k.id !== 'mpls-lama' && (
                           <button 
-                            title="Kelola Instrumen"
+                            title="Edit Template (Builder)"
                             onClick={() => router.push(`/admin/instrumen/builder?kegiatan_id=${k.id}`)}
                             style={{ background: 'white', border: '1px solid #d1d5db', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', color: '#4b5563' }}
                           >
@@ -172,43 +172,14 @@ export default function KelolaTemplate() {
                           </button>
                         )}
                         
-                        {/* Tombol Dasbor */}
+                        {/* Tombol Preview Instrumen */}
                         <button 
-                          title="Lihat Dasbor Analitik"
-                          onClick={() => router.push(`/dashboard/${k.id}`)}
+                          title="Preview Template"
+                          onClick={() => window.open(`/kegiatan/${k.id}/isi-form`, '_blank')}
                           style={{ background: '#eff6ff', border: '1px solid #bfdbfe', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', color: '#1d4ed8' }}
                         >
-                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M3 3v18h18"/><path d="M18 17V9"/><path d="M13 17V5"/><path d="M8 17v-3"/></svg>
+                          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
                         </button>
-                        
-                        {/* Tombol Excel */}
-                        {k.id !== 'mpls-lama' && (
-                          <button 
-                            title="Unduh Laporan Excel"
-                            onClick={() => {
-                              alert('Mempersiapkan unduhan Excel... Tunggu sebentar ya!');
-                              window.location.href = `/api/admin/export-excel?kegiatan_id=${k.id}&t=${Date.now()}`;
-                            }}
-                            style={{ background: '#f0fdf4', border: '1px solid #bbf7d0', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', color: '#15803d' }}
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
-                          </button>
-                        )}
-
-                        {/* Tombol Tautan Publik (Hanya PKG/Evaluasi Publik) */}
-                        {k.kategori_program === 'PKG' && (
-                          <button 
-                            title="Salin Tautan Publik"
-                            onClick={() => {
-                              const url = `${window.location.origin}/isi-form/public/${k.id}`;
-                              navigator.clipboard.writeText(url);
-                              alert('Tautan publik form berhasil disalin!\n' + url);
-                            }}
-                            style={{ background: '#faf5ff', border: '1px solid #e9d5ff', padding: '0.5rem', borderRadius: '6px', cursor: 'pointer', color: '#7e22ce' }}
-                          >
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                          </button>
-                        )}
                         
                       </td>
                     </tr>
