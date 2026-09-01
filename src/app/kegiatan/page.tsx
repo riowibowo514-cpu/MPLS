@@ -4,6 +4,7 @@ import { useState, useEffect, useRef, Suspense } from 'react';
 import { supabase } from '@/lib/supabase';
 import { Kegiatan } from '@/lib/types';
 import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 
 function DaftarKegiatanPetugasContent() {
   const [kegiatans, setKegiatans] = useState<Kegiatan[]>([]);
@@ -228,6 +229,16 @@ function DaftarKegiatanPetugasContent() {
             
           </div>
         )}
+      </div>
+      
+      {/* Tombol sekunder untuk Cari Hasil */}
+      <div style={{ marginTop: '2rem', width: '100%', maxWidth: '600px', textAlign: 'center' }}>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', fontSize: '0.9rem' }}>
+          Sudah pernah mengisi instrumen?
+        </p>
+        <Link href="/cari" className="btn btn-outline" style={{ display: 'inline-block', padding: '0.75rem 2rem', borderColor: '#10b981', color: '#10b981', background: 'white' }}>
+          Cari Hasil & Unduh Bukti PDF
+        </Link>
       </div>
     </div>
   );
