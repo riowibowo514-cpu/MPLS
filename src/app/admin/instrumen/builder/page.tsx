@@ -248,7 +248,7 @@ function BuilderContent() {
             style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', borderColor: '#8b5cf6', color: '#8b5cf6' }} 
             disabled={isReadingFile}
           >
-            {isReadingFile ? 'Membaca...' : '✨ Unggah (AI)'}
+            {isReadingFile ? 'Membaca...' : '✨ Unggah PDF'}
           </button>
           
           <button 
