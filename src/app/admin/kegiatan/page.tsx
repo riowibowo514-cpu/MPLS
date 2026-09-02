@@ -308,7 +308,7 @@ export default function KelolaKegiatan() {
                   style={{ width: '100%' }}
                 >
                   <option value="MONEV">Program Monev BGTK</option>
-                  <option value="EVALUASI">Program Evaluasi Kegiatan BGTK</option>
+                  <option value="EVALUASI_PANITIA">Program Evaluasi Kegiatan BGTK</option>
                 </select>
               </div>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>

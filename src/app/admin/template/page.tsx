@@ -59,12 +59,14 @@ export default function KelolaTemplate() {
       }
 
       fetchKegiatan();
+      fetchKegiatan();
     } else {
-      alert('Gagal membuat kegiatan');
+      console.error(error);
+      alert('Gagal membuat kegiatan: ' + (error?.message || 'Error tidak diketahui'));
     }
   };
 
-  const templateData = kegiatans.filter(k => k.kategori_program === 'TEMPLATE_EVALUASI' || k.kategori_program === 'TEMPLATE_MONEV');
+  const templateData = kegiatans.filter(k => k.kategori_program === 'TEMPLATE_EVALUASI' || k.kategori_program === 'MONEV');
 
   // 3. Filter berdasarkan Pencarian
   const finalData = templateData.filter(k => 
@@ -218,7 +220,7 @@ export default function KelolaTemplate() {
                   onChange={e => setForm({...form, kategori_program: e.target.value})}
                   style={{ width: '100%' }}
                 >
-                  <option value="TEMPLATE_MONEV">Program Monev BGTK</option>
+                  <option value="MONEV">Program Monev BGTK</option>
                   <option value="TEMPLATE_EVALUASI">Program Evaluasi Kegiatan BGTK</option>
                 </select>
 
