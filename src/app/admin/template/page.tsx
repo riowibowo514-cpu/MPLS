@@ -64,7 +64,7 @@ export default function KelolaTemplate() {
     }
   };
 
-  const templateData = kegiatans.filter(k => k.kategori_program === 'TEMPLATE_EVALUASI');
+  const templateData = kegiatans.filter(k => k.kategori_program === 'TEMPLATE_EVALUASI' || k.kategori_program === 'TEMPLATE_MONEV');
 
   // 3. Filter berdasarkan Pencarian
   const finalData = templateData.filter(k => 
@@ -137,14 +137,14 @@ export default function KelolaTemplate() {
                       <td style={{ padding: '1rem' }}>
                         <span style={{ 
                           fontSize: '0.75rem', 
-                          background: k.kategori_program === 'PKG' ? '#ede9fe' : k.kategori_program === 'EVALUASI_PANITIA' ? '#ffedd5' : '#dbeafe', 
-                          color: k.kategori_program === 'PKG' ? '#6d28d9' : k.kategori_program === 'EVALUASI_PANITIA' ? '#c2410c' : '#1d4ed8', 
+                          background: k.kategori_program === 'TEMPLATE_EVALUASI' ? '#ffedd5' : '#dbeafe', 
+                          color: k.kategori_program === 'TEMPLATE_EVALUASI' ? '#c2410c' : '#1d4ed8', 
                           padding: '0.25rem 0.5rem', 
                           borderRadius: '4px',
                           fontWeight: 'bold',
                           whiteSpace: 'nowrap'
                         }}>
-                          {k.kategori_program || 'MONEV'}
+                          {k.kategori_program === 'TEMPLATE_EVALUASI' ? 'Evaluasi Kegiatan BGTK' : 'Monev BGTK'}
                         </span>
                       </td>
                       <td style={{ padding: '1rem' }}>
@@ -218,16 +218,10 @@ export default function KelolaTemplate() {
                   onChange={e => setForm({...form, kategori_program: e.target.value})}
                   style={{ width: '100%' }}
                 >
-                  <option value="MONEV">Monitoring & Evaluasi (MONEV BGTK)</option>
-                  <option value="PKG">Peningkatan Kompetensi Guru (PKG)</option>
-                  <option value="EVALUASI_PANITIA">Evaluasi Kepanitiaan (Kegiatan Daring/Luring)</option>
-                  <option value="TEMPLATE_EVALUASI">Template Master Evaluasi (Jangan Digunakan Langsung)</option>
+                  <option value="TEMPLATE_MONEV">Program Monev BGTK</option>
+                  <option value="TEMPLATE_EVALUASI">Program Evaluasi Kegiatan BGTK</option>
                 </select>
-                {form.kategori_program === 'PKG' && (
-                  <p style={{ fontSize: '0.75rem', color: '#8b5cf6', marginTop: '0.5rem', background: '#ede9fe', padding: '0.5rem', borderRadius: '4px' }}>
-                    * Instrumen Evaluasi Baku (IKP & Panitia) akan di-generate otomatis untuk kegiatan PKG ini.
-                  </p>
-                )}
+
               </div>
               <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
                 <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={() => setIsModalOpen(false)}>Batal</button>
