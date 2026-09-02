@@ -22,17 +22,17 @@ export async function POST(req: NextRequest) {
     // 1. Ekstrak teks dari PDF
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
-    
-    // Polyfill untuk DOMMatrix karena pdf-parse/pdf.js membutuhkannya di Node.js versi terbaru
-    if (typeof global.DOMMatrix === 'undefined') {
-      (global as any).DOMMatrix = class DOMMatrix {
-        constructor() {}
-      };
-    }
-    
-    const pdfParse = require('pdf-parse');
-    const pdfData = await pdfParse(buffer);
-    const rawText = pdfData.text;
+    const PDFParser = require("pdf2json");
+    const rawText = await new Promise<string>((resolve, reject) => {
+      const pdfParser = new PDFParser(null, 1);
+      
+      pdfParser.on("pdfParser_dataError", (errData: any) => reject(errData.parserError));
+      pdfParser.on("pdfParser_dataReady", () => {
+        resolve(pdfParser.getRawTextContent());
+      });
+
+      pdfParser.parseBuffer(buffer);
+    });
 
     if (!rawText || rawText.trim() === '') {
       return NextResponse.json({ error: 'Gagal mengekstrak teks dari PDF atau PDF kosong' }, { status: 400 });
