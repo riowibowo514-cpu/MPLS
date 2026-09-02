@@ -74,11 +74,62 @@ function BuilderContent() {
     }
   };
 
+  
+  const [existingInstrumenId, setExistingInstrumenId] = useState<string | null>(null);
+  const [isLoadingData, setIsLoadingData] = useState(false);
+
   useEffect(() => {
     if (!kegiatan_id) {
       router.push('/admin/kegiatan');
+      return;
     }
+
+    const fetchExisting = async () => {
+      setIsLoadingData(true);
+      try {
+        const { data: instData, error: instErr } = await supabase
+          .from('instrumen')
+          .select('*')
+          .eq('kegiatan_id', kegiatan_id)
+          .single();
+        
+        if (instErr || !instData) return; // Tidak ada data lama
+        
+        setExistingInstrumenId(instData.id);
+        setInstrumen({ nama_instrumen: instData.nama_instrumen, deskripsi: instData.deskripsi });
+
+        const { data: mFields } = await supabase
+          .from('instrumen_metadata_field')
+          .select('*')
+          .eq('instrumen_id', instData.id)
+          .order('urutan', { ascending: true });
+        
+        if (mFields) setMetadataFields(mFields);
+
+        const { data: secs } = await supabase
+          .from('instrumen_section')
+          .select('*, items:instrumen_item(*)')
+          .eq('instrumen_id', instData.id)
+          .order('urutan', { ascending: true });
+
+        if (secs) {
+          // Sort items for each section
+          const sortedSecs = secs.map(s => {
+            s.items.sort((a: any, b: any) => (a.urutan || 0) - (b.urutan || 0));
+            return s;
+          });
+          setSections(sortedSecs as any);
+        }
+      } catch (err) {
+        console.error("Gagal memuat instrumen lama", err);
+      } finally {
+        setIsLoadingData(false);
+      }
+    };
+
+    fetchExisting();
   }, [kegiatan_id, router]);
+
 
   const addMetadataField = () => {
     setMetadataFields([...metadataFields, { label_field: '', tipe_field: 'text', wajib_diisi: true, urutan: metadataFields.length }]);
@@ -103,16 +154,39 @@ function BuilderContent() {
     if (!instrumen.nama_instrumen) return alert('Nama instrumen wajib diisi!');
     setIsSaving(true);
 
+    
     try {
-      // 1. Save Instrumen
-      const { data: instData, error: instError } = await supabase
-        .from('instrumen')
-        .insert([{ kegiatan_id, nama_instrumen: instrumen.nama_instrumen, deskripsi: instrumen.deskripsi }])
-        .select()
-        .single();
-        
-      if (instError) throw instError;
-      const instrumenId = instData.id;
+      let instrumenId = existingInstrumenId;
+
+      if (existingInstrumenId) {
+        // Update instrumen
+        await supabase
+          .from('instrumen')
+          .update({ nama_instrumen: instrumen.nama_instrumen, deskripsi: instrumen.deskripsi })
+          .eq('id', existingInstrumenId);
+          
+        // Hapus metadata, section, items lama untuk di-replace
+        // Karena cascading delete mungkin tidak aktif, kita hapus manual dari bawah
+        const { data: oldSecs } = await supabase.from('instrumen_section').select('id').eq('instrumen_id', existingInstrumenId);
+        if (oldSecs && oldSecs.length > 0) {
+           const oldSecIds = oldSecs.map(s => s.id);
+           await supabase.from('instrumen_item').delete().in('section_id', oldSecIds);
+           await supabase.from('instrumen_section').delete().eq('instrumen_id', existingInstrumenId);
+        }
+        await supabase.from('instrumen_metadata_field').delete().eq('instrumen_id', existingInstrumenId);
+
+      } else {
+        // Insert Instrumen baru
+        const { data: instData, error: instError } = await supabase
+          .from('instrumen')
+          .insert([{ kegiatan_id, nama_instrumen: instrumen.nama_instrumen, deskripsi: instrumen.deskripsi }])
+          .select()
+          .single();
+          
+        if (instError) throw instError;
+        instrumenId = instData.id;
+      }
+
 
       // 2. Save Metadata Fields
       if (metadataFields.length > 0) {
@@ -149,6 +223,10 @@ function BuilderContent() {
       setIsSaving(false);
     }
   };
+
+  if (isLoadingData) {
+    return <div style={{ padding: '4rem', textAlign: 'center' }}>Memuat data instrumen lama...</div>;
+  }
 
   return (
     <div className="container" style={{ padding: '2rem 1rem' }}>
