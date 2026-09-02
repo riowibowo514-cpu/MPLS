@@ -243,7 +243,7 @@ export default function BuatEvaluasi() {
                 placeholder="Contoh: JOSS123"
                 value={formData.pin}
                 onChange={e => setFormData({...formData, pin: e.target.value})}
-                style={{ border: '2px solid #fbbf24', paddingRight: '2.5rem' }}
+                style={{ border: '2px solid #fbbf24', paddingRight: '2.5rem', width: '100%' }}
               />
               <button
                 type="button"

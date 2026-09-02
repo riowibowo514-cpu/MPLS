@@ -217,7 +217,7 @@ export default function CekHasilPanitia() {
                       placeholder="Ketik PIN yang Anda buat..."
                       value={pinInput}
                       onChange={e => setPinInput(e.target.value)}
-                      style={{ border: '2px solid #fbbf24', paddingRight: '2.5rem' }}
+                      style={{ border: '2px solid #fbbf24', paddingRight: '2.5rem', width: '100%' }}
                     />
                     <button
                       type="button"
