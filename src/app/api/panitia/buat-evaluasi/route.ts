@@ -23,7 +23,7 @@ export async function POST(request: Request) {
     }
 
     // 1. Cari Master Template yang sesuai
-    const targetMasterName = tipeKuesioner === 'daring' ? 'MASTER TEMPLATE EVALUASI DARING' : 'MASTER TEMPLATE EVALUASI PKG';
+    const targetMasterName = tipeKuesioner === 'daring' ? 'MASTER TEMPLATE EVALUASI DARING' : 'MASTER TEMPLATE PKG (JANGAN DIHAPUS)';
     const { data: templateKegiatan, error: templateError } = await supabase
       .from('kegiatan')
       .select('*')
