@@ -22,6 +22,14 @@ export async function POST(req: NextRequest) {
     // 1. Ekstrak teks dari PDF
     const arrayBuffer = await file.arrayBuffer();
     const buffer = Buffer.from(arrayBuffer);
+    
+    // Polyfill untuk DOMMatrix karena pdf-parse/pdf.js membutuhkannya di Node.js versi terbaru
+    if (typeof global.DOMMatrix === 'undefined') {
+      (global as any).DOMMatrix = class DOMMatrix {
+        constructor() {}
+      };
+    }
+    
     const pdfParse = require('pdf-parse');
     const pdfData = await pdfParse(buffer);
     const rawText = pdfData.text;
