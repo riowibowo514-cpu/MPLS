@@ -104,15 +104,7 @@ export default function LoginPage() {
           </button>
         </form>
       </div>
-      <div style={{ marginTop: '2rem', textAlign: 'center' }}>
-        <button 
-          onClick={() => router.push('/')} 
-          className="btn btn-outline" 
-          style={{ border: 'none' }}
-        >
-          &larr; Kembali ke Beranda
-        </button>
-      </div>
+
     </main>
   );
 }

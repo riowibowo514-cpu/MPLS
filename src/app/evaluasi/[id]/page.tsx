@@ -39,6 +39,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
   const [isSuccess, setIsSuccess] = useState(false);
 
   const [schema, setSchema] = useState<InstrumenFull | null>(null);
+  const [kategoriProgram, setKategoriProgram] = useState<string>('');
   
   // State untuk form
   const [currentStep, setCurrentStep] = useState(0);
@@ -100,7 +101,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
 
       const { data: keg, error: errKeg } = await supabase
         .from('kegiatan')
-        .select('status')
+        .select('status, kategori_program')
         .eq('id', kegiatan_id)
         .single();
       
@@ -108,6 +109,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
       if (keg.status === 'nonaktif') {
         throw new Error('Mohon Maaf, formulir evaluasi untuk kegiatan ini telah ditutup oleh panitia.');
       }
+      setKategoriProgram(keg.kategori_program || '');
 
       // 1. Dapatkan instrumen dari kegiatan_id
       const { data: inst, error: errInst } = await supabase
@@ -271,7 +273,17 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
         <div className="card" style={{ maxWidth: '600px', margin: '0 auto', padding: '3rem 2rem' }}>
           <div className="no-print">
             <h2 style={{ color: '#10b981' }}>Berhasil Disimpan!</h2>
-            <p>Terima kasih telah berpartisipasi. Jawaban Anda telah berhasil direkam.</p>
+            <p style={{ marginBottom: '2rem' }}>Terima kasih telah berpartisipasi. Jawaban Anda telah berhasil direkam.</p>
+            {kategoriProgram === 'MONEV' && (
+              <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginBottom: '2rem' }}>
+                <button className="btn btn-outline" onClick={() => window.location.reload()}>
+                  Isi Form Lagi
+                </button>
+                <button className="btn btn-primary" onClick={() => router.push('/')}>
+                  Kembali ke Beranda
+                </button>
+              </div>
+            )}
           </div>
           
           {/* Bagian khusus untuk di-print sebagai PDF (Berita Acara) */}

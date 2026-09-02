@@ -6,11 +6,10 @@ export default function BackButton() {
   const router = useRouter();
   const pathname = usePathname();
 
-  if (pathname === '/') return null;
+  if (pathname === '/' || pathname.includes('/isi-form') || pathname.includes('/evaluasi/')) return null;
 
   const handleBack = () => {
-    if (pathname.includes('/isi-form')) {
-      router.back();
+    if (pathname.includes('/isi-form') || pathname.includes('/evaluasi/')) {
       return;
     }
 
