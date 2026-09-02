@@ -93,7 +93,14 @@ function BuilderContent() {
           .eq('kegiatan_id', kegiatan_id)
           .single();
         
-        if (instErr || !instData) return; // Tidak ada data lama
+        if (instErr || !instData) {
+          // Jika instrumen belum ada, ambil nama kegiatannya untuk dijadikan default judul instrumen
+          const { data: kegData } = await supabase.from('kegiatan').select('nama_kegiatan, deskripsi').eq('id', kegiatan_id).single();
+          if (kegData) {
+            setInstrumen({ nama_instrumen: kegData.nama_kegiatan, deskripsi: kegData.deskripsi || '' });
+          }
+          return;
+        }
         
         setExistingInstrumenId(instData.id);
         setInstrumen({ nama_instrumen: instData.nama_instrumen, deskripsi: instData.deskripsi });

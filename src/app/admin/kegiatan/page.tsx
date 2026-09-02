@@ -43,26 +43,15 @@ export default function KelolaKegiatan() {
       .insert([form])
       .select();
       
-    if (!error) {
+    if (!error && data && data.length > 0) {
       setIsModalOpen(false);
       setForm({ nama_kegiatan: '', deskripsi: '', tahun: new Date().getFullYear().toString(), kategori_program: 'MONEV' });
       
-      // Auto-generate PKG Instrument if category is PKG
-      if (form.kategori_program === 'PKG' && data && data[0]) {
-        try {
-          await fetch('/api/admin/generate-pkg', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ kegiatan_id: data[0].id })
-          });
-        } catch (err) {
-          console.error("Gagal auto-generate PKG", err);
-        }
-      }
-
-      fetchKegiatan();
+      // Langsung arahkan ke halaman form builder
+      router.push(`/admin/instrumen/builder?kegiatan_id=${data[0].id}`);
     } else {
-      alert('Gagal membuat kegiatan');
+      console.error(error);
+      alert('Gagal membuat kegiatan: ' + (error?.message || 'Error tidak diketahui'));
     }
   };
 
