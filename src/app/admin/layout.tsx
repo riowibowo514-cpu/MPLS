@@ -12,7 +12,7 @@ export default function AdminLayout({
           Kelola Kegiatan
         </Link>
         <Link href="/admin/template" className="btn btn-outline" style={{ border: 'none', borderBottom: '2px solid transparent' }}>
-          Master Template
+          Kelola Instrumen
         </Link>
         <Link href="/admin/pengguna" className="btn btn-outline" style={{ border: 'none', borderBottom: '2px solid transparent' }}>
           Kelola Pengguna

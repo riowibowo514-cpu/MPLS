@@ -67,11 +67,11 @@ export default function KelolaTemplate() {
       {/* Header & Tombol Buat */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem', flexWrap: 'wrap', gap: '1rem' }}>
         <div>
-          <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Master Template Instrumen</h2>
-          <p style={{ color: '#6b7280', margin: 0 }}>Kelola template master untuk form PKG dan Daring</p>
+          <h2 style={{ fontSize: '1.75rem', marginBottom: '0.25rem' }}>Kelola Instrumen</h2>
+          <p style={{ color: '#6b7280', fontSize: '0.875rem' }}>Kelola instrumen untuk kegiatan Monev dan form Kepanitiaan</p>
         </div>
         <button className="btn btn-primary" onClick={() => setIsModalOpen(true)} style={{ background: '#1d4ed8', border: 'none', boxShadow: '0 4px 6px -1px rgba(29, 78, 216, 0.4)' }}>
-          + Tambah Template Baru
+          + Tambah Instrumen Baru
         </button>
       </div>
 
