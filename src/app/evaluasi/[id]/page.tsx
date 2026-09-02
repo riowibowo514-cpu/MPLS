@@ -816,9 +816,7 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
         
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '2rem' }}>
           {currentStep === 0 ? (
-            <button type="button" className="btn btn-outline" onClick={() => router.push('/kegiatan')}>
-              Batal
-            </button>
+            <div />
           ) : (
             <button type="button" className="btn btn-outline" onClick={() => { setCurrentStep(prev => prev - 1); window.scrollTo(0, 0); }}>
               Sebelumnya
