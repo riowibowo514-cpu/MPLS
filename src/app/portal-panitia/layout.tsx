@@ -114,11 +114,7 @@ export default function PortalPanitiaLayout({ children }: { children: React.Reac
             </button>
           </form>
           
-          <div style={{ marginTop: '1.5rem' }}>
-            <a href="/" style={{ color: 'var(--text-secondary)', fontSize: '0.875rem', textDecoration: 'underline' }}>
-              Kembali ke Halaman Utama
-            </a>
-          </div>
+
         </div>
       </div>
     );
