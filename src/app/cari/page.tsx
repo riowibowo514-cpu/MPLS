@@ -322,20 +322,24 @@ export default function SearchPage() {
         <div className="print-only" style={{ display: 'none', textAlign: 'left', margin: '0 auto', width: '100%', padding: '2rem' }}>
           <div style={{ textAlign: 'center', marginBottom: '2rem', fontWeight: 'bold', fontSize: '1.1rem', lineHeight: '1.5' }}>
             INSTRUMEN MONITORING DAN EVALUASI<br/>
-            IMPLEMENTASI MATEMATIKA GEMBIRA BAGI GURU TK DAN GURU SD<br/>
-            TAHUN 2026<br/>
+            {schema.nama_instrumen.toUpperCase()}<br/>
+            TAHUN {kegiatans.find(k => k.id === selectedKegiatanId)?.tahun || new Date().getFullYear()}<br/>
             PROVINSI SUMATERA BARAT
           </div>
           
           <table style={{ width: '100%', marginBottom: '2rem', borderCollapse: 'collapse', fontSize: '1rem' }}>
             <tbody>
-              {schema.metadata_fields.map(m => (
-                <tr key={m.id}>
-                  <td style={{ width: '200px', padding: '0.25rem 0' }}>{m.label_field}</td>
-                  <td style={{ width: '20px', padding: '0.25rem 0' }}>:</td>
-                  <td style={{ padding: '0.25rem 0' }}>{selectedPengisian.metadata_values[m.id]}</td>
-                </tr>
-              ))}
+              {schema.metadata_fields.map(m => {
+                const labelField = (m.label_field || '').trim();
+                const lbl = labelField.replace(/^\[.*?\]\s*/, '').trim();
+                return (
+                  <tr key={m.id}>
+                    <td style={{ width: '200px', padding: '0.25rem 0' }}>{lbl}</td>
+                    <td style={{ width: '20px', padding: '0.25rem 0' }}>:</td>
+                    <td style={{ padding: '0.25rem 0' }}>{selectedPengisian.metadata_values[m.id]}</td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
           

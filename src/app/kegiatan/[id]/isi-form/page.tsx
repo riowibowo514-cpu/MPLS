@@ -291,16 +291,16 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
           <div className="print-only" style={{ display: 'none', textAlign: 'left', margin: '0 auto', width: '100%' }}>
             <div style={{ textAlign: 'center', marginBottom: '2rem', fontWeight: 'bold', fontSize: '1.1rem', lineHeight: '1.5' }}>
               INSTRUMEN MONITORING DAN EVALUASI<br/>
-              IMPLEMENTASI MATEMATIKA GEMBIRA BAGI GURU TK DAN GURU SD<br/>
-              TAHUN 2026<br/>
+              {schema.nama_instrumen.toUpperCase()}<br/>
+              TAHUN {new Date().getFullYear()}<br/>
               PROVINSI SUMATERA BARAT
             </div>
             
             <table style={{ width: '100%', marginBottom: '2rem', borderCollapse: 'collapse', fontSize: '1rem' }}>
               <tbody>
                 {schema.metadata_fields.map(m => {
-                  const match = m.label_field.match(/^\[(.*?)\]\s*(.*)$/);
-                  const lbl = match ? match[2] : m.label_field;
+                  const labelField = (m.label_field || '').trim();
+                  const lbl = labelField.replace(/^\[.*?\]\s*/, '').trim();
                   return (
                   <tr key={m.id}>
                     <td style={{ width: '200px', padding: '0.25rem 0' }}>{lbl}</td>

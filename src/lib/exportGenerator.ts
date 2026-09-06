@@ -180,6 +180,82 @@ export function generateDynamicPDFSummary(schema: InstrumenFull, pengisians: any
     }
   });
 
+  if (sectionAverages.length === 0 && pengisians.length > 0) {
+    let currentY = 50;
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'italic');
+    doc.text('Instrumen ini bersifat kualitatif (Esai / Pilihan Ganda) sehingga tidak memiliki', 105, currentY, { align: 'center' });
+    currentY += 7;
+    doc.text('rekapitulasi skor kinerja numerik (IKP/SKM).', 105, currentY, { align: 'center' });
+    currentY += 15;
+    
+    // Hitung dan tampilkan Pilihan Ganda
+    let hasChoice = false;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    
+    schema.sections.forEach(sec => {
+      sec.items.forEach(item => {
+        if (item.tipe_jawaban === 'pilihan_ganda') {
+          if (!hasChoice) {
+            doc.text('Ringkasan Jawaban Pilihan Ganda:', 14, currentY);
+            currentY += 10;
+            hasChoice = true;
+          }
+          
+          if (currentY > 270) {
+            doc.addPage();
+            currentY = 20;
+          }
+
+          doc.setFont('helvetica', 'bold');
+          const titleLines = doc.splitTextToSize(`- ${item.teks_pertanyaan}`, 180);
+          doc.text(titleLines, 14, currentY);
+          currentY += (titleLines.length * 6);
+          
+          const counts: Record<string, number> = {};
+          if (item.opsi_jawaban) {
+            item.opsi_jawaban.forEach((o: string) => counts[o] = 0);
+          }
+          
+          pengisians.forEach(p => {
+            const ans = p.jawaban.find((j: any) => j.item_id === item.id);
+            if (ans && ans.nilai_teks) {
+              counts[ans.nilai_teks] = (counts[ans.nilai_teks] || 0) + 1;
+            }
+          });
+
+          doc.setFont('helvetica', 'normal');
+          Object.entries(counts).forEach(([opt, count]) => {
+            if (count > 0) {
+              doc.text(`${opt}: ${count} responden`, 20, currentY);
+              currentY += 6;
+            }
+          });
+          currentY += 4;
+        }
+      });
+    });
+
+    if (hasChoice) currentY += 5;
+    
+    if (currentY > 250) {
+      doc.addPage();
+      currentY = 20;
+    }
+
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.setTextColor(16, 185, 129); // Green
+    doc.text('Silakan gunakan tombol "Export Excel" di Dashboard', 105, currentY, { align: 'center' });
+    currentY += 7;
+    doc.text('untuk melihat seluruh rincian jawaban (termasuk Esai) secara lengkap.', 105, currentY, { align: 'center' });
+    
+    const today = new Date().toISOString().split('T')[0];
+    doc.save(`Ringkasan_Eksekutif_${schema.nama_instrumen.replace(/[^a-zA-Z0-9]/g, '_')}_${today}.pdf`);
+    return;
+  }
+
   let currentY = 40;
 
   // 1. KINERJA PER ASPEK (Tabel)
