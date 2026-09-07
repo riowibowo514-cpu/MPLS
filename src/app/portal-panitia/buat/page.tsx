@@ -13,6 +13,8 @@ export default function BuatEvaluasi() {
     tanggalSelesai: new Date().toISOString().split('T')[0],
     adaKonsumsi: true,
     adaPenginapan: true,
+    isRakor: false,
+    tempatPelaksanaan: '',
     pin: '',
     tipeKuesioner: 'reguler', // 'reguler' atau 'daring'
     tarikBiodata: false
@@ -137,6 +139,17 @@ export default function BuatEvaluasi() {
           </div>
 
           <div style={{ marginBottom: '1.5rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Tempat Pelaksanaan (Opsional)</label>
+            <input 
+              type="text" 
+              className="form-control"
+              placeholder="Contoh: Hotel XYZ, Kota Padang"
+              value={formData.tempatPelaksanaan}
+              onChange={e => setFormData({...formData, tempatPelaksanaan: e.target.value})}
+            />
+          </div>
+
+          <div style={{ marginBottom: '1.5rem' }}>
             <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Tipe Kuesioner</label>
             <select 
               className="form-control"
@@ -186,9 +199,19 @@ export default function BuatEvaluasi() {
           <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#f9fafb', border: '1px solid #e5e7eb', borderRadius: '8px' }}>
             <h3 style={{ marginTop: 0, marginBottom: '1rem', fontSize: '1.1rem' }}>Aspek Penilaian Ekstra</h3>
             <p style={{ fontSize: '0.875rem', color: '#6b7280', marginBottom: '1rem' }}>
-              Hilangkan centang jika acara Anda tidak memiliki aspek berikut. Sistem otomatis akan menghapus pertanyaan terkait dari form.
+              Pilih aspek kegiatan sesuai dengan kondisi aktual. Sistem otomatis akan memodifikasi/menghapus pertanyaan terkait dari form jika tidak dicentang.
             </p>
             
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', cursor: 'pointer', background: '#eef2ff', padding: '0.75rem', borderRadius: '6px', border: '1px solid #c7d2fe' }}>
+              <input 
+                type="checkbox" 
+                checked={formData.isRakor}
+                onChange={e => setFormData({...formData, isRakor: e.target.checked})}
+                style={{ width: '1.25rem', height: '1.25rem' }}
+              />
+              <span style={{ fontWeight: 'bold', color: '#4338ca' }}>Kegiatan ini berupa Rapat Koordinasi (Rakor / Rakortek)</span>
+            </label>
+
             <label style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginBottom: '1rem', cursor: 'pointer' }}>
               <input 
                 type="checkbox" 

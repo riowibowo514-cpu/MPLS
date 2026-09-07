@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { namaKegiatan, deskripsi, tanggalMulai, tanggalSelesai, adaKonsumsi, adaPenginapan, pin, tipeKuesioner, tarikBiodata } = body;
+    const { namaKegiatan, deskripsi, tanggalMulai, tanggalSelesai, adaKonsumsi, adaPenginapan, pin, tipeKuesioner, tarikBiodata, isRakor, tempatPelaksanaan } = body;
 
     if (!namaKegiatan || !tanggalMulai || !tanggalSelesai || !pin || !tipeKuesioner) {
       return NextResponse.json({ error: 'Data tidak lengkap (Nama, Tanggal, Tipe, dan PIN wajib diisi).' }, { status: 400 });
@@ -20,6 +20,11 @@ export async function POST(request: Request) {
       formattedTanggal = dateMulai.toLocaleDateString('id-ID', options);
     } else {
       formattedTanggal = `${dateMulai.toLocaleDateString('id-ID', options)} s.d. ${dateSelesai.toLocaleDateString('id-ID', options)}`;
+    }
+
+    let finalDeskripsi = deskripsi || '';
+    if (tempatPelaksanaan) {
+      finalDeskripsi = `Tempat Pelaksanaan: ${tempatPelaksanaan}\n\n${finalDeskripsi}`;
     }
 
     // 1. Cari Master Template yang sesuai
@@ -60,7 +65,7 @@ export async function POST(request: Request) {
       .insert({
         id: newKegiatanId,
         nama_kegiatan: namaKegiatan,
-        deskripsi: deskripsi || '',
+        deskripsi: finalDeskripsi.trim(),
         tahun: formattedTanggal,
         status: 'aktif',
         kategori_program: 'EVALUASI_PANITIA',
@@ -112,6 +117,13 @@ export async function POST(request: Request) {
         const sectionNameLower = section.nama_section.toLowerCase();
         if (!adaKonsumsi && (sectionNameLower.includes('konsumsi') || sectionNameLower.includes('makan'))) return false;
         if (!adaPenginapan && (sectionNameLower.includes('penginapan') || sectionNameLower.includes('akomodasi') || sectionNameLower.includes('hotel'))) return false;
+        
+        if (isRakor && (
+          sectionNameLower.includes('materi') || 
+          sectionNameLower.includes('efektivitas') || 
+          sectionNameLower.includes('kepuasan')
+        )) return false;
+
         return true;
       });
 
