@@ -151,11 +151,20 @@ export async function POST(request: Request) {
           .in('section_id', validSectionIds);
 
         if (allItems && allItems.length > 0) {
-          const newItemsToInsert = allItems.map(item => ({
-            ...item,
-            id: crypto.randomUUID(),
-            section_id: sectionIdMap.get(item.section_id)
-          }));
+          const newItemsToInsert = allItems
+            .filter(item => {
+              if (isRakor) {
+                const textLower = item.teks_pertanyaan.toLowerCase();
+                if (textLower.includes('praktik langsung') || textLower.includes('simulasi mengajar')) return false;
+                if (textLower.includes('interaktivitas metode pelatihan')) return false;
+              }
+              return true;
+            })
+            .map(item => ({
+              ...item,
+              id: crypto.randomUUID(),
+              section_id: sectionIdMap.get(item.section_id)
+            }));
           
           // Bulk Insert Items
           await supabase.from('instrumen_item').insert(newItemsToInsert);
