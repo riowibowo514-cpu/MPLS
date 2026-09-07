@@ -751,8 +751,9 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
             <input type="hidden" value={kesimpulanInputs.statusFinal} />
 
             <div className="form-group" style={{ marginTop: '1.5rem' }}>
-              <label>Catatan Kritis / Temuan Lapangan <span style={{color:'gray', fontSize:'0.8em'}}>(Opsional)</span></label>
+              <label>Catatan Kritis / Temuan Lapangan <span style={{color:'red'}}>*</span></label>
               <textarea 
+                required
                 value={kesimpulanInputs.catatanKritis}
                 onChange={e => setKesimpulanInputs({ ...kesimpulanInputs, catatanKritis: e.target.value })}
                 rows={3}
@@ -761,8 +762,9 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
             </div>
             
             <div className="form-group" style={{ marginTop: '1rem' }}>
-              <label>Rekomendasi <span style={{color:'gray', fontSize:'0.8em'}}>(Opsional)</span></label>
+              <label>Rekomendasi <span style={{color:'red'}}>*</span></label>
               <textarea 
+                required
                 value={kesimpulanInputs.rekomendasi}
                 onChange={e => setKesimpulanInputs({ ...kesimpulanInputs, rekomendasi: e.target.value })}
                 rows={3}
