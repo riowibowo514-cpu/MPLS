@@ -192,6 +192,12 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
           <h2 style={{ fontSize: '1.5rem', textTransform: 'uppercase', marginBottom: '0.5rem' }}>Laporan Hasil Evaluasi Penyelenggaraan Kegiatan</h2>
           <h1 style={{ fontSize: '1.75rem', color: '#1e40af', marginBottom: '1rem' }}>{kegiatan?.nama_kegiatan}</h1>
           
+          {kegiatan?.deskripsi && (
+            <div style={{ fontSize: '1rem', color: '#4b5563', marginBottom: '1rem', whiteSpace: 'pre-wrap' }}>
+              {kegiatan.deskripsi}
+            </div>
+          )}
+          
           <div style={{ display: 'flex', justifyContent: 'center', gap: '3rem', fontSize: '1.1rem', marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', maxWidth: '600px', margin: '0 auto' }}>
              <div style={{ textAlign: 'center' }}>
                <div style={{ fontSize: '0.875rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Responden</div>

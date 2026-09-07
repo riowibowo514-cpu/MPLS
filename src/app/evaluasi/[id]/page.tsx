@@ -476,10 +476,11 @@ export default function IsiFormDinamis({ params }: { params: Promise<{ id: strin
 
   return (
     <main className="container" style={{ padding: '2rem 1rem' }}>
-      <div style={{ marginBottom: '2rem' }}>
+      <div style={{ textAlign: 'center', marginBottom: '3rem' }}>
         <h1 style={{ color: 'var(--primary)', marginBottom: '0.5rem' }}>{schema.nama_instrumen}</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem' }}>{schema.deskripsi}</p>
-        <div style={{ padding: '1rem', background: '#eff6ff', borderLeft: '4px solid #3b82f6', borderRadius: '4px', fontSize: '0.9rem', color: '#1e3a8a' }}>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: '1rem', whiteSpace: 'pre-wrap' }}>{schema.deskripsi}</p>
+        
+        <div style={{ background: '#e0f2fe', color: '#0369a1', padding: '1rem', borderRadius: 'var(--radius-md)', textAlign: 'left', fontSize: '0.9rem', lineHeight: 1.6, borderLeft: '4px solid #0ea5e9' }}>
           <strong>Petunjuk Penting:</strong> Karena seluruh pertanyaan wajib diisi, apabila terdapat pertanyaan (khususnya pertanyaan lanjutan/kondisional) yang <strong>tidak relevan</strong> atau <strong>tidak memiliki jawaban</strong>, mohon ketikkan tanda strip (<strong>-</strong>) atau <strong>"Tidak Ada"</strong> pada kolom yang tersedia.
         </div>
       </div>

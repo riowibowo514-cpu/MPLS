@@ -82,7 +82,7 @@ export async function POST(request: Request) {
         id: newInstrumenId,
         kegiatan_id: newKegiatanId,
         nama_instrumen: `Instrumen Evaluasi: ${namaKegiatan}`,
-        deskripsi: `Dibuat secara mandiri oleh Panitia pada ${new Date().toLocaleDateString()}`,
+        deskripsi: `Dibuat secara mandiri oleh Panitia pada ${new Date().toLocaleDateString()}${finalDeskripsi ? '\n\n' + finalDeskripsi.trim() : ''}`,
         created_at: now
       });
 
