@@ -22,8 +22,16 @@ export default function KelolaAbsenPage() {
   const [toleransi, setToleransi] = useState('15');
   const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Modal QR
+  // Modal QR & Edit
   const [showQrModal, setShowQrModal] = useState<any>(null);
+  const [showEditModal, setShowEditModal] = useState<any>(null);
+  
+  // Edit form states
+  const [editNamaSesi, setEditNamaSesi] = useState('');
+  const [editTanggal, setEditTanggal] = useState('');
+  const [editJamMulai, setEditJamMulai] = useState('');
+  const [editToleransi, setEditToleransi] = useState('');
+  const [isEditing, setIsEditing] = useState(false);
 
   useEffect(() => {
     if (kegiatanId) {
@@ -85,6 +93,34 @@ export default function KelolaAbsenPage() {
     } else {
       fetchData(); // Refresh data
     }
+  };
+
+  const openEditModal = (sesi: any) => {
+    setEditNamaSesi(sesi.nama_sesi);
+    setEditTanggal(sesi.tanggal);
+    setEditJamMulai(sesi.jam_mulai);
+    setEditToleransi(sesi.toleransi_menit.toString());
+    setShowEditModal(sesi);
+  };
+
+  const handleUpdateSesi = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsEditing(true);
+
+    const { error } = await supabase.from('sesi_kegiatan').update({
+      nama_sesi: editNamaSesi,
+      tanggal: editTanggal,
+      jam_mulai: editJamMulai,
+      toleransi_menit: parseInt(editToleransi)
+    }).eq('id', showEditModal.id);
+
+    if (error) {
+      alert('Gagal mengubah sesi: ' + error.message);
+    } else {
+      setShowEditModal(null);
+      fetchData();
+    }
+    setIsEditing(false);
   };
 
   if (isLoading) return <div className="container" style={{ padding: '4rem 1rem' }}>Memuat data ruang rahasia...</div>;
@@ -159,12 +195,20 @@ export default function KelolaAbsenPage() {
                     <Link href={`/admin/kegiatan/${kegiatanId}/kelola-absen/rekap?sesi_id=${sesi.id}`} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
                       Rekap Kehadiran
                     </Link>
+                    <div style={{ borderLeft: '1px solid #e2e8f0', height: '24px', margin: '0 0.25rem' }}></div>
+                    <button 
+                      onClick={() => openEditModal(sesi)}
+                      style={{ background: 'none', border: 'none', color: '#0ea5e9', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center' }} 
+                      title="Edit Sesi"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    </button>
                     <button 
                       onClick={() => handleDeleteSesi(sesi.id, sesi.nama_sesi)}
                       style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center' }} 
                       title="Hapus Sesi"
                     >
-                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                     </button>
                   </div>
                 </div>
@@ -173,6 +217,39 @@ export default function KelolaAbsenPage() {
           )}
         </div>
       </div>
+
+      {/* Modal Edit Sesi */}
+      {showEditModal && (
+        <div style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, background: 'rgba(0,0,0,0.5)', display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 50 }}>
+          <div className="card animate-fade-in" style={{ width: '100%', maxWidth: '400px', padding: '2rem' }}>
+            <h3 style={{ marginBottom: '1.5rem' }}>Edit Sesi Absensi</h3>
+            <form onSubmit={handleUpdateSesi}>
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
+                <label>Nama Sesi</label>
+                <input type="text" className="input-text" required value={editNamaSesi} onChange={e => setEditNamaSesi(e.target.value)} />
+              </div>
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
+                <label>Tanggal Sesi</label>
+                <input type="date" className="input-text" required value={editTanggal} onChange={e => setEditTanggal(e.target.value)} />
+              </div>
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
+                <label>Jam Mulai (WIB)</label>
+                <input type="time" className="input-text" required value={editJamMulai} onChange={e => setEditJamMulai(e.target.value)} />
+              </div>
+              <div className="form-group" style={{ marginBottom: '1.5rem' }}>
+                <label>Toleransi (Menit)</label>
+                <input type="number" className="input-text" required value={editToleransi} onChange={e => setEditToleransi(e.target.value)} />
+              </div>
+              <div style={{ display: 'flex', gap: '1rem' }}>
+                <button type="button" className="btn btn-outline" style={{ flex: 1 }} onClick={() => setShowEditModal(null)}>Batal</button>
+                <button type="submit" className="btn btn-primary" style={{ flex: 1 }} disabled={isEditing}>
+                  {isEditing ? 'Menyimpan...' : 'Simpan'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Modal QR Code */}
       {showQrModal && (
