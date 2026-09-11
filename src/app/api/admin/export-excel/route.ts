@@ -39,13 +39,29 @@ export async function GET(req: NextRequest) {
       sections.forEach(s => s.items.sort((a: any, b: any) => a.urutan - b.urutan));
     }
 
-    // 3. Dapatkan Data Pengisian
-    const { data: pengisianList, error: pErr } = await supabase
-      .from('pengisian')
-      .select('*')
-      .eq('instrumen_id', instrumen.id);
-
-    if (pErr) throw pErr;
+    // 3. Dapatkan Data Pengisian (Pagination untuk lewati batas 1000 baris)
+    let pengisianList: any[] = [];
+    let pFetchMore = true;
+    let pOffset = 0;
+    const pLimit = 1000;
+    
+    while (pFetchMore) {
+      const { data: pChunk, error: pErr } = await supabase
+        .from('pengisian')
+        .select('*')
+        .eq('instrumen_id', instrumen.id)
+        .range(pOffset, pOffset + pLimit - 1);
+        
+      if (pErr) throw pErr;
+      
+      if (pChunk && pChunk.length > 0) {
+        pengisianList = [...pengisianList, ...pChunk];
+        if (pChunk.length < pLimit) pFetchMore = false;
+        else pOffset += pLimit;
+      } else {
+        pFetchMore = false;
+      }
+    }
 
     // 4. Dapatkan Semua Jawaban yang terkait dengan pengisian tersebut
     const pengisianIds = pengisianList ? pengisianList.map(p => p.id) : [];

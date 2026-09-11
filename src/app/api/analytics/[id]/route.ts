@@ -32,16 +32,30 @@ export async function GET(
       sections: sections || []
     };
 
-    // 2. Ambil seluruh data pengisian dan jawaban
-    // (Ini berat, oleh karena itu diletakkan di server side dengan cache 60 detik)
-    const { data: pengisians, error: pError } = await supabase
-      .from('pengisian')
-      .select('*, jawaban(*)')
-      .eq('instrumen_id', inst.id)
-      .order('tanggal_pengisian', { ascending: true });
+    // 2. Ambil seluruh data pengisian dan jawaban (Pagination untuk melewati batas 1000 baris)
+    let safePengisians: any[] = [];
+    let fetchMore = true;
+    let offset = 0;
+    const limit = 1000;
+
+    while (fetchMore) {
+      const { data: chunk, error: pError } = await supabase
+        .from('pengisian')
+        .select('*, jawaban(*)')
+        .eq('instrumen_id', inst.id)
+        .order('tanggal_pengisian', { ascending: true })
+        .range(offset, offset + limit - 1);
+        
+      if (pError) throw pError;
       
-    if (pError) throw pError;
-    const safePengisians = pengisians || [];
+      if (chunk && chunk.length > 0) {
+        safePengisians = [...safePengisians, ...chunk];
+        if (chunk.length < limit) fetchMore = false;
+        else offset += limit;
+      } else {
+        fetchMore = false;
+      }
+    }
 
     // 2.5 Ambil Data Petugas
     const { data: users } = await supabase.from('users').select('id, nama_lengkap, username');
