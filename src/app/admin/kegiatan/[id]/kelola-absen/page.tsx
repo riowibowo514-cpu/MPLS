@@ -76,6 +76,17 @@ export default function KelolaAbsenPage() {
     setIsSubmitting(false);
   };
 
+  const handleDeleteSesi = async (sesiId: string, namaSesi: string) => {
+    if (!confirm(`Apakah Anda yakin ingin MENGHAPUS sesi "${namaSesi}"?\n\nPERINGATAN: Semua data kehadiran peserta di sesi ini akan ikut terhapus selamanya!`)) return;
+
+    const { error } = await supabase.from('sesi_kegiatan').delete().eq('id', sesiId);
+    if (error) {
+      alert('Gagal menghapus sesi: ' + error.message);
+    } else {
+      fetchData(); // Refresh data
+    }
+  };
+
   if (isLoading) return <div className="container" style={{ padding: '4rem 1rem' }}>Memuat data ruang rahasia...</div>;
   if (!kegiatan) return <div className="container" style={{ padding: '4rem 1rem' }}>Kegiatan tidak ditemukan.</div>;
 
@@ -141,13 +152,20 @@ export default function KelolaAbsenPage() {
                       {sesi.tanggal} • {sesi.jam_mulai} WIB • Toleransi {sesi.toleransi_menit}m
                     </p>
                   </div>
-                  <div style={{ display: 'flex', gap: '0.5rem' }}>
+                  <div style={{ display: 'flex', gap: '0.5rem', alignItems: 'center' }}>
                     <button className="btn btn-outline" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }} onClick={() => setShowQrModal(sesi)}>
                       Lihat QR Code
                     </button>
                     <Link href={`/admin/kegiatan/${kegiatanId}/kelola-absen/rekap?sesi_id=${sesi.id}`} className="btn btn-primary" style={{ padding: '0.5rem 1rem', fontSize: '0.85rem' }}>
                       Rekap Kehadiran
                     </Link>
+                    <button 
+                      onClick={() => handleDeleteSesi(sesi.id, sesi.nama_sesi)}
+                      style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '0.5rem', display: 'flex', alignItems: 'center' }} 
+                      title="Hapus Sesi"
+                    >
+                      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                    </button>
                   </div>
                 </div>
               ))}
