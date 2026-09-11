@@ -59,8 +59,6 @@ export default function KelolaAbsenPage() {
       kegiatan_id: kegiatanId,
       nama_sesi: namaSesi,
       tanggal: tanggal,
-      jamMulai: jamMulai, // Wait! the DB column is jam_mulai!
-      // Let me fix the payload
       jam_mulai: jamMulai,
       toleransi_menit: parseInt(toleransi),
       qr_token: token,
