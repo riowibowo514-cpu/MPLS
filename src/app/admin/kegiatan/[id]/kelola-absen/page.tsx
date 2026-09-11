@@ -267,8 +267,43 @@ export default function KelolaAbsenPage() {
               />
             </div>
             
-            <div style={{ background: '#f8fafc', padding: '0.75rem', borderRadius: '4px', fontSize: '0.8rem', wordBreak: 'break-all', marginBottom: '1.5rem', color: '#64748b' }}>
-              Link: {typeof window !== 'undefined' ? `${window.location.origin}/absen/${showQrModal.qr_token}` : `/absen/${showQrModal.qr_token}`}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem', marginBottom: '1.5rem' }}>
+              <button 
+                className="btn btn-outline" 
+                style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                onClick={async () => {
+                  try {
+                    const url = `https://api.qrserver.com/v1/create-qr-code/?size=500x500&data=${encodeURIComponent(window.location.origin + '/absen/' + showQrModal.qr_token)}`;
+                    const response = await fetch(url);
+                    const blob = await response.blob();
+                    const blobUrl = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = blobUrl;
+                    a.download = `QR_${showQrModal.nama_sesi.replace(/[^a-z0-9]/gi, '_')}.png`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(blobUrl);
+                  } catch (e) {
+                    alert('Gagal mendownload QR. Silakan klik kanan pada gambar dan pilih Save Image.');
+                  }
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                Unduh Gambar
+              </button>
+              
+              <button 
+                className="btn btn-outline" 
+                style={{ fontSize: '0.85rem', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '0.4rem' }}
+                onClick={() => {
+                  navigator.clipboard.writeText(`${window.location.origin}/absen/${showQrModal.qr_token}`);
+                  alert('Link berhasil disalin!');
+                }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                Copy Link
+              </button>
             </div>
 
             <button className="btn btn-primary" style={{ width: '100%' }} onClick={() => setShowQrModal(null)}>Tutup</button>
