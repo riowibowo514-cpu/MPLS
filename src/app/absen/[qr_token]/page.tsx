@@ -211,11 +211,8 @@ export default function AbsenPesertaPage() {
           <div className="form-group" style={{ marginBottom: '2rem' }}>
             <label style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
               <span>Tanda Tangan Digital <span style={{ color: 'red' }}>*</span></span>
-              {hasSignature && (
-                <button type="button" onClick={clearSignature} style={{ background: 'none', border: 'none', color: '#f59e0b', fontSize: '0.8rem', cursor: 'pointer' }}>Bersihkan</button>
-              )}
             </label>
-            <div style={{ border: '2px dashed #cbd5e1', borderRadius: '8px', background: '#f8fafc', position: 'relative', overflow: 'hidden' }}>
+            <div style={{ border: '2px dashed #cbd5e1', borderRadius: '8px', background: '#f8fafc', position: 'relative', overflow: 'hidden', marginBottom: '0.5rem' }}>
               {!hasSignature && (
                 <div style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', pointerEvents: 'none', color: '#94a3b8', fontSize: '0.9rem' }}>
                   Goreskan tanda tangan Anda di sini
@@ -234,6 +231,31 @@ export default function AbsenPesertaPage() {
                 onTouchMove={draw}
                 onTouchEnd={stopDrawing}
               />
+            </div>
+            
+            {/* Tombol Hapus/Bersihkan yang lebih menonjol */}
+            <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
+               <button 
+                  type="button" 
+                  onClick={clearSignature} 
+                  disabled={!hasSignature}
+                  style={{ 
+                    background: hasSignature ? '#fee2e2' : '#f1f5f9', 
+                    border: 'none', 
+                    color: hasSignature ? '#ef4444' : '#94a3b8', 
+                    fontSize: '0.85rem', 
+                    padding: '0.4rem 1rem', 
+                    borderRadius: '4px',
+                    cursor: hasSignature ? 'pointer' : 'not-allowed',
+                    fontWeight: 500,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.4rem'
+                  }}
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M3 6h18"></path><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path></svg>
+                  Hapus Tanda Tangan
+                </button>
             </div>
           </div>
 
