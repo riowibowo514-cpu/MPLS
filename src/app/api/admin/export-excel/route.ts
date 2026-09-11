@@ -52,16 +52,21 @@ export async function GET(req: NextRequest) {
     let jawabanMap: Record<string, any[]> = {}; // pengisian_id -> list of jawaban
 
     if (pengisianIds.length > 0) {
-      const { data: jawabanList } = await supabase
-        .from('jawaban')
-        .select('*')
-        .in('pengisian_id', pengisianIds);
-
-      if (jawabanList) {
-        jawabanList.forEach(j => {
-          if (!jawabanMap[j.pengisian_id]) jawabanMap[j.pengisian_id] = [];
-          jawabanMap[j.pengisian_id].push(j);
-        });
+      // Ambil dalam pecahan (chunk) 30 ID untuk menghindari batas URL 16KB dan batas limit 1000 baris Supabase
+      const chunkSize = 30;
+      for (let i = 0; i < pengisianIds.length; i += chunkSize) {
+        const chunkIds = pengisianIds.slice(i, i + chunkSize);
+        const { data: chunkJawaban } = await supabase
+          .from('jawaban')
+          .select('*')
+          .in('pengisian_id', chunkIds);
+          
+        if (chunkJawaban) {
+          chunkJawaban.forEach(j => {
+            if (!jawabanMap[j.pengisian_id]) jawabanMap[j.pengisian_id] = [];
+            jawabanMap[j.pengisian_id].push(j);
+          });
+        }
       }
     }
 
