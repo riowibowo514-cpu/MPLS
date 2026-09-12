@@ -164,18 +164,18 @@ export default function RekapAbsensiPage() {
         {/* Kontrol Web (Tidak Dicetak) */}
         <div className="no-print" style={{ marginBottom: '2rem' }}>
           <h1 style={{ fontSize: '1.8rem', margin: '0 0 1.5rem 0', textTransform: 'uppercase' }}>REKAP ABSENSI</h1>
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
-            <Link href={`/admin/kegiatan/${kegiatanId}/kelola-absen`} className="btn btn-outline">← Kembali ke Kelola</Link>
+          <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <Link href={`/admin/kegiatan/${kegiatanId}/kelola-absen`} className="btn btn-outline">← Kembali</Link>
             {sesi.status === 'aktif' && (
               <button className="btn btn-outline" style={{ borderColor: '#ef4444', color: '#ef4444' }} onClick={handleTutupSesi}>
-                Tutup Sesi (Kunci QR)
+                Kunci QR
               </button>
             )}
             <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }} onClick={handleExportExcel}>
                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
-               Unduh Excel
+               Excel
             </button>
-            <button className="btn btn-primary" onClick={printRekap}>Cetak PDF / Print</button>
+            <button className="btn btn-primary" onClick={printRekap}>Cetak PDF</button>
           </div>
         </div>
 
