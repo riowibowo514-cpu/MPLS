@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { qrToken, pesertaId, nama, instansi, ttdDigital } = body;
+    const { qrToken, pesertaId, nama, instansi, kabKota, ttdDigital } = body;
 
     if (!qrToken || !nama || !ttdDigital) {
       return NextResponse.json({ error: 'Data tidak lengkap.' }, { status: 400 });
@@ -63,15 +63,16 @@ export async function POST(req: Request) {
         finalPesertaId = existingPeserta.id;
       } else {
         // Buat peserta baru
-        const { data: newPeserta, error: newPesertaErr } = await supabase
-          .from('daftar_peserta')
-          .insert([{
-            kegiatan_id: sesi.kegiatan_id,
-            nama: nama.trim(),
-            instansi_asal: instansi ? instansi.trim() : null
-          }])
-          .select('id')
-          .single();
+          const { data: newPeserta, error: newPesertaErr } = await supabase
+            .from('daftar_peserta')
+            .insert([{
+              kegiatan_id: sesi.kegiatan_id,
+              nama: nama.trim(),
+              instansi_asal: instansi ? instansi.trim() : null,
+              kab_kota: kabKota ? kabKota.trim() : null
+            }])
+            .select('id')
+            .single();
 
         if (newPesertaErr || !newPeserta) {
           throw new Error('Gagal mendaftarkan peserta baru: ' + newPesertaErr?.message);

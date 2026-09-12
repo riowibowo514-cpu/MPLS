@@ -20,6 +20,7 @@ export default function AbsenPesertaPage() {
   const [savedPesertaName, setSavedPesertaName] = useState<string | null>(null);
   const [namaBaru, setNamaBaru] = useState('');
   const [instansiBaru, setInstansiBaru] = useState('');
+  const [kabKotaBaru, setKabKotaBaru] = useState('');
 
   // Signature Pad
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -125,6 +126,7 @@ export default function AbsenPesertaPage() {
         pesertaId: savedPesertaId, // Could be null if new
         nama: savedPesertaId ? savedPesertaName : namaBaru,
         instansi: instansiBaru,
+        kabKota: kabKotaBaru,
         ttdDigital: signatureImage
       };
 
@@ -201,9 +203,13 @@ export default function AbsenPesertaPage() {
                 <label>Nama Lengkap (Gelar)</label>
                 <input type="text" className="input-text" required value={namaBaru} onChange={e => setNamaBaru(e.target.value)} placeholder="Contoh: Budi Setiawan, M.Pd" />
               </div>
-              <div className="form-group">
+              <div className="form-group" style={{ marginBottom: '1rem' }}>
                 <label>Instansi / Asal Sekolah</label>
                 <input type="text" className="input-text" required value={instansiBaru} onChange={e => setInstansiBaru(e.target.value)} placeholder="Contoh: SMAN 1 Padang" />
+              </div>
+              <div className="form-group">
+                <label>Kabupaten / Kota</label>
+                <input type="text" className="input-text" required value={kabKotaBaru} onChange={e => setKabKotaBaru(e.target.value)} placeholder="Contoh: Kab. Padang Pariaman" />
               </div>
             </div>
           )}
