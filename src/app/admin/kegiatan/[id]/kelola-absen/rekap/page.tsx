@@ -108,26 +108,29 @@ export default function RekapAbsensiPage() {
     <>
       <style dangerouslySetInnerHTML={{__html: `
         @media print {
-          body { background: white !important; color: black !important; font-size: 11pt; }
+          body { background: white !important; color: black !important; font-family: 'Calibri', 'Arial', sans-serif; font-size: 11pt; }
           .no-print { display: none !important; }
           .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
-          .print-header { display: flex !important; align-items: center; justify-content: center; border-bottom: 2px solid black; padding-bottom: 15px; margin-bottom: 20px; }
-          .print-header img { height: 70px; margin-right: 20px; }
-          .print-header .header-text { text-align: left; }
-          .print-meta { width: 100%; margin-bottom: 20px; border-collapse: collapse; }
+          
+          .print-title { text-align: center; font-weight: bold; font-size: 14pt; text-decoration: underline; margin-bottom: 20px; }
+          
+          .print-meta { width: 100%; margin-bottom: 20px; border-collapse: collapse; font-size: 11pt; }
           .print-meta td { padding: 4px; vertical-align: top; }
-          .print-meta td:first-child { width: 150px; font-weight: bold; }
-          .print-table { width: 100%; border-collapse: collapse; font-size: 10pt; }
+          .print-meta td:first-child { width: 180px; }
+          
+          .print-table { width: 100%; border-collapse: collapse; font-size: 11pt; }
           .print-table th, .print-table td { border: 1px solid black; padding: 6px; vertical-align: middle; }
-          .print-table th { background-color: #f1f5f9; font-weight: bold; text-align: center; text-transform: uppercase; }
+          
+          .print-table th { background-color: #bce4f5 !important; -webkit-print-color-adjust: exact; font-weight: bold; text-align: center; text-transform: uppercase; }
+          .print-table .row-sesi { background-color: #f8cbad !important; -webkit-print-color-adjust: exact; font-weight: bold; text-align: center; text-transform: uppercase; }
+          
           .print-table .ttd-cell { position: relative; height: 50px; }
-          .print-table .ttd-num { position: absolute; top: 4px; left: 4px; font-size: 8pt; }
+          .print-table .ttd-num { position: absolute; top: 4px; left: 4px; font-size: 10pt; }
           .print-table .ttd-img { max-height: 40px; max-width: 80px; position: absolute; top: 5px; left: 20px; filter: contrast(1.5); }
           .print-only { display: block !important; }
           @page { size: A4 portrait; margin: 1.5cm; }
         }
         .print-only { display: none; }
-        .print-header { display: none; }
         .print-meta { display: none; }
       `}} />
 
@@ -153,18 +156,7 @@ export default function RekapAbsensiPage() {
 
         <div className="card" style={{ padding: '2rem', marginBottom: '2rem' }}>
           
-          {/* Print Header (Official Format) */}
-          <div className="print-header">
-            <img src="/logo-bgtk.png" alt="Logo BGTK" />
-            <div className="header-text">
-              <h2 style={{ fontSize: '14pt', margin: '0 0 4px 0' }}>Kementerian Pendidikan Dasar dan Menengah</h2>
-              <p style={{ fontSize: '11pt', margin: '0' }}>Balai Guru dan Tenaga Kependidikan Provinsi Sumatera Barat</p>
-            </div>
-          </div>
-
-          <div style={{ textAlign: 'center', marginBottom: '1.5rem' }} className="print-only">
-            <h3 style={{ fontSize: '12pt', fontWeight: 'bold', margin: '0 0 10px 0' }}>DAFTAR HADIR PESERTA</h3>
-          </div>
+          <div className="print-only print-title">DAFTAR HADIR PESERTA</div>
 
           <table className="print-meta">
             <tbody>
@@ -177,7 +169,7 @@ export default function RekapAbsensiPage() {
                 <td>: {sesi.tanggal}</td>
               </tr>
               <tr>
-                <td>Lokasi / Sesi</td>
+                <td>Lokasi Kegiatan</td>
                 <td>: {sesi.nama_sesi}</td>
               </tr>
             </tbody>
@@ -217,6 +209,9 @@ export default function RekapAbsensiPage() {
                   <th style={{ padding: '0.75rem', textAlign: 'left', width: '15%' }}>KAB/KOTA</th>
                   <th className="no-print" style={{ padding: '0.75rem', textAlign: 'left', width: '15%' }}>WAKTU & STATUS</th>
                   <th style={{ padding: '0.75rem', textAlign: 'center', width: '20%' }} colSpan={2}>TANDA TANGAN</th>
+                </tr>
+                <tr className="print-only">
+                  <td colSpan={6} className="row-sesi">{sesi.nama_sesi}</td>
                 </tr>
               </thead>
               <tbody>
