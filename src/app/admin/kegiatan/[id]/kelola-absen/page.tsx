@@ -130,12 +130,7 @@ export default function KelolaAbsenPage() {
     <main className="container" style={{ padding: '2rem 1rem' }}>
       <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
         <Link href="/admin/kegiatan" className="btn btn-outline">← Kembali</Link>
-        <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Kelola Absensi (DEV)</h1>
-      </div>
-
-      <div style={{ background: '#fef3c7', color: '#b45309', padding: '1rem', borderRadius: '8px', marginBottom: '2rem', border: '1px solid #fde68a' }}>
-        <strong>Halaman Rahasia (Shadow Development)</strong>
-        <p style={{ margin: 0, fontSize: '0.9rem' }}>Halaman ini tidak dapat diakses oleh Panitia karena tombolnya disembunyikan. Segala perubahan yang Anda buat di sini aman untuk diuji coba.</p>
+        <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Kelola Absensi</h1>
       </div>
 
       <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
