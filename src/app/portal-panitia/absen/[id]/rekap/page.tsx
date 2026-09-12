@@ -180,12 +180,10 @@ export default function RekapAbsensiPage() {
 
       <main className="container" style={{ padding: '2rem 1rem' }}>
         {/* Kontrol Web (Tidak Dicetak) */}
-        <div className="no-print" style={{ marginBottom: '2rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div className="no-print" style={{ marginBottom: '2rem' }}>
+          <h1 style={{ fontSize: '1.8rem', margin: '0 0 1.5rem 0', textTransform: 'uppercase' }}>REKAP ABSENSI</h1>
+          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
             <button onClick={() => window.location.href = `/portal-panitia/absen/${kegiatanId}?pin=${pin}`} className="btn btn-outline">← Kembali ke Sesi</button>
-            <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Rekap Absensi</h1>
-          </div>
-          <div style={{ display: 'flex', gap: '1rem' }}>
             {sesi.status === 'aktif' && (
               <button className="btn btn-outline" style={{ borderColor: '#ef4444', color: '#ef4444' }} onClick={handleTutupSesi}>
                 Tutup Sesi (Kunci QR)
