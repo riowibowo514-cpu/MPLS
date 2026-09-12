@@ -66,10 +66,16 @@ export default function AbsenPesertaPage() {
 
   // --- Signature Pad Logic ---
   const startDrawing = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault(); // Prevent scrolling while drawing on mobile
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    ctx.strokeStyle = '#000000';
 
     const rect = canvas.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;
@@ -81,11 +87,16 @@ export default function AbsenPesertaPage() {
   };
 
   const draw = (e: React.MouseEvent | React.TouchEvent) => {
+    e.preventDefault(); // Prevent scrolling while drawing on mobile
     if (!isDrawing) return;
     const canvas = canvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+
+    ctx.lineWidth = 3;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
 
     const rect = canvas.getBoundingClientRect();
     const clientX = 'touches' in e ? e.touches[0].clientX : (e as React.MouseEvent).clientX;

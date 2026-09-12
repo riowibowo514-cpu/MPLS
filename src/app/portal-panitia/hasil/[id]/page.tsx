@@ -180,7 +180,7 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
               alert('Link Form Evaluasi berhasil disalin ke clipboard!\n\nSilakan bagikan link tersebut kepada peserta kegiatan.');
             }}
             className="btn btn-outline"
-            style={{ background: 'white', color: '#047857', borderColor: 'white', fontSize: '1.1rem', display: 'flex', gap: '0.5rem', fontWeight: 'bold' }}
+            style={{ background: 'white', color: '#047857', borderColor: 'white', fontSize: '1.1rem', display: 'flex', gap: '0.5rem', fontWeight: 900 }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
             Salin Link Form
@@ -188,7 +188,7 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
           <button 
             onClick={() => router.push(`/portal-panitia/absen/${kegiatanId}?pin=${pin}`)}
             className="btn btn-outline"
-            style={{ background: 'white', color: '#1e40af', borderColor: 'white', fontSize: '1.1rem', display: 'flex', gap: '0.5rem', fontWeight: 'bold' }}
+            style={{ background: 'white', color: '#1e40af', borderColor: 'white', fontSize: '1.1rem', display: 'flex', gap: '0.5rem', fontWeight: 900 }}
           >
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             Kelola Absensi
@@ -220,14 +220,14 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
           <div style={{ display: 'flex', justifyContent: 'center', gap: '3rem', fontSize: '1.1rem', marginTop: '1.5rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', border: '1px solid #e2e8f0', maxWidth: '600px', margin: '0 auto' }}>
              <div style={{ textAlign: 'center' }}>
                <div style={{ fontSize: '0.875rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Total Responden</div>
-               <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: '#0f172a' }}>{totalResponden} <span style={{fontSize:'1rem', fontWeight:'normal'}}>Orang</span></div>
+               <div style={{ fontSize: '1.5rem', fontWeight: 900, color: '#0f172a' }}>{totalResponden} <span style={{fontSize:'1rem', fontWeight:'normal'}}>Orang</span></div>
              </div>
              
              <div style={{ width: '1px', background: '#cbd5e1' }}></div>
              
              <div style={{ textAlign: 'center' }}>
                <div style={{ fontSize: '0.875rem', color: '#64748b', textTransform: 'uppercase', letterSpacing: '0.5px' }}>Kepuasan Keseluruhan</div>
-               <div style={{ fontSize: '1.5rem', fontWeight: 'bold', color: Number(grandAvg) >= 3 ? '#10b981' : '#f59e0b' }}>
+               <div style={{ fontSize: '1.5rem', fontWeight: 900, color: Number(grandAvg) >= 3 ? '#10b981' : '#f59e0b' }}>
                  {grandAvg} <span style={{fontSize:'1rem', fontWeight:'normal', color: '#64748b'}}>/ 4.00</span>
                </div>
              </div>
@@ -254,7 +254,7 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
                     <h4 style={{ margin: 0, fontSize: '1.1rem' }}>{section.nama_section}</h4>
                     {sectionAverages[section.id] && (
                       <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontWeight: 'bold', color: Number(sectionAverages[section.id].avg) >= 3 ? '#10b981' : '#f59e0b' }}>
+                        <div style={{ fontWeight: 900, color: Number(sectionAverages[section.id].avg) >= 3 ? '#10b981' : '#f59e0b' }}>
                           Rata-rata: {sectionAverages[section.id].avg} / 4.00
                         </div>
                       </div>
@@ -272,7 +272,7 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
                             <td style={{ padding: '0.75rem 0.5rem', width: '5%', verticalAlign: 'top' }}>{index + 1}.</td>
                             <td style={{ padding: '0.75rem 0.5rem', width: '70%', verticalAlign: 'top' }}>{item.teks_pertanyaan}</td>
                             <td style={{ padding: '0.75rem 0.5rem', width: '25%', verticalAlign: 'top', textAlign: 'right' }}>
-                              <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: Number(avg) >= 3 ? '#10b981' : '#f59e0b' }}>
+                              <div style={{ fontWeight: 900, fontSize: '1.1rem', color: Number(avg) >= 3 ? '#10b981' : '#f59e0b' }}>
                                 {avg} / 4.00
                               </div>
                               <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Index: {percentage}%</div>
@@ -306,7 +306,7 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
             
             <div style={{ marginTop: '4rem', textAlign: 'right', paddingRight: '2rem' }}>
                <p style={{ marginBottom: '4rem' }}>Ketua Panitia Kegiatan,</p>
-               <p style={{ fontWeight: 'bold' }}>..........................................</p>
+               <p style={{ fontWeight: 900 }}>..........................................</p>
             </div>
           </>
         )}

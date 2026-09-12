@@ -214,15 +214,15 @@ export default function RekapAbsensiPage() {
             <div style={{ display: 'flex', gap: '2rem', marginBottom: '2rem', background: '#f8fafc', padding: '1rem', borderRadius: '8px', justifyContent: 'space-around' }}>
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0 0 0.25rem 0' }}>Total Kehadiran</p>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: '#0f172a' }}>{totalHadir}</p>
+                <p style={{ fontSize: '1.5rem', fontWeight: 900, margin: 0, color: '#0f172a' }}>{totalHadir}</p>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0 0 0.25rem 0' }}>Tepat Waktu</p>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: '#10b981' }}>{totalTepatWaktu}</p>
+                <p style={{ fontSize: '1.5rem', fontWeight: 900, margin: 0, color: '#10b981' }}>{totalTepatWaktu}</p>
               </div>
               <div style={{ textAlign: 'center' }}>
                 <p style={{ fontSize: '0.85rem', color: '#64748b', margin: '0 0 0.25rem 0' }}>Terlambat</p>
-                <p style={{ fontSize: '1.5rem', fontWeight: 'bold', margin: 0, color: '#ef4444' }}>{totalTerlambat}</p>
+                <p style={{ fontSize: '1.5rem', fontWeight: 900, margin: 0, color: '#ef4444' }}>{totalTerlambat}</p>
               </div>
             </div>
 
@@ -288,8 +288,8 @@ export default function RekapAbsensiPage() {
                   {/* Garis Vertikal Pemisah */}
                   <div style={{ borderLeft: '1.5mm solid #0077c0', height: '18mm', margin: '0 5mm' }}></div>
                   <div className="letterhead-text" style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '1mm' }}>
-                    <h2 style={{ color: '#0077c0', margin: 0, fontSize: '15pt', fontWeight: 'bold' }}>Kementerian Pendidikan Dasar dan Menengah</h2>
-                    <h3 style={{ color: '#333', margin: 0, fontSize: '10pt', fontWeight: 'bold' }}>Balai Guru dan Tenaga Kependidikan Provinsi Sumatera Barat</h3>
+                    <h2 style={{ color: '#0077c0', margin: 0, fontSize: '15pt', fontWeight: 900 }}>Kementerian Pendidikan Dasar dan Menengah</h2>
+                    <h3 style={{ color: '#333', margin: 0, fontSize: '10pt', fontWeight: 900 }}>Balai Guru dan Tenaga Kependidikan Provinsi Sumatera Barat</h3>
                     <p style={{ color: '#555', margin: 0, fontSize: '9pt' }}>Jalan Dewi Sartika, Rawang, Pariaman, 25511</p>
                     <div style={{ color: '#555', fontSize: '9pt', display: 'flex', alignItems: 'center', gap: '2mm' }}>
                       <span style={{ fontSize: '10pt' }}>🌐</span> www.kemendikdasmen.go.id
@@ -377,7 +377,7 @@ export default function RekapAbsensiPage() {
                   <div style={{ textAlign: 'left', width: '60mm' }}>
                     <p style={{ margin: '0 0 5mm 0' }}>Padang, {sesi.tanggal}</p>
                     <p style={{ margin: '0 0 20mm 0' }}>Ketua Pelaksana,</p>
-                    <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{ketua.nama}</p>
+                    <p style={{ margin: 0, fontWeight: 900, textDecoration: 'underline' }}>{ketua.nama}</p>
                     <p style={{ margin: 0 }}>{ketua.nip ? `NIP ${ketua.nip}` : '\u00A0'}</p>
                   </div>
                 </div>
