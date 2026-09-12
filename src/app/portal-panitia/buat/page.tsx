@@ -14,6 +14,8 @@ export default function BuatEvaluasi() {
     adaKonsumsi: true,
     adaPenginapan: true,
     isRakor: false,
+    jamMulaiSesi: '08:00',
+    daftarKelas: '',
     tempatPelaksanaan: '',
     pin: '',
     tipeKuesioner: 'reguler', // 'reguler' atau 'daring'
@@ -186,7 +188,7 @@ export default function BuatEvaluasi() {
             />
           </div>
 
-          <div style={{ marginBottom: '1.5rem', display: 'flex', gap: '1rem' }}>
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '1.5rem' }}>
             <div style={{ flex: 1 }}>
               <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Tanggal Mulai</label>
               <input 
@@ -206,6 +208,39 @@ export default function BuatEvaluasi() {
                 value={formData.tanggalSelesai}
                 onChange={e => setFormData({...formData, tanggalSelesai: e.target.value})}
               />
+            </div>
+          </div>
+
+          <div style={{ marginBottom: '2rem', padding: '1.5rem', background: '#fdf4ff', border: '1px solid #f87171', borderRadius: '8px' }}>
+            <h3 style={{ marginTop: 0, marginBottom: '0.5rem', fontSize: '1.1rem', color: '#be185d' }}>⚙️ Generator Sesi Absen Otomatis</h3>
+            <p style={{ fontSize: '0.875rem', color: '#9d174d', marginBottom: '1rem' }}>
+              Sistem akan membuatkan QR Code Sesi Absen untuk <strong>setiap hari</strong> dari Tanggal Mulai s.d Selesai secara otomatis. 
+              Isi data di bawah agar presisi:
+            </p>
+            
+            <div style={{ display: 'flex', gap: '1rem', marginBottom: '1rem' }}>
+              <div style={{ flex: 1 }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Jam Mulai Kegiatan (Per Hari)</label>
+                <input 
+                  type="time" 
+                  required
+                  className="form-control"
+                  value={formData.jamMulaiSesi}
+                  onChange={e => setFormData({...formData, jamMulaiSesi: e.target.value})}
+                />
+              </div>
+              <div style={{ flex: 2 }}>
+                <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 'bold' }}>Daftar Kelas (Bila ada pembagian kelas)</label>
+                <input 
+                  type="text" 
+                  className="form-control"
+                  placeholder="Contoh: Kelas A, Kelas B (pisahkan dgn koma). Kosongkan bila 1 ruangan saja."
+                  value={formData.daftarKelas}
+                  onChange={e => setFormData({...formData, daftarKelas: e.target.value})}
+                  autoComplete="off"
+                  name="kelasRandom"
+                />
+              </div>
             </div>
           </div>
 

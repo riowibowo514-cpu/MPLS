@@ -4,7 +4,7 @@ import { supabase } from '@/lib/supabase';
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const { namaKegiatan, deskripsi, tanggalMulai, tanggalSelesai, adaKonsumsi, adaPenginapan, pin, tipeKuesioner, tarikBiodata, isRakor, tempatPelaksanaan } = body;
+    const { namaKegiatan, deskripsi, tanggalMulai, tanggalSelesai, adaKonsumsi, adaPenginapan, pin, tipeKuesioner, tarikBiodata, isRakor, tempatPelaksanaan, jamMulaiSesi, daftarKelas } = body;
 
     if (!namaKegiatan || !tanggalMulai || !tanggalSelesai || !pin || !tipeKuesioner) {
       return NextResponse.json({ error: 'Data tidak lengkap (Nama, Tanggal, Tipe, dan PIN wajib diisi).' }, { status: 400 });
@@ -171,6 +171,47 @@ export async function POST(request: Request) {
         }
       }
     }
+
+    // --- GENERATOR SESI ABSEN OTOMATIS ---
+    if (jamMulaiSesi) {
+      const start = new Date(tanggalMulai);
+      const end = new Date(tanggalSelesai);
+      const dateList = [];
+      let current = new Date(start);
+      while (current <= end) {
+        dateList.push(current.toISOString().split('T')[0]);
+        current.setDate(current.getDate() + 1);
+      }
+
+      let classList = [''];
+      if (daftarKelas && daftarKelas.trim() !== '') {
+        classList = daftarKelas.split(',').map((c: string) => c.trim()).filter((c: string) => c !== '');
+      }
+
+      const sesiToInsert: any[] = [];
+      dateList.forEach((tgl, i) => {
+        const hariKe = i + 1;
+        classList.forEach((cls) => {
+          let namaSesi = `Hari ${hariKe}`;
+          if (cls) {
+            namaSesi += ` - ${cls}`;
+          }
+          sesiToInsert.push({
+            kegiatan_id: newKegiatanId,
+            nama_sesi: namaSesi,
+            tanggal: tgl,
+            jam_mulai: jamMulaiSesi,
+            toleransi_menit: 15,
+            status: 'dibuka'
+          });
+        });
+      });
+
+      if (sesiToInsert.length > 0) {
+        await supabase.from('sesi_kegiatan').insert(sesiToInsert);
+      }
+    }
+    // -------------------------------------
 
     // Sukses
     return NextResponse.json({ 
