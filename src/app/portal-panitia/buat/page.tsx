@@ -144,6 +144,8 @@ export default function BuatEvaluasi() {
               placeholder="Contoh: PKG Angkatan 1 BGTK Sumbar"
               value={formData.namaKegiatan}
               onChange={e => setFormData({...formData, namaKegiatan: e.target.value})}
+              autoComplete="off"
+              name="namaKegiatanRandom"
             />
           </div>
 
@@ -155,6 +157,8 @@ export default function BuatEvaluasi() {
               placeholder="Contoh: Hotel XYZ, Kota Padang"
               value={formData.tempatPelaksanaan}
               onChange={e => setFormData({...formData, tempatPelaksanaan: e.target.value})}
+              autoComplete="off"
+              name="tempatPelaksanaanRandom"
             />
           </div>
 
@@ -275,6 +279,8 @@ export default function BuatEvaluasi() {
                 placeholder="Contoh: JOSS123"
                 value={formData.pin}
                 onChange={e => setFormData({...formData, pin: e.target.value})}
+                autoComplete="new-password"
+                name="pinRahasiaRandom"
                 style={{ border: '2px solid #fbbf24', paddingRight: '2.5rem', width: '100%' }}
               />
               <button
