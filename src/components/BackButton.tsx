@@ -10,7 +10,8 @@ export default function BackButton() {
     pathname === '/' || 
     pathname.includes('/isi-form') || 
     pathname.includes('/evaluasi/') ||
-    pathname.includes('/portal-panitia/absen')
+    pathname.includes('/portal-panitia/absen') ||
+    pathname.includes('/portal-panitia/hasil')
   ) {
     return null;
   }
