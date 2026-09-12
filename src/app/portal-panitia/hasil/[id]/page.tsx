@@ -250,17 +250,23 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
               
               return (
                 <div key={section.id} style={{ marginBottom: '2rem' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '0.75rem 1rem', border: '1px solid #e2e8f0', margin: '0 0 1rem 0' }}>
-                    <h4 style={{ margin: 0, fontSize: '1.1rem' }}>{section.nama_section}</h4>
-                    {sectionAverages[section.id] && (
-                      <div style={{ textAlign: 'right' }}>
-                        <div style={{ fontWeight: 900, color: Number(sectionAverages[section.id].avg) >= 3 ? '#10b981' : '#f59e0b' }}>
-                          Rata-rata: {sectionAverages[section.id].avg} / 4.00
-                        </div>
-                      </div>
-                    )}
-                  </div>
                   <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.9rem' }}>
+                    <thead style={{ display: 'table-header-group' }}>
+                      <tr>
+                        <th colSpan={3} style={{ padding: 0, paddingBottom: '1rem' }}>
+                          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#f8fafc', padding: '0.75rem 1rem', border: '1px solid #e2e8f0', fontWeight: 'normal' }}>
+                            <h4 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 'bold' }}>{section.nama_section}</h4>
+                            {sectionAverages[section.id] && (
+                              <div style={{ textAlign: 'right' }}>
+                                <div style={{ fontWeight: 'bold', color: Number(sectionAverages[section.id].avg) >= 3 ? '#10b981' : '#f59e0b' }}>
+                                  Rata-rata: {sectionAverages[section.id].avg} / 4.00
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </th>
+                      </tr>
+                    </thead>
                     <tbody>
                       {scorableItems.map((item: any, index: number) => {
                         const data = rataRataAspek[item.id];
@@ -268,11 +274,11 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
                         const percentage = data.count > 0 ? ((data.total_skor / (data.count * 4)) * 100).toFixed(1) : 0;
                         
                         return (
-                          <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9' }}>
+                          <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9', pageBreakInside: 'avoid' }}>
                             <td style={{ padding: '0.75rem 0.5rem', width: '5%', verticalAlign: 'top' }}>{index + 1}.</td>
                             <td style={{ padding: '0.75rem 0.5rem', width: '70%', verticalAlign: 'top' }}>{item.teks_pertanyaan}</td>
                             <td style={{ padding: '0.75rem 0.5rem', width: '25%', verticalAlign: 'top', textAlign: 'right' }}>
-                              <div style={{ fontWeight: 900, fontSize: '1.1rem', color: Number(avg) >= 3 ? '#10b981' : '#f59e0b' }}>
+                              <div style={{ fontWeight: 'bold', fontSize: '1.1rem', color: Number(avg) >= 3 ? '#10b981' : '#f59e0b' }}>
                                 {avg} / 4.00
                               </div>
                               <div style={{ fontSize: '0.75rem', color: '#94a3b8' }}>Index: {percentage}%</div>
