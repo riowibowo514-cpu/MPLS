@@ -306,7 +306,7 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
             
             <div style={{ marginTop: '4rem', textAlign: 'right', paddingRight: '2rem' }}>
                <p style={{ marginBottom: '4rem' }}>Ketua Panitia Kegiatan,</p>
-               <p style={{ fontWeight: 900 }}>..........................................</p>
+               <p style={{ fontWeight: 'bold' }}>..........................................</p>
             </div>
           </>
         )}

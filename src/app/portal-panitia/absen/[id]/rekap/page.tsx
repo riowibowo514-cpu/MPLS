@@ -375,7 +375,7 @@ export default function RekapAbsensiPage() {
                   <div style={{ textAlign: 'left', width: '60mm' }}>
                     <p style={{ margin: '0 0 5mm 0' }}>Padang, {sesi.tanggal}</p>
                     <p style={{ margin: '0 0 20mm 0' }}>Ketua Pelaksana,</p>
-                    <p style={{ margin: 0, fontWeight: 900, textDecoration: 'underline' }}>{ketua.nama}</p>
+                    <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{ketua.nama}</p>
                     <p style={{ margin: 0 }}>{ketua.nip ? `NIP ${ketua.nip}` : '\u00A0'}</p>
                   </div>
                 </div>
