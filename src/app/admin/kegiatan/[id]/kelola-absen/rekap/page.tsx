@@ -54,8 +54,8 @@ export default function RekapAbsensiPage() {
     const nama = window.prompt("Masukkan Nama Ketua Pelaksana:", ketua.nama);
     if (nama === null) return;
     
-    const nip = window.prompt("Masukkan NIP Ketua Pelaksana:", ketua.nip);
-    if (nip === null) return;
+    let nip = window.prompt("Masukkan NIP Ketua Pelaksana (Kosongkan jika tidak ada):", ketua.nip);
+    if (nip === null) nip = ""; // Anggap kosong jika dibatalkan/opsional
 
     setKetua({ nama, nip });
     setTimeout(() => {
@@ -388,7 +388,7 @@ export default function RekapAbsensiPage() {
                           <p style={{ margin: '0 0 5mm 0' }}>Padang, {sesi.tanggal}</p>
                           <p style={{ margin: '0 0 20mm 0' }}>Ketua Pelaksana,</p>
                           <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{ketua.nama}</p>
-                          <p style={{ margin: 0 }}>NIP {ketua.nip}</p>
+                          <p style={{ margin: 0 }}>{ketua.nip ? `NIP ${ketua.nip}` : '\u00A0'}</p>
                         </div>
                       </div>
                     )}
