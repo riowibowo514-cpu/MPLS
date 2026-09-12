@@ -24,6 +24,7 @@ export default function BuatEvaluasi() {
   const [showPin, setShowPin] = useState(false);
   const [error, setError] = useState('');
   const [successLink, setSuccessLink] = useState('');
+  const [successId, setSuccessId] = useState('');
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,6 +54,7 @@ export default function BuatEvaluasi() {
 
       // Berhasil
       setSuccessLink(`${window.location.origin}/evaluasi/${data.kegiatan_id}`);
+      setSuccessId(data.kegiatan_id);
       
     } catch (err: any) {
       setError(err.message);
@@ -92,12 +94,19 @@ export default function BuatEvaluasi() {
           </div>
 
           <div style={{ padding: '1rem', background: '#fffbeb', borderRadius: '8px', borderLeft: '4px solid #f59e0b', textAlign: 'left' }}>
-            <strong>Penting:</strong> Simpan PIN Rahasia Anda (<span style={{ letterSpacing: '2px', fontWeight: 'bold' }}>{formData.pin}</span>). Anda akan membutuhkannya untuk mengunduh rekapitulasi nilai Excel nanti.
+            <strong>Penting:</strong> Simpan PIN Rahasia Anda (<span style={{ letterSpacing: '2px', fontWeight: 'bold' }}>{formData.pin}</span>). Anda akan membutuhkannya untuk masuk ke <strong>Kelola Absensi</strong> dan mengunduh Excel nanti.
           </div>
           
-          <div style={{ marginTop: '3rem' }}>
+          <div style={{ marginTop: '2rem' }}>
+            <button 
+              onClick={() => router.push(`/portal-panitia/absen/${successId}?pin=${formData.pin}`)} 
+              className="btn btn-primary" 
+              style={{ width: '100%', background: '#8b5cf6', borderColor: '#8b5cf6', color: 'white', padding: '1rem', fontSize: '1.1rem', marginBottom: '1rem' }}
+            >
+              ⚙️ Kelola Absensi Acara
+            </button>
             <Link href="/portal-panitia" style={{ color: '#10b981', textDecoration: 'none', fontWeight: 'bold' }}>
-              Kembali ke Portal Panitia
+              Kembali ke Beranda Portal
             </Link>
           </div>
         </div>
