@@ -99,7 +99,7 @@ export default function KelolaAbsenPage() {
       setNamaSesi('');
       setTanggal('');
       setJamMulai('');
-      fetchData();
+      fetchData(pin!);
     }
     setIsSubmitting(false);
   };
@@ -111,7 +111,7 @@ export default function KelolaAbsenPage() {
     if (error) {
       alert('Gagal menghapus sesi: ' + error.message);
     } else {
-      fetchData(); // Refresh data
+      fetchData(pin!); // Refresh data
     }
   };
 
