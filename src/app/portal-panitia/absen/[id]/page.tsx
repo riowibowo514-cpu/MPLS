@@ -160,9 +160,28 @@ export default function KelolaAbsenPage() {
 
   return (
     <main className="container" style={{ padding: '2rem 1rem' }}>
-      <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem' }}>
-        <button onClick={() => router.push(`/portal-panitia/hasil/${kegiatanId}?pin=${pin}`)} className="btn btn-outline">← Kembali</button>
-        <h1 style={{ fontSize: '1.5rem', margin: 0 }}>Kelola Absensi</h1>
+      <div style={{ marginBottom: '2rem', display: 'flex', alignItems: 'center', gap: '1rem', flexWrap: 'wrap' }}>
+        <button 
+          onClick={() => router.push(`/portal-panitia/hasil/${kegiatanId}?pin=${pin}`)} 
+          className="btn btn-outline"
+          style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>
+          Kembali ke Dashboard Evaluasi & Link
+        </button>
+        <h1 style={{ fontSize: '1.5rem', margin: 0, flex: 1 }}>Kelola Absensi</h1>
+        
+        <button 
+          onClick={() => {
+            navigator.clipboard.writeText(`${window.location.origin}/evaluasi/${kegiatanId}`);
+            alert('Link Form Evaluasi berhasil disalin ke clipboard!');
+          }}
+          className="btn btn-primary"
+          style={{ background: '#047857', borderColor: '#047857', display: 'flex', alignItems: 'center', gap: '0.5rem' }}
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+          Salin Link Form Evaluasi
+        </button>
       </div>
 
       <div className="card" style={{ padding: '1.5rem', marginBottom: '2rem' }}>
