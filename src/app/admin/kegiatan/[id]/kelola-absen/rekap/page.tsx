@@ -53,6 +53,50 @@ export default function RekapAbsensiPage() {
     window.print();
   };
 
+  const handleExportExcel = async () => {
+    try {
+      // We dynamically import xlsx to keep initial bundle size small
+      const XLSX = await import('xlsx');
+      
+      const worksheetData = [
+        ['No', 'Nama Lengkap', 'Instansi Asal', 'Waktu Hadir', 'Status', 'Tanda Tangan']
+      ];
+
+      absensiList.forEach((absen, idx) => {
+        const dateWib = new Date(new Date(absen.waktu_absen).getTime() + 7 * 60 * 60 * 1000);
+        const timeStr = `${dateWib.getUTCHours().toString().padStart(2, '0')}:${dateWib.getUTCMinutes().toString().padStart(2, '0')} WIB`;
+        
+        let statusStr = absen.status_kehadiran;
+        if (absen.menit_keterlambatan > 0) statusStr += ` (+${absen.menit_keterlambatan}m)`;
+
+        worksheetData.push([
+          (idx + 1).toString(),
+          absen.nama_snapshot,
+          absen.peserta?.instansi_asal || '-',
+          timeStr,
+          statusStr,
+          absen.ttd_digital ? 'Ditandatangani' : 'Kosong'
+        ]);
+      });
+
+      const worksheet = XLSX.utils.aoa_to_sheet(worksheetData);
+      
+      // Auto-size columns
+      worksheet['!cols'] = [
+        { wch: 5 }, { wch: 30 }, { wch: 25 }, { wch: 15 }, { wch: 20 }, { wch: 15 }
+      ];
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, 'Rekap Absensi');
+      
+      const fileName = `Rekap_Absen_${sesi.nama_sesi.replace(/[^a-z0-9]/gi, '_')}.xlsx`;
+      XLSX.writeFile(workbook, fileName);
+    } catch (err) {
+      alert('Gagal mengekspor Excel.');
+      console.error(err);
+    }
+  };
+
   if (isLoading) return <div className="container" style={{ padding: '4rem 1rem' }}>Memuat data rekap absensi...</div>;
   if (!sesi) return <div className="container" style={{ padding: '4rem 1rem' }}>Sesi tidak ditemukan.</div>;
 
@@ -73,7 +117,11 @@ export default function RekapAbsensiPage() {
               Tutup Sesi (Kunci QR)
             </button>
           )}
-          <button className="btn btn-primary" onClick={printRekap}>Cetak Laporan</button>
+          <button className="btn btn-outline" style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }} onClick={handleExportExcel}>
+             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+             Unduh Excel
+          </button>
+          <button className="btn btn-primary" onClick={printRekap}>Cetak PDF / Print</button>
         </div>
       </div>
 
