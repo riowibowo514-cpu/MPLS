@@ -113,11 +113,7 @@ export default function RekapAbsensiPage() {
           .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
           
           /* Letterhead */
-          .letterhead { display: flex !important; margin-bottom: 2mm; align-items: flex-start; }
-          .letterhead img { width: 20mm; height: 20mm; margin-right: 4mm; }
-          .letterhead-text h2 { margin: 0; font-size: 12pt; font-weight: bold; }
-          .letterhead-text h3 { margin: 0; font-size: 10pt; font-weight: bold; }
-          .letterhead-text p { margin: 0; font-size: 9pt; }
+          .letterhead { display: flex !important; }
           .divider { border-bottom: 1pt solid black; margin-top: 2mm; margin-bottom: 4mm; }
           
           .print-title { text-align: center; font-weight: bold; font-size: 12pt; text-decoration: underline; margin-bottom: 4mm; }
@@ -274,14 +270,26 @@ export default function RekapAbsensiPage() {
                     
                     {isFirstPage && (
                       <>
-                        <div className="letterhead">
-                          <img src="/logo-bgtk.png" alt="Logo" />
-                          <div className="letterhead-text">
-                            <h2>Kementerian Pendidikan Dasar dan Menengah</h2>
-                            <h3>Balai Guru dan Tenaga Kependidikan Provinsi Sumatera Barat</h3>
-                            <p>Jalan Dewi Sartika, Rawang, Pariaman, 25511</p>
-                            <p>www.kemendikdasmen.go.id</p>
-                            <p>081364642333 | 177</p>
+                        <div className="letterhead" style={{ display: 'flex', alignItems: 'center', marginBottom: '4mm' }}>
+                          <div style={{ flex: '0 0 auto' }}>
+                            <img src="/logo-bgtk.png" alt="Logo" style={{ height: '22mm', objectFit: 'contain' }} />
+                          </div>
+                          <div style={{ width: '1.5mm', backgroundColor: '#0077c0', height: '22mm', margin: '0 5mm' }}></div>
+                          <div className="letterhead-text" style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '1mm' }}>
+                            <h2 style={{ color: '#0077c0', margin: 0, fontSize: '15pt', fontWeight: 'bold' }}>Kementerian Pendidikan Dasar dan Menengah</h2>
+                            <h3 style={{ color: '#333', margin: 0, fontSize: '10pt', fontWeight: 'bold' }}>Balai Guru dan Tenaga Kependidikan Provinsi Sumatera Barat</h3>
+                            <p style={{ color: '#555', margin: 0, fontSize: '9pt' }}>Jalan Dewi Sartika, Rawang, Pariaman, 25511</p>
+                            <div style={{ color: '#555', fontSize: '9pt', display: 'flex', alignItems: 'center', gap: '2mm' }}>
+                              <span style={{ fontSize: '10pt' }}>🌐</span> www.kemendikdasmen.go.id
+                            </div>
+                            <div style={{ color: '#555', fontSize: '9pt', display: 'flex', alignItems: 'center', gap: '4mm' }}>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
+                                <span style={{ fontSize: '10pt' }}>📱</span> 081364642333
+                              </span>
+                              <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
+                                <span style={{ fontSize: '10pt' }}>🎧</span> 177
+                              </span>
+                            </div>
                           </div>
                         </div>
                         <div className="divider"></div>
