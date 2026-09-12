@@ -170,8 +170,8 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
       {/* Header Khusus Web (Disembunyikan saat print) */}
       <div className="no-print" style={{ background: '#1e40af', color: 'white', padding: '1.5rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
         <div>
-          <h1 style={{ margin: 0, fontSize: '1.5rem' }}>Portal Panitia: Laporan Analisis</h1>
-          <p style={{ margin: '0.5rem 0 0 0', opacity: 0.8 }}>Siap untuk dicetak sebagai bahan evaluasi kegiatan.</p>
+          <h1 style={{ margin: 0, fontSize: '1.5rem', background: 'none', WebkitTextFillColor: 'white' }}>Portal Panitia: Laporan Analisis</h1>
+          <p style={{ margin: '0.5rem 0 0 0', opacity: 0.8, color: 'white' }}>Siap untuk dicetak sebagai bahan evaluasi kegiatan.</p>
         </div>
         <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
           <button 
