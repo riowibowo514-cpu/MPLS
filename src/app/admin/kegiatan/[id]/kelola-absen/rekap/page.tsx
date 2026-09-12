@@ -14,6 +14,7 @@ export default function RekapAbsensiPage() {
   const [sesi, setSesi] = useState<any>(null);
   const [absensiList, setAbsensiList] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [ketua, setKetua] = useState({ nama: 'Arman, S. Pd., MM', nip: '197006301998031006' });
 
   useEffect(() => {
     if (kegiatanId && sesiId) fetchData();
@@ -50,7 +51,16 @@ export default function RekapAbsensiPage() {
   };
 
   const printRekap = () => {
-    window.print();
+    const nama = window.prompt("Masukkan Nama Ketua Pelaksana:", ketua.nama);
+    if (nama === null) return;
+    
+    const nip = window.prompt("Masukkan NIP Ketua Pelaksana:", ketua.nip);
+    if (nip === null) return;
+
+    setKetua({ nama, nip });
+    setTimeout(() => {
+      window.print();
+    }, 300);
   };
 
   const handleExportExcel = async () => {
@@ -377,8 +387,8 @@ export default function RekapAbsensiPage() {
                         <div style={{ textAlign: 'left', width: '60mm' }}>
                           <p style={{ margin: '0 0 5mm 0' }}>Padang, {sesi.tanggal}</p>
                           <p style={{ margin: '0 0 20mm 0' }}>Ketua Pelaksana,</p>
-                          <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>Arman, S. Pd., MM</p>
-                          <p style={{ margin: 0 }}>NIP 197006301998031006</p>
+                          <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{ketua.nama}</p>
+                          <p style={{ margin: 0 }}>NIP {ketua.nip}</p>
                         </div>
                       </div>
                     )}
