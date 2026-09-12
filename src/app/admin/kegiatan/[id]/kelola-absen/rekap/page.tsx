@@ -272,9 +272,15 @@ export default function RekapAbsensiPage() {
                     {isFirstPage && (
                       <>
                         <div className="letterhead" style={{ display: 'flex', alignItems: 'center', marginBottom: '4mm' }}>
-                          <div style={{ flex: '0 0 auto' }}>
-                            <img src="/logo-kemendikdasmen.png" alt="Logo Kemendikdasmen" style={{ height: '16mm', objectFit: 'contain' }} />
+                          {/* Logo Kiri (Tut Wuri + Teks) */}
+                          <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '2mm' }}>
+                            <img src="/tut-wuri.svg" alt="Tut Wuri Handayani" style={{ height: '18mm', objectFit: 'contain' }} />
+                            <div style={{ fontSize: '19pt', fontWeight: '900', fontFamily: 'Arial, Helvetica, sans-serif', letterSpacing: '-0.5px' }}>
+                              <span style={{ color: '#0077c0' }}>Kemen</span><span style={{ color: '#f4a41d' }}>dikdasmen</span>
+                            </div>
                           </div>
+                          
+                          {/* Garis Vertikal Pemisah */}
                           <div style={{ borderLeft: '1.5mm solid #0077c0', height: '18mm', margin: '0 5mm' }}></div>
                           <div className="letterhead-text" style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '1mm' }}>
                             <h2 style={{ color: '#0077c0', margin: 0, fontSize: '15pt', fontWeight: 'bold' }}>Kementerian Pendidikan Dasar dan Menengah</h2>
