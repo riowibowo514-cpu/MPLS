@@ -113,7 +113,8 @@ export default function RekapAbsensiPage() {
           .card { box-shadow: none !important; border: none !important; padding: 0 !important; margin: 0 !important; }
           
           /* Letterhead */
-          .letterhead { display: flex !important; }
+          .letterhead { display: flex !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+          .letterhead h2 { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
           .divider { border-bottom: 1pt solid black; margin-top: 2mm; margin-bottom: 4mm; }
           
           .print-title { text-align: center; font-weight: bold; font-size: 12pt; text-decoration: underline; margin-bottom: 4mm; }
@@ -272,9 +273,9 @@ export default function RekapAbsensiPage() {
                       <>
                         <div className="letterhead" style={{ display: 'flex', alignItems: 'center', marginBottom: '4mm' }}>
                           <div style={{ flex: '0 0 auto' }}>
-                            <img src="/logo-bgtk.png" alt="Logo" style={{ height: '22mm', objectFit: 'contain' }} />
+                            <img src="/logo-kemendikdasmen.png" alt="Logo Kemendikdasmen" style={{ height: '16mm', objectFit: 'contain' }} />
                           </div>
-                          <div style={{ width: '1.5mm', backgroundColor: '#0077c0', height: '22mm', margin: '0 5mm' }}></div>
+                          <div style={{ borderLeft: '1.5mm solid #0077c0', height: '18mm', margin: '0 5mm' }}></div>
                           <div className="letterhead-text" style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '1mm' }}>
                             <h2 style={{ color: '#0077c0', margin: 0, fontSize: '15pt', fontWeight: 'bold' }}>Kementerian Pendidikan Dasar dan Menengah</h2>
                             <h3 style={{ color: '#333', margin: 0, fontSize: '10pt', fontWeight: 'bold' }}>Balai Guru dan Tenaga Kependidikan Provinsi Sumatera Barat</h3>
