@@ -253,150 +253,118 @@ export default function RekapAbsensiPage() {
           {/* ==================================================== */}
           {/* TAMPILAN PRINT PDF (JSON SPECIFIC) */}
           {/* ==================================================== */}
-          <div className="print-only">
-            {(() => {
-              if (absensiList.length === 0) return <p>Tidak ada data.</p>;
-
-              const FIRST_PAGE_ROWS = 13;
-              const NEXT_PAGE_ROWS = 17;
-              
-              const pages = [];
-              let currentIdx = 0;
-              
-              if (absensiList.length > 0) {
-                pages.push(absensiList.slice(currentIdx, currentIdx + FIRST_PAGE_ROWS));
-                currentIdx += FIRST_PAGE_ROWS;
-              }
-              while (currentIdx < absensiList.length) {
-                pages.push(absensiList.slice(currentIdx, currentIdx + NEXT_PAGE_ROWS));
-                currentIdx += NEXT_PAGE_ROWS;
-              }
-
-              return pages.map((pageRows, pageIdx) => {
-                const isFirstPage = pageIdx === 0;
-                let startNo = isFirstPage ? 1 : FIRST_PAGE_ROWS + (pageIdx - 1) * NEXT_PAGE_ROWS + 1;
-
-                return (
-                  <div key={pageIdx} className={isFirstPage ? '' : 'page-break'} style={{ width: '170mm', margin: '0 auto' }}>
-                    
-                    {isFirstPage && (
-                      <>
-                        <div className="letterhead" style={{ display: 'flex', alignItems: 'center', marginBottom: '4mm' }}>
-                          {/* Logo Kiri (Tut Wuri + Teks) */}
-                          <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '2mm' }}>
-                            <img src="/tut-wuri.svg" alt="Tut Wuri Handayani" style={{ height: '18mm', objectFit: 'contain' }} />
-                            <div style={{ fontSize: '19pt', fontWeight: '900', fontFamily: 'Arial, Helvetica, sans-serif', letterSpacing: '-0.5px' }}>
-                              <span style={{ color: '#0077c0' }}>Kemen</span><span style={{ color: '#f4a41d' }}>dikdasmen</span>
-                            </div>
-                          </div>
-                          
-                          {/* Garis Vertikal Pemisah */}
-                          <div style={{ borderLeft: '1.5mm solid #0077c0', height: '18mm', margin: '0 5mm' }}></div>
-                          <div className="letterhead-text" style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '1mm' }}>
-                            <h2 style={{ color: '#0077c0', margin: 0, fontSize: '15pt', fontWeight: 'bold' }}>Kementerian Pendidikan Dasar dan Menengah</h2>
-                            <h3 style={{ color: '#333', margin: 0, fontSize: '10pt', fontWeight: 'bold' }}>Balai Guru dan Tenaga Kependidikan Provinsi Sumatera Barat</h3>
-                            <p style={{ color: '#555', margin: 0, fontSize: '9pt' }}>Jalan Dewi Sartika, Rawang, Pariaman, 25511</p>
-                            <div style={{ color: '#555', fontSize: '9pt', display: 'flex', alignItems: 'center', gap: '2mm' }}>
-                              <span style={{ fontSize: '10pt' }}>🌐</span> www.kemendikdasmen.go.id
-                            </div>
-                            <div style={{ color: '#555', fontSize: '9pt', display: 'flex', alignItems: 'center', gap: '4mm' }}>
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
-                                <span style={{ fontSize: '10pt' }}>📱</span> 081364642333
-                              </span>
-                              <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
-                                <span style={{ fontSize: '10pt' }}>🎧</span> 177
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-                        <div className="divider"></div>
-
-                        <div className="print-title">DAFTAR HADIR PESERTA</div>
-
-                        <table className="print-meta">
-                          <tbody>
-                            <tr>
-                              <td>Nama Kegiatan</td>
-                              <td>: {sesi.kegiatan.nama_kegiatan}</td>
-                            </tr>
-                            <tr>
-                              <td>Hari/Tanggal</td>
-                              <td>: {sesi.tanggal}</td>
-                            </tr>
-                            <tr>
-                              <td>Lokasi Kegiatan</td>
-                              <td>: {sesi.nama_sesi}</td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </>
-                    )}
-
-                    <table className="print-table">
-                      <thead>
-                        <tr>
-                          <th className="col-no">NO</th>
-                          <th className="col-nama">NAMA LENGKAP</th>
-                          <th className="col-instansi">INSTANSI</th>
-                          <th className="col-kab">KAB/KOTA</th>
-                          <th className="col-ttd" colSpan={2}>TANDA TANGAN</th>
-                        </tr>
-                        {isFirstPage && (
-                          <tr>
-                            <td colSpan={6} className="row-sesi">{sesi.nama_sesi}</td>
-                          </tr>
-                        )}
-                      </thead>
-                      <tbody>
-                        {pageRows.map((absen, rowIdx) => {
-                          const currentNo = startNo + rowIdx;
-                          const isOdd = currentNo % 2 !== 0;
-
-                          return (
-                            <tr key={absen.id}>
-                              <td className="col-no">{currentNo}</td>
-                              <td className="col-nama">{absen.nama_snapshot}</td>
-                              <td className="col-instansi">{absen.peserta?.instansi_asal || '-'}</td>
-                              <td className="col-kab">{absen.peserta?.kab_kota || '-'}</td>
-                              
-                              {isOdd ? (
-                                <>
-                                  <td className="col-ttd ttd-cell">
-                                    <span className="ttd-num">{currentNo}</span>
-                                    {absen.ttd_digital && <img className="ttd-img" src={absen.ttd_digital} alt="TTD" />}
-                                  </td>
-                                  <td className="col-ttd ttd-cell"></td>
-                                </>
-                              ) : (
-                                <>
-                                  <td className="col-ttd ttd-cell"></td>
-                                  <td className="col-ttd ttd-cell">
-                                    <span className="ttd-num">{currentNo}</span>
-                                    {absen.ttd_digital && <img className="ttd-img" src={absen.ttd_digital} alt="TTD" />}
-                                  </td>
-                                </>
-                              )}
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-
-                    {pageIdx === pages.length - 1 && (
-                      <div style={{ marginTop: '8mm', display: 'flex', justifyContent: 'flex-end' }}>
-                        <div style={{ textAlign: 'left', width: '60mm' }}>
-                          <p style={{ margin: '0 0 5mm 0' }}>Padang, {sesi.tanggal}</p>
-                          <p style={{ margin: '0 0 20mm 0' }}>Ketua Pelaksana,</p>
-                          <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{ketua.nama}</p>
-                          <p style={{ margin: 0 }}>{ketua.nip ? `NIP ${ketua.nip}` : '\u00A0'}</p>
-                        </div>
-                      </div>
-                    )}
-
+          <div className="print-only" style={{ width: '170mm', margin: '0 auto' }}>
+            {absensiList.length === 0 ? (
+              <p>Tidak ada data.</p>
+            ) : (
+              <>
+                <div className="letterhead" style={{ display: 'flex', alignItems: 'center', marginBottom: '4mm' }}>
+                  {/* Logo Kiri (Tut Wuri + Teks) */}
+                  <div style={{ flex: '0 0 auto', display: 'flex', alignItems: 'center', gap: '2mm' }}>
+                    <img src="/tut-wuri.svg" alt="Tut Wuri Handayani" style={{ height: '18mm', objectFit: 'contain' }} />
+                    <div style={{ fontSize: '19pt', fontWeight: '900', fontFamily: 'Arial, Helvetica, sans-serif', letterSpacing: '-0.5px' }}>
+                      <span style={{ color: '#0077c0' }}>Kemen</span><span style={{ color: '#f4a41d' }}>dikdasmen</span>
+                    </div>
                   </div>
-                );
-              });
-            })()}
+                  
+                  {/* Garis Vertikal Pemisah */}
+                  <div style={{ borderLeft: '1.5mm solid #0077c0', height: '18mm', margin: '0 5mm' }}></div>
+                  <div className="letterhead-text" style={{ flex: '1', display: 'flex', flexDirection: 'column', gap: '1mm' }}>
+                    <h2 style={{ color: '#0077c0', margin: 0, fontSize: '15pt', fontWeight: 'bold' }}>Kementerian Pendidikan Dasar dan Menengah</h2>
+                    <h3 style={{ color: '#333', margin: 0, fontSize: '10pt', fontWeight: 'bold' }}>Balai Guru dan Tenaga Kependidikan Provinsi Sumatera Barat</h3>
+                    <p style={{ color: '#555', margin: 0, fontSize: '9pt' }}>Jalan Dewi Sartika, Rawang, Pariaman, 25511</p>
+                    <div style={{ color: '#555', fontSize: '9pt', display: 'flex', alignItems: 'center', gap: '2mm' }}>
+                      <span style={{ fontSize: '10pt' }}>🌐</span> www.kemendikdasmen.go.id
+                    </div>
+                    <div style={{ color: '#555', fontSize: '9pt', display: 'flex', alignItems: 'center', gap: '4mm' }}>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
+                        <span style={{ fontSize: '10pt' }}>📱</span> 081364642333
+                      </span>
+                      <span style={{ display: 'flex', alignItems: 'center', gap: '1mm' }}>
+                        <span style={{ fontSize: '10pt' }}>🎧</span> 177
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <div className="divider"></div>
+
+                <div className="print-title">DAFTAR HADIR PESERTA</div>
+
+                <table className="print-meta">
+                  <tbody>
+                    <tr>
+                      <td>Nama Kegiatan</td>
+                      <td>: {sesi.kegiatan.nama_kegiatan}</td>
+                    </tr>
+                    <tr>
+                      <td>Hari/Tanggal</td>
+                      <td>: {sesi.tanggal}</td>
+                    </tr>
+                    <tr>
+                      <td>Lokasi Kegiatan</td>
+                      <td>: {sesi.nama_sesi}</td>
+                    </tr>
+                  </tbody>
+                </table>
+
+                <table className="print-table">
+                  <thead>
+                    <tr>
+                      <th className="col-no">NO</th>
+                      <th className="col-nama">NAMA LENGKAP</th>
+                      <th className="col-instansi">INSTANSI</th>
+                      <th className="col-kab">KAB/KOTA</th>
+                      <th className="col-ttd" colSpan={2}>TANDA TANGAN</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td colSpan={6} className="row-sesi">{sesi.nama_sesi}</td>
+                    </tr>
+                    {absensiList.map((absen, idx) => {
+                      const currentNo = idx + 1;
+                      const isOdd = currentNo % 2 !== 0;
+
+                      return (
+                        <tr key={absen.id} style={{ pageBreakInside: 'avoid' }}>
+                          <td className="col-no">{currentNo}</td>
+                          <td className="col-nama">{absen.nama_snapshot}</td>
+                          <td className="col-instansi">{absen.peserta?.instansi_asal || '-'}</td>
+                          <td className="col-kab">{absen.peserta?.kab_kota || '-'}</td>
+                          
+                          {isOdd ? (
+                            <>
+                              <td className="col-ttd ttd-cell" style={{ borderRight: 'none' }}>
+                                <span className="ttd-num">{currentNo}</span>
+                                {absen.ttd_digital && <img className="ttd-img" src={absen.ttd_digital} alt="TTD" />}
+                              </td>
+                              <td className="col-ttd ttd-cell" style={{ borderLeft: 'none' }}></td>
+                            </>
+                          ) : (
+                            <>
+                              <td className="col-ttd ttd-cell" style={{ borderRight: 'none' }}></td>
+                              <td className="col-ttd ttd-cell" style={{ borderLeft: 'none' }}>
+                                <span className="ttd-num">{currentNo}</span>
+                                {absen.ttd_digital && <img className="ttd-img" src={absen.ttd_digital} alt="TTD" />}
+                              </td>
+                            </>
+                          )}
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                <div style={{ marginTop: '8mm', display: 'flex', justifyContent: 'flex-end', pageBreakInside: 'avoid' }}>
+                  <div style={{ textAlign: 'left', width: '60mm' }}>
+                    <p style={{ margin: '0 0 5mm 0' }}>Padang, {sesi.tanggal}</p>
+                    <p style={{ margin: '0 0 20mm 0' }}>Ketua Pelaksana,</p>
+                    <p style={{ margin: 0, fontWeight: 'bold', textDecoration: 'underline' }}>{ketua.nama}</p>
+                    <p style={{ margin: 0 }}>{ketua.nip ? `NIP ${ketua.nip}` : '\u00A0'}</p>
+                  </div>
+                </div>
+              </>
+            )}
           </div>
 
         </div>
