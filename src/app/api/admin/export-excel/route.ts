@@ -68,20 +68,38 @@ export async function GET(req: NextRequest) {
     let jawabanMap: Record<string, any[]> = {}; // pengisian_id -> list of jawaban
 
     if (pengisianIds.length > 0) {
-      // Ambil dalam pecahan (chunk) 30 ID untuk menghindari batas URL 16KB dan batas limit 1000 baris Supabase
+      // Ambil dalam pecahan (chunk) 30 ID untuk menghindari batas URL 16KB
+      // Lakukan paginasi juga pada jawaban untuk menghindari batas 1000 baris Supabase
       const chunkSize = 30;
       for (let i = 0; i < pengisianIds.length; i += chunkSize) {
         const chunkIds = pengisianIds.slice(i, i + chunkSize);
-        const { data: chunkJawaban } = await supabase
-          .from('jawaban')
-          .select('*')
-          .in('pengisian_id', chunkIds);
-          
-        if (chunkJawaban) {
-          chunkJawaban.forEach(j => {
-            if (!jawabanMap[j.pengisian_id]) jawabanMap[j.pengisian_id] = [];
-            jawabanMap[j.pengisian_id].push(j);
-          });
+        
+        let jFetchMore = true;
+        let jOffset = 0;
+        const jLimit = 1000;
+        
+        while (jFetchMore) {
+          const { data: chunkJawaban, error } = await supabase
+            .from('jawaban')
+            .select('*')
+            .in('pengisian_id', chunkIds)
+            .range(jOffset, jOffset + jLimit - 1);
+            
+          if (error) throw error;
+            
+          if (chunkJawaban && chunkJawaban.length > 0) {
+            chunkJawaban.forEach(j => {
+              if (!jawabanMap[j.pengisian_id]) jawabanMap[j.pengisian_id] = [];
+              jawabanMap[j.pengisian_id].push(j);
+            });
+            if (chunkJawaban.length < jLimit) {
+              jFetchMore = false;
+            } else {
+              jOffset += jLimit;
+            }
+          } else {
+            jFetchMore = false;
+          }
         }
       }
     }

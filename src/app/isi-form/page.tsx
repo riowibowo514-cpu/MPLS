@@ -7,6 +7,9 @@ import { INSTRUMEN_BARU, calculateStatus, getItemsForJenjang, StatusResult } fro
 export default function FormPage() {
   const router = useRouter();
   const [step, setStep] = useState(1);
+  const [sessionId] = useState(() => 
+    typeof crypto !== 'undefined' && crypto.randomUUID ? crypto.randomUUID() : Math.random().toString(36).substring(2) + Date.now().toString(36)
+  );
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState('');
@@ -99,6 +102,23 @@ export default function FormPage() {
       }
     }
     setError('');
+    
+    // Log identitas setelah sukses step 1
+    if (step === 1) {
+      fetch('/api/log-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          namaPetugas: identitas.namaPetugas,
+          namaSekolah: identitas.namaSekolah,
+          jenjang: identitas.jenjang,
+          kabKota: identitas.kabKota,
+          status: 'draft'
+        })
+      }).catch(err => console.error('Gagal mencatat log:', err));
+    }
+
     setStep(prev => prev + 1);
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -167,9 +187,30 @@ export default function FormPage() {
 
       setIsSuccess(true);
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      // Log success
+      fetch('/api/log-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          status: 'submitted'
+        })
+      }).catch(e => console.error('Gagal mencatat log success:', e));
     } catch (err: any) {
       setError(err.message || 'Gagal menyimpan data');
       setIsSubmitting(false);
+
+      // Log error
+      fetch('/api/log-access', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          sessionId,
+          status: 'error',
+          errorMessage: err.message || 'Gagal menyimpan data'
+        })
+      }).catch(e => console.error('Gagal mencatat log error:', e));
     }
   };
 

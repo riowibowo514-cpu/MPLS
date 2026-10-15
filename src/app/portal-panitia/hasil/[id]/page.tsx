@@ -84,13 +84,37 @@ export default function LaporanAnalisisPanitia({ params }: { params: Promise<{ i
       if (pengisian && pengisian.length > 0) {
         const pengisianIds = pengisian.map(p => p.id);
         
-        // 4. Ambil semua jawaban untuk pengisian tersebut
-        const { data: jawaban, error: jErr } = await supabase
-          .from('jawaban')
-          .select('*')
-          .in('pengisian_id', pengisianIds);
+        // 4. Ambil semua jawaban untuk pengisian tersebut dengan chunk & pagination
+        let jawaban: any[] = [];
+        const chunkSize = 30;
+        for (let i = 0; i < pengisianIds.length; i += chunkSize) {
+          const chunkIds = pengisianIds.slice(i, i + chunkSize);
           
-        if (jErr) throw jErr;
+          let jFetchMore = true;
+          let jOffset = 0;
+          const jLimit = 1000;
+          
+          while (jFetchMore) {
+            const { data: chunkJawaban, error: jErr } = await supabase
+              .from('jawaban')
+              .select('*')
+              .in('pengisian_id', chunkIds)
+              .range(jOffset, jOffset + jLimit - 1);
+              
+            if (jErr) throw jErr;
+            
+            if (chunkJawaban && chunkJawaban.length > 0) {
+              jawaban = [...jawaban, ...chunkJawaban];
+              if (chunkJawaban.length < jLimit) {
+                jFetchMore = false;
+              } else {
+                jOffset += jLimit;
+              }
+            } else {
+              jFetchMore = false;
+            }
+          }
+        }
         
         // --- PROSES AGREGASI ---
         const rataRata: Record<string, { total_skor: number, count: number }> = {};
